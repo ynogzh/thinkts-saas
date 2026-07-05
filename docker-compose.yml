@@ -1,0 +1,59 @@
+# ── thinkts-saas ──
+# SQLite (default, zero config):
+#   docker compose up -d
+#
+# MySQL (production):
+#   docker compose --profile mysql up -d
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8360:8360"
+    environment:
+      - NODE_ENV=production
+      - DB_TYPE=sqlite
+      - DB_PATH=/data/thinkts.db
+    volumes:
+      - sqlite_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8360/admin/api/menus"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile.admin
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── MySQL (optional, for production) ──
+  mysql:
+    image: mysql:8
+    profiles: [mysql]
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-thinkts}
+      MYSQL_DATABASE: thinkts_saas
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  sqlite_data:
+  mysql_data:

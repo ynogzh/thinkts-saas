@@ -1,0 +1,43 @@
+# ── thinkts-saas backend ──
+FROM oven/bun:1 AS base
+
+WORKDIR /app
+
+# Copy monorepo root workspace config
+COPY package.json bun.lockb ./
+COPY packages/thinkts/package.json packages/thinkts/
+COPY packages/tenant/package.json packages/tenant/
+COPY packages/identity/package.json packages/identity/
+COPY packages/permission/package.json packages/permission/
+COPY packages/trade/package.json packages/trade/
+COPY packages/payment/package.json packages/payment/
+COPY packages/promote/package.json packages/promote/
+COPY packages/cms/package.json packages/cms/
+COPY apps/iotbiz/package.json apps/iotbiz/
+
+# Install dependencies (workspace protocol)
+RUN bun install --frozen-lockfile
+
+# Copy source code
+COPY packages/thinkts/src packages/thinkts/src/
+COPY packages/thinkts/index.ts packages/thinkts/
+COPY packages/tenant/ packages/tenant/
+COPY packages/identity/ packages/identity/
+COPY packages/permission/ packages/permission/
+COPY packages/trade/ packages/trade/
+COPY packages/payment/ packages/payment/
+COPY packages/promote/ packages/promote/
+COPY packages/cms/ packages/cms/
+COPY apps/iotbiz/ apps/iotbiz/
+
+# Create data directory for SQLite
+RUN mkdir -p /data
+
+ENV NODE_ENV=production
+ENV DB_TYPE=sqlite
+ENV DB_PATH=/data/thinkts.db
+ENV PORT=8360
+
+EXPOSE 8360
+
+CMD ["bun", "apps/iotbiz/entry.ts"]
