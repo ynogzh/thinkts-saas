@@ -30,3 +30,5 @@ thinkts-saas/
 
 - thinkts 和 thinkts-cli 服务于 thinkts-saas，可以改
 - 插件 SaaS 通用。业务特定逻辑放在 `apps/xxx/src/` 里
+
+后台基于 [shadcn-admin-2.2.0](https://github.com/shadcn-admin/shadcn-admin)，实现功能前先搜索现有组件，再利用组件实现。
