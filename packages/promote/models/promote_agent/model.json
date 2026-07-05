@@ -1,0 +1,109 @@
+{
+  "name": "promote_agent",
+  "table": "promote_agent",
+  "comment": "promote_agent",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "Id",
+      "required": true,
+      "primary": true,
+      "autoIncrement": true,
+      "index": true
+    },
+    {
+      "name": "tenant_id",
+      "type": "bigInteger",
+      "label": "Tenant id",
+      "required": true,
+      "index": true
+    },
+    {
+      "name": "user_id",
+      "type": "bigInteger",
+      "label": "User id",
+      "required": true
+    },
+    {
+      "name": "agent_no",
+      "type": "string",
+      "label": "Agent no",
+      "length": 64,
+      "required": true
+    },
+    {
+      "name": "level_id",
+      "type": "bigInteger",
+      "label": "Level id",
+      "required": true
+    },
+    {
+      "name": "parent_agent_id",
+      "type": "bigInteger",
+      "label": "Parent agent id",
+      "nullable": true
+    },
+    {
+      "name": "channel_id",
+      "type": "bigInteger",
+      "label": "Channel id",
+      "nullable": true
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "label": "Status",
+      "length": 32,
+      "default": "enabled"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "required": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp",
+      "label": "Updated at",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "name": "uk_tenant_user",
+      "columns": [
+        "tenant_id",
+        "user_id"
+      ],
+      "unique": true
+    },
+    {
+      "name": "uk_tenant_no",
+      "columns": [
+        "tenant_id",
+        "agent_no"
+      ],
+      "unique": true
+    },
+    {
+      "name": "idx_tenant_parent",
+      "columns": [
+        "tenant_id",
+        "parent_agent_id"
+      ],
+      "unique": false
+    }
+  ],
+  "option": {
+    "timestamps": true,
+    "softDeletes": false
+  },
+  "dataResource": {
+    "resourceCode": "promote_agent",
+    "tenantField": "tenant_id",
+    "ownerField": "user_id"
+  }
+}

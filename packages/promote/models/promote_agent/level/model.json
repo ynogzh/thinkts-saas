@@ -1,0 +1,82 @@
+{
+  "name": "promote_agent_level",
+  "table": "promote_agent_level",
+  "comment": "promote_agent_level",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "Id",
+      "required": true,
+      "primary": true,
+      "autoIncrement": true,
+      "index": true
+    },
+    {
+      "name": "tenant_id",
+      "type": "bigInteger",
+      "label": "Tenant id",
+      "required": true,
+      "index": true
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "label": "Name",
+      "length": 100,
+      "required": true
+    },
+    {
+      "name": "level",
+      "type": "integer",
+      "label": "Level",
+      "required": true
+    },
+    {
+      "name": "commission_rate",
+      "type": "decimal",
+      "label": "Commission rate",
+      "precision": 6,
+      "scale": 4,
+      "required": true
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "label": "Status",
+      "length": 32,
+      "default": "enabled"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "required": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp",
+      "label": "Updated at",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "name": "uk_tenant_level",
+      "columns": [
+        "tenant_id",
+        "level"
+      ],
+      "unique": true
+    }
+  ],
+  "option": {
+    "timestamps": true,
+    "softDeletes": false
+  },
+  "dataResource": {
+    "resourceCode": "promote_agent_level",
+    "tenantField": "tenant_id"
+  }
+}

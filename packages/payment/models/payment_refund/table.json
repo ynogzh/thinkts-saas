@@ -1,0 +1,187 @@
+{
+  "title": "退款单",
+  "model": "payment_refund",
+  "list": {
+    "columns": [
+      {
+        "field": "tenant_id",
+        "title": "Tenant id",
+        "width": 80
+      },
+      {
+        "field": "refund_no",
+        "title": "Refund no",
+        "width": 160
+      },
+      {
+        "field": "payment_order_id",
+        "title": "Payment order id",
+        "width": 80
+      },
+      {
+        "field": "amount",
+        "title": "Amount",
+        "width": 160
+      },
+      {
+        "field": "reason",
+        "title": "Reason",
+        "width": 160
+      },
+      {
+        "field": "status",
+        "title": "Status",
+        "width": 160
+      },
+      {
+        "field": "third_refund_no",
+        "title": "Third refund no",
+        "width": 160
+      },
+      {
+        "field": "id",
+        "title": "Id",
+        "width": 80
+      }
+    ],
+    "orderBy": {
+      "field": "id",
+      "direction": "desc"
+    },
+    "pageSize": 20,
+    "rowActions": [
+      {
+        "type": "view",
+        "title": "查看"
+      },
+      {
+        "type": "edit",
+        "title": "编辑"
+      },
+      {
+        "type": "delete",
+        "title": "删除",
+        "confirm": "确认删除？"
+      }
+    ],
+    "headerActions": [
+      {
+        "type": "create",
+        "title": "新增Payment refund",
+        "icon": "plus"
+      }
+    ]
+  },
+  "search": {
+    "fields": [
+      {
+        "field": "tenant_id",
+        "title": "Tenant id",
+        "type": "numberRange"
+      },
+      {
+        "field": "refund_no",
+        "title": "Refund no",
+        "type": "input"
+      },
+      {
+        "field": "payment_order_id",
+        "title": "Payment order id",
+        "type": "numberRange"
+      },
+      {
+        "field": "amount",
+        "title": "Amount",
+        "type": "numberRange"
+      }
+    ],
+    "showCount": 3
+  },
+  "form": {
+    "groups": [
+      {
+        "title": "基本信息",
+        "columns": 2,
+        "fields": [
+          {
+            "field": "tenant_id",
+            "title": "Tenant id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "refund_no",
+            "title": "Refund no",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "payment_order_id",
+            "title": "Payment order id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "amount",
+            "title": "Amount",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "reason",
+            "title": "Reason",
+            "type": "input"
+          },
+          {
+            "field": "status",
+            "title": "Status",
+            "type": "input"
+          },
+          {
+            "field": "third_refund_no",
+            "title": "Third refund no",
+            "type": "input"
+          }
+        ]
+      }
+    ],
+    "modes": {
+      "create": {
+        "fields": [
+          "tenant_id",
+          "refund_no",
+          "payment_order_id",
+          "amount",
+          "reason",
+          "status",
+          "third_refund_no"
+        ]
+      },
+      "edit": {
+        "fields": [
+          "tenant_id",
+          "refund_no",
+          "payment_order_id",
+          "amount",
+          "reason",
+          "status",
+          "third_refund_no"
+        ]
+      },
+      "view": {
+        "fields": [
+          "id",
+          "tenant_id",
+          "refund_no",
+          "payment_order_id",
+          "amount",
+          "reason",
+          "status",
+          "third_refund_no",
+          "created_at",
+          "updated_at"
+        ]
+      }
+    }
+  }
+}

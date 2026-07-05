@@ -1,0 +1,123 @@
+{
+  "name": "payment_order",
+  "table": "payment_order",
+  "comment": "payment_order",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "Id",
+      "required": true,
+      "primary": true,
+      "autoIncrement": true,
+      "index": true
+    },
+    {
+      "name": "tenant_id",
+      "type": "bigInteger",
+      "label": "Tenant id",
+      "required": true,
+      "index": true
+    },
+    {
+      "name": "pay_no",
+      "type": "string",
+      "label": "Pay no",
+      "length": 64,
+      "required": true
+    },
+    {
+      "name": "trade_order_id",
+      "type": "bigInteger",
+      "label": "Trade order id",
+      "required": true
+    },
+    {
+      "name": "biz_type",
+      "type": "string",
+      "label": "Biz type",
+      "length": 64,
+      "required": true
+    },
+    {
+      "name": "biz_id",
+      "type": "bigInteger",
+      "label": "Biz id",
+      "required": true
+    },
+    {
+      "name": "amount",
+      "type": "decimal",
+      "label": "Amount",
+      "precision": 12,
+      "scale": 2,
+      "required": true
+    },
+    {
+      "name": "channel_code",
+      "type": "string",
+      "label": "Channel code",
+      "length": 64,
+      "required": true
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "label": "Status",
+      "length": 32,
+      "default": "created"
+    },
+    {
+      "name": "third_trade_no",
+      "type": "string",
+      "label": "Third trade no",
+      "length": 128,
+      "nullable": true
+    },
+    {
+      "name": "paid_at",
+      "type": "timestamp",
+      "label": "Paid at",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "required": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp",
+      "label": "Updated at",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "name": "uk_tenant_pay_no",
+      "columns": [
+        "tenant_id",
+        "pay_no"
+      ],
+      "unique": true
+    },
+    {
+      "name": "idx_tenant_trade",
+      "columns": [
+        "tenant_id",
+        "trade_order_id"
+      ],
+      "unique": false
+    }
+  ],
+  "option": {
+    "timestamps": true,
+    "softDeletes": false
+  },
+  "dataResource": {
+    "resourceCode": "payment_order",
+    "tenantField": "tenant_id"
+  }
+}

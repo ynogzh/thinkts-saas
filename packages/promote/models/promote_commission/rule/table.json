@@ -1,0 +1,182 @@
+{
+  "title": "佣金规则",
+  "model": "promote_commission_rule",
+  "list": {
+    "columns": [
+      {
+        "field": "biz_type",
+        "title": "Biz type",
+        "width": 100,
+        "render": "tag"
+      },
+      {
+        "field": "tenant_id",
+        "title": "Tenant id",
+        "width": 80
+      },
+      {
+        "field": "level_id",
+        "title": "Level id",
+        "width": 80
+      },
+      {
+        "field": "rate",
+        "title": "Rate",
+        "width": 160
+      },
+      {
+        "field": "status",
+        "title": "Status",
+        "width": 160
+      },
+      {
+        "field": "condition_json",
+        "title": "Condition json",
+        "width": 160
+      },
+      {
+        "field": "id",
+        "title": "Id",
+        "width": 80
+      },
+      {
+        "field": "created_at",
+        "title": "Created at",
+        "width": 160,
+        "render": "datetime"
+      }
+    ],
+    "orderBy": {
+      "field": "id",
+      "direction": "desc"
+    },
+    "pageSize": 20,
+    "rowActions": [
+      {
+        "type": "view",
+        "title": "查看"
+      },
+      {
+        "type": "edit",
+        "title": "编辑"
+      },
+      {
+        "type": "delete",
+        "title": "删除",
+        "confirm": "确认删除？"
+      }
+    ],
+    "headerActions": [
+      {
+        "type": "create",
+        "title": "新增Promote commission rule",
+        "icon": "plus"
+      }
+    ]
+  },
+  "search": {
+    "fields": [
+      {
+        "field": "biz_type",
+        "title": "Biz type",
+        "type": "select"
+      },
+      {
+        "field": "tenant_id",
+        "title": "Tenant id",
+        "type": "numberRange"
+      },
+      {
+        "field": "level_id",
+        "title": "Level id",
+        "type": "numberRange"
+      },
+      {
+        "field": "rate",
+        "title": "Rate",
+        "type": "numberRange"
+      }
+    ],
+    "showCount": 3
+  },
+  "form": {
+    "groups": [
+      {
+        "title": "基本信息",
+        "columns": 2,
+        "fields": [
+          {
+            "field": "tenant_id",
+            "title": "Tenant id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "biz_type",
+            "title": "Biz type",
+            "type": "select",
+            "required": true
+          },
+          {
+            "field": "level_id",
+            "title": "Level id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "rate",
+            "title": "Rate",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "condition_json",
+            "title": "Condition json",
+            "type": "textarea",
+            "span": 2
+          },
+          {
+            "field": "status",
+            "title": "Status",
+            "type": "input"
+          }
+        ]
+      }
+    ],
+    "modes": {
+      "create": {
+        "fields": [
+          "tenant_id",
+          "biz_type",
+          "level_id",
+          "rate",
+          "condition_json",
+          "status"
+        ]
+      },
+      "edit": {
+        "fields": [
+          "tenant_id",
+          "biz_type",
+          "level_id",
+          "rate",
+          "condition_json",
+          "status"
+        ]
+      },
+      "view": {
+        "fields": [
+          "id",
+          "tenant_id",
+          "biz_type",
+          "level_id",
+          "rate",
+          "condition_json",
+          "status",
+          "created_at",
+          "updated_at"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,187 @@
+{
+  "title": "代理",
+  "model": "promote_agent",
+  "list": {
+    "columns": [
+      {
+        "field": "tenant_id",
+        "title": "Tenant id",
+        "width": 80
+      },
+      {
+        "field": "user_id",
+        "title": "User id",
+        "width": 80
+      },
+      {
+        "field": "agent_no",
+        "title": "Agent no",
+        "width": 160
+      },
+      {
+        "field": "level_id",
+        "title": "Level id",
+        "width": 80
+      },
+      {
+        "field": "parent_agent_id",
+        "title": "Parent agent id",
+        "width": 80
+      },
+      {
+        "field": "channel_id",
+        "title": "Channel id",
+        "width": 80
+      },
+      {
+        "field": "status",
+        "title": "Status",
+        "width": 160
+      },
+      {
+        "field": "id",
+        "title": "Id",
+        "width": 80
+      }
+    ],
+    "orderBy": {
+      "field": "id",
+      "direction": "desc"
+    },
+    "pageSize": 20,
+    "rowActions": [
+      {
+        "type": "view",
+        "title": "查看"
+      },
+      {
+        "type": "edit",
+        "title": "编辑"
+      },
+      {
+        "type": "delete",
+        "title": "删除",
+        "confirm": "确认删除？"
+      }
+    ],
+    "headerActions": [
+      {
+        "type": "create",
+        "title": "新增Promote agent",
+        "icon": "plus"
+      }
+    ]
+  },
+  "search": {
+    "fields": [
+      {
+        "field": "tenant_id",
+        "title": "Tenant id",
+        "type": "numberRange"
+      },
+      {
+        "field": "user_id",
+        "title": "User id",
+        "type": "numberRange"
+      },
+      {
+        "field": "agent_no",
+        "title": "Agent no",
+        "type": "input"
+      },
+      {
+        "field": "level_id",
+        "title": "Level id",
+        "type": "numberRange"
+      }
+    ],
+    "showCount": 3
+  },
+  "form": {
+    "groups": [
+      {
+        "title": "基本信息",
+        "columns": 2,
+        "fields": [
+          {
+            "field": "tenant_id",
+            "title": "Tenant id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "user_id",
+            "title": "User id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "agent_no",
+            "title": "Agent no",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "level_id",
+            "title": "Level id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "parent_agent_id",
+            "title": "Parent agent id",
+            "type": "number"
+          },
+          {
+            "field": "channel_id",
+            "title": "Channel id",
+            "type": "number"
+          },
+          {
+            "field": "status",
+            "title": "Status",
+            "type": "input"
+          }
+        ]
+      }
+    ],
+    "modes": {
+      "create": {
+        "fields": [
+          "tenant_id",
+          "user_id",
+          "agent_no",
+          "level_id",
+          "parent_agent_id",
+          "channel_id",
+          "status"
+        ]
+      },
+      "edit": {
+        "fields": [
+          "tenant_id",
+          "user_id",
+          "agent_no",
+          "level_id",
+          "parent_agent_id",
+          "channel_id",
+          "status"
+        ]
+      },
+      "view": {
+        "fields": [
+          "id",
+          "tenant_id",
+          "user_id",
+          "agent_no",
+          "level_id",
+          "parent_agent_id",
+          "channel_id",
+          "status",
+          "created_at",
+          "updated_at"
+        ]
+      }
+    }
+  }
+}

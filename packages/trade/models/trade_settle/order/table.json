@@ -1,0 +1,200 @@
+{
+  "title": "结算单",
+  "model": "trade_settle_order",
+  "list": {
+    "columns": [
+      {
+        "field": "settle_type",
+        "title": "Settle type",
+        "width": 100,
+        "render": "tag"
+      },
+      {
+        "field": "receiver_type",
+        "title": "Receiver type",
+        "width": 100,
+        "render": "tag"
+      },
+      {
+        "field": "tenant_id",
+        "title": "Tenant id",
+        "width": 80
+      },
+      {
+        "field": "settle_no",
+        "title": "Settle no",
+        "width": 160
+      },
+      {
+        "field": "receiver_id",
+        "title": "Receiver id",
+        "width": 80
+      },
+      {
+        "field": "amount",
+        "title": "Amount",
+        "width": 160
+      },
+      {
+        "field": "status",
+        "title": "Status",
+        "width": 160
+      },
+      {
+        "field": "settled_at",
+        "title": "Settled at",
+        "width": 160,
+        "render": "datetime"
+      }
+    ],
+    "orderBy": {
+      "field": "id",
+      "direction": "desc"
+    },
+    "pageSize": 20,
+    "rowActions": [
+      {
+        "type": "view",
+        "title": "查看"
+      },
+      {
+        "type": "edit",
+        "title": "编辑"
+      },
+      {
+        "type": "delete",
+        "title": "删除",
+        "confirm": "确认删除？"
+      }
+    ],
+    "headerActions": [
+      {
+        "type": "create",
+        "title": "新增Trade settle order",
+        "icon": "plus"
+      }
+    ]
+  },
+  "search": {
+    "fields": [
+      {
+        "field": "settle_type",
+        "title": "Settle type",
+        "type": "select"
+      },
+      {
+        "field": "receiver_type",
+        "title": "Receiver type",
+        "type": "select"
+      },
+      {
+        "field": "settled_at",
+        "title": "Settled at",
+        "type": "daterange"
+      },
+      {
+        "field": "tenant_id",
+        "title": "Tenant id",
+        "type": "numberRange"
+      }
+    ],
+    "showCount": 3
+  },
+  "form": {
+    "groups": [
+      {
+        "title": "基本信息",
+        "columns": 2,
+        "fields": [
+          {
+            "field": "tenant_id",
+            "title": "Tenant id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "settle_no",
+            "title": "Settle no",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "settle_type",
+            "title": "Settle type",
+            "type": "select",
+            "required": true
+          },
+          {
+            "field": "receiver_type",
+            "title": "Receiver type",
+            "type": "select",
+            "required": true
+          },
+          {
+            "field": "receiver_id",
+            "title": "Receiver id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "amount",
+            "title": "Amount",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "status",
+            "title": "Status",
+            "type": "input"
+          },
+          {
+            "field": "settled_at",
+            "title": "Settled at",
+            "type": "datetime"
+          }
+        ]
+      }
+    ],
+    "modes": {
+      "create": {
+        "fields": [
+          "tenant_id",
+          "settle_no",
+          "settle_type",
+          "receiver_type",
+          "receiver_id",
+          "amount",
+          "status",
+          "settled_at"
+        ]
+      },
+      "edit": {
+        "fields": [
+          "tenant_id",
+          "settle_no",
+          "settle_type",
+          "receiver_type",
+          "receiver_id",
+          "amount",
+          "status",
+          "settled_at"
+        ]
+      },
+      "view": {
+        "fields": [
+          "id",
+          "tenant_id",
+          "settle_no",
+          "settle_type",
+          "receiver_type",
+          "receiver_id",
+          "amount",
+          "status",
+          "settled_at",
+          "created_at",
+          "updated_at"
+        ]
+      }
+    }
+  }
+}

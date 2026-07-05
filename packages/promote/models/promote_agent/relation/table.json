@@ -1,0 +1,153 @@
+{
+  "title": "代理关系闭包",
+  "model": "promote_agent_relation",
+  "list": {
+    "columns": [
+      {
+        "field": "tenant_id",
+        "title": "Tenant id",
+        "width": 80
+      },
+      {
+        "field": "ancestor_agent_id",
+        "title": "Ancestor agent id",
+        "width": 80
+      },
+      {
+        "field": "descendant_agent_id",
+        "title": "Descendant agent id",
+        "width": 80
+      },
+      {
+        "field": "depth",
+        "title": "Depth",
+        "width": 80
+      },
+      {
+        "field": "id",
+        "title": "Id",
+        "width": 80
+      },
+      {
+        "field": "created_at",
+        "title": "Created at",
+        "width": 160,
+        "render": "datetime"
+      }
+    ],
+    "orderBy": {
+      "field": "id",
+      "direction": "desc"
+    },
+    "pageSize": 20,
+    "rowActions": [
+      {
+        "type": "view",
+        "title": "查看"
+      },
+      {
+        "type": "edit",
+        "title": "编辑"
+      },
+      {
+        "type": "delete",
+        "title": "删除",
+        "confirm": "确认删除？"
+      }
+    ],
+    "headerActions": [
+      {
+        "type": "create",
+        "title": "新增Promote agent relation",
+        "icon": "plus"
+      }
+    ]
+  },
+  "search": {
+    "fields": [
+      {
+        "field": "tenant_id",
+        "title": "Tenant id",
+        "type": "numberRange"
+      },
+      {
+        "field": "ancestor_agent_id",
+        "title": "Ancestor agent id",
+        "type": "numberRange"
+      },
+      {
+        "field": "descendant_agent_id",
+        "title": "Descendant agent id",
+        "type": "numberRange"
+      },
+      {
+        "field": "depth",
+        "title": "Depth",
+        "type": "numberRange"
+      }
+    ],
+    "showCount": 3
+  },
+  "form": {
+    "groups": [
+      {
+        "title": "基本信息",
+        "columns": 2,
+        "fields": [
+          {
+            "field": "tenant_id",
+            "title": "Tenant id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "ancestor_agent_id",
+            "title": "Ancestor agent id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "descendant_agent_id",
+            "title": "Descendant agent id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "depth",
+            "title": "Depth",
+            "type": "number",
+            "required": true
+          }
+        ]
+      }
+    ],
+    "modes": {
+      "create": {
+        "fields": [
+          "tenant_id",
+          "ancestor_agent_id",
+          "descendant_agent_id",
+          "depth"
+        ]
+      },
+      "edit": {
+        "fields": [
+          "tenant_id",
+          "ancestor_agent_id",
+          "descendant_agent_id",
+          "depth"
+        ]
+      },
+      "view": {
+        "fields": [
+          "id",
+          "tenant_id",
+          "ancestor_agent_id",
+          "descendant_agent_id",
+          "depth",
+          "created_at"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "name": "promote_user_coupon",
+  "table": "promote_user_coupon",
+  "comment": "promote_user_coupon",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "Id",
+      "required": true,
+      "primary": true,
+      "autoIncrement": true,
+      "index": true
+    },
+    {
+      "name": "tenant_id",
+      "type": "bigInteger",
+      "label": "Tenant id",
+      "required": true,
+      "index": true
+    },
+    {
+      "name": "user_id",
+      "type": "bigInteger",
+      "label": "User id",
+      "required": true
+    },
+    {
+      "name": "template_id",
+      "type": "bigInteger",
+      "label": "Template id",
+      "required": true
+    },
+    {
+      "name": "coupon_no",
+      "type": "string",
+      "label": "Coupon no",
+      "length": 64,
+      "required": true
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "label": "Status",
+      "length": 32,
+      "default": "unused"
+    },
+    {
+      "name": "received_at",
+      "type": "timestamp",
+      "label": "Received at",
+      "required": true
+    },
+    {
+      "name": "valid_start_at",
+      "type": "timestamp",
+      "label": "Valid start at",
+      "required": true
+    },
+    {
+      "name": "valid_end_at",
+      "type": "timestamp",
+      "label": "Valid end at",
+      "required": true
+    },
+    {
+      "name": "locked_biz_type",
+      "type": "string",
+      "label": "Locked biz type",
+      "length": 64,
+      "nullable": true
+    },
+    {
+      "name": "locked_biz_id",
+      "type": "bigInteger",
+      "label": "Locked biz id",
+      "nullable": true
+    },
+    {
+      "name": "used_at",
+      "type": "timestamp",
+      "label": "Used at",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "required": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp",
+      "label": "Updated at",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "name": "uk_tenant_coupon_no",
+      "columns": [
+        "tenant_id",
+        "coupon_no"
+      ],
+      "unique": true
+    },
+    {
+      "name": "idx_tenant_user_status",
+      "columns": [
+        "tenant_id",
+        "user_id",
+        "status",
+        "valid_end_at"
+      ],
+      "unique": false
+    }
+  ],
+  "option": {
+    "timestamps": true,
+    "softDeletes": false
+  },
+  "dataResource": {
+    "resourceCode": "promote_user_coupon",
+    "tenantField": "tenant_id",
+    "ownerField": "user_id"
+  }
+}

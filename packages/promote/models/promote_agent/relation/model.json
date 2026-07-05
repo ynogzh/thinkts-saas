@@ -1,0 +1,75 @@
+{
+  "name": "promote_agent_relation",
+  "table": "promote_agent_relation",
+  "comment": "promote_agent_relation",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "Id",
+      "required": true,
+      "primary": true,
+      "autoIncrement": true,
+      "index": true
+    },
+    {
+      "name": "tenant_id",
+      "type": "bigInteger",
+      "label": "Tenant id",
+      "required": true,
+      "index": true
+    },
+    {
+      "name": "ancestor_agent_id",
+      "type": "bigInteger",
+      "label": "Ancestor agent id",
+      "required": true
+    },
+    {
+      "name": "descendant_agent_id",
+      "type": "bigInteger",
+      "label": "Descendant agent id",
+      "required": true
+    },
+    {
+      "name": "depth",
+      "type": "integer",
+      "label": "Depth",
+      "required": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "name": "uk_tenant_ancestor_descendant",
+      "columns": [
+        "tenant_id",
+        "ancestor_agent_id",
+        "descendant_agent_id"
+      ],
+      "unique": true
+    },
+    {
+      "name": "idx_tenant_descendant",
+      "columns": [
+        "tenant_id",
+        "descendant_agent_id"
+      ],
+      "unique": false
+    }
+  ],
+  "option": {
+    "timestamps": true,
+    "softDeletes": false
+  },
+  "dataResource": {
+    "resourceCode": "promote_agent_relation",
+    "tenantField": "tenant_id"
+  }
+}

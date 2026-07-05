@@ -1,0 +1,102 @@
+{
+  "name": "trade_settle_order",
+  "table": "trade_settle_order",
+  "comment": "trade_settle_order",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "Id",
+      "required": true,
+      "primary": true,
+      "autoIncrement": true,
+      "index": true
+    },
+    {
+      "name": "tenant_id",
+      "type": "bigInteger",
+      "label": "Tenant id",
+      "required": true,
+      "index": true
+    },
+    {
+      "name": "settle_no",
+      "type": "string",
+      "label": "Settle no",
+      "length": 64,
+      "required": true
+    },
+    {
+      "name": "settle_type",
+      "type": "string",
+      "label": "Settle type",
+      "length": 64,
+      "required": true
+    },
+    {
+      "name": "receiver_type",
+      "type": "string",
+      "label": "Receiver type",
+      "length": 64,
+      "required": true
+    },
+    {
+      "name": "receiver_id",
+      "type": "bigInteger",
+      "label": "Receiver id",
+      "required": true
+    },
+    {
+      "name": "amount",
+      "type": "decimal",
+      "label": "Amount",
+      "precision": 12,
+      "scale": 2,
+      "required": true
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "label": "Status",
+      "length": 32,
+      "default": "pending"
+    },
+    {
+      "name": "settled_at",
+      "type": "timestamp",
+      "label": "Settled at",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "required": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp",
+      "label": "Updated at",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "name": "uk_tenant_settle_no",
+      "columns": [
+        "tenant_id",
+        "settle_no"
+      ],
+      "unique": true
+    }
+  ],
+  "option": {
+    "timestamps": true,
+    "softDeletes": false
+  },
+  "dataResource": {
+    "resourceCode": "trade_settle_order",
+    "tenantField": "tenant_id"
+  }
+}

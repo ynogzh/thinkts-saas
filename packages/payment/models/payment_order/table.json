@@ -1,0 +1,215 @@
+{
+  "title": "支付单",
+  "model": "payment_order",
+  "list": {
+    "columns": [
+      {
+        "field": "biz_type",
+        "title": "Biz type",
+        "width": 100,
+        "render": "tag"
+      },
+      {
+        "field": "tenant_id",
+        "title": "Tenant id",
+        "width": 80
+      },
+      {
+        "field": "pay_no",
+        "title": "Pay no",
+        "width": 160
+      },
+      {
+        "field": "trade_order_id",
+        "title": "Trade order id",
+        "width": 80
+      },
+      {
+        "field": "biz_id",
+        "title": "Biz id",
+        "width": 80
+      },
+      {
+        "field": "amount",
+        "title": "Amount",
+        "width": 160
+      },
+      {
+        "field": "channel_code",
+        "title": "Channel code",
+        "width": 160
+      },
+      {
+        "field": "status",
+        "title": "Status",
+        "width": 160
+      }
+    ],
+    "orderBy": {
+      "field": "id",
+      "direction": "desc"
+    },
+    "pageSize": 20,
+    "rowActions": [
+      {
+        "type": "view",
+        "title": "查看"
+      },
+      {
+        "type": "edit",
+        "title": "编辑"
+      },
+      {
+        "type": "delete",
+        "title": "删除",
+        "confirm": "确认删除？"
+      }
+    ],
+    "headerActions": [
+      {
+        "type": "create",
+        "title": "新增Payment order",
+        "icon": "plus"
+      }
+    ]
+  },
+  "search": {
+    "fields": [
+      {
+        "field": "biz_type",
+        "title": "Biz type",
+        "type": "select"
+      },
+      {
+        "field": "paid_at",
+        "title": "Paid at",
+        "type": "daterange"
+      },
+      {
+        "field": "tenant_id",
+        "title": "Tenant id",
+        "type": "numberRange"
+      },
+      {
+        "field": "pay_no",
+        "title": "Pay no",
+        "type": "input"
+      }
+    ],
+    "showCount": 3
+  },
+  "form": {
+    "groups": [
+      {
+        "title": "基本信息",
+        "columns": 2,
+        "fields": [
+          {
+            "field": "tenant_id",
+            "title": "Tenant id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "pay_no",
+            "title": "Pay no",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "trade_order_id",
+            "title": "Trade order id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "biz_type",
+            "title": "Biz type",
+            "type": "select",
+            "required": true
+          },
+          {
+            "field": "biz_id",
+            "title": "Biz id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "amount",
+            "title": "Amount",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "channel_code",
+            "title": "Channel code",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "status",
+            "title": "Status",
+            "type": "input"
+          },
+          {
+            "field": "third_trade_no",
+            "title": "Third trade no",
+            "type": "input"
+          },
+          {
+            "field": "paid_at",
+            "title": "Paid at",
+            "type": "datetime"
+          }
+        ]
+      }
+    ],
+    "modes": {
+      "create": {
+        "fields": [
+          "tenant_id",
+          "pay_no",
+          "trade_order_id",
+          "biz_type",
+          "biz_id",
+          "amount",
+          "channel_code",
+          "status",
+          "third_trade_no",
+          "paid_at"
+        ]
+      },
+      "edit": {
+        "fields": [
+          "tenant_id",
+          "pay_no",
+          "trade_order_id",
+          "biz_type",
+          "biz_id",
+          "amount",
+          "channel_code",
+          "status",
+          "third_trade_no",
+          "paid_at"
+        ]
+      },
+      "view": {
+        "fields": [
+          "id",
+          "tenant_id",
+          "pay_no",
+          "trade_order_id",
+          "biz_type",
+          "biz_id",
+          "amount",
+          "channel_code",
+          "status",
+          "third_trade_no",
+          "paid_at",
+          "created_at",
+          "updated_at"
+        ]
+      }
+    }
+  }
+}
