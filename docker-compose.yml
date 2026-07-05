@@ -1,5 +1,5 @@
 # ── thinkts-saas ──
-# SQLite (default, zero config):
+# SQLite (zero config):
 #   docker compose up -d
 #
 # MySQL (production):
@@ -36,7 +36,6 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  # ── MySQL (optional, for production) ──
   mysql:
     image: mysql:8
     profiles: [mysql]
