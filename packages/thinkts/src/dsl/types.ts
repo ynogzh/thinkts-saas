@@ -91,6 +91,9 @@ export const t = {
     col<T>("json", init),
 };
 
+export function nullable<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
+  return { ...col, nullable: true, required: false };
+}
 export function required<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
   return { ...col, required: true, nullable: false };
 }

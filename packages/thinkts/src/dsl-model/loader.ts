@@ -46,14 +46,26 @@ function tryReadJSON<T>(path: string): T | undefined {
   }
 }
 
+import { join, basename } from "path";
+import { toDslConfig } from "../dsl/define";
+import type { ModelDefinition } from "../dsl/define";
+
 function loadModelDSL(dir: string): ModelDSL | undefined {
-  // Prefer JS (can contain logic), fall back to JSON
+  // Prefer TS (defineModel), then JS, then JSON
+  const tsValue = tryImport<ModelDefinition | BaseModelDSL | ModelDSL>(join(dir, "model.ts"));
+  if (tsValue) return resolveModelImport(tsValue);
   const jsValue = tryImport<BaseModelDSL | ModelDSL>(join(dir, "model.js"));
-  if (jsValue) {
-    if (jsValue instanceof BaseModelDSL) return jsValue.toModelConfig();
-    return jsValue as ModelDSL;
-  }
+  if (jsValue) return resolveModelImport(jsValue);
   return tryReadJSON<ModelDSL>(join(dir, "model.json"));
+}
+
+function resolveModelImport(value: ModelDefinition | BaseModelDSL | ModelDSL | Record<string, unknown>): ModelDSL | undefined {
+  if (value instanceof BaseModelDSL) return value.toModelConfig();
+  // defineModel export — has tableName + columns (not _sqlType)
+  if (typeof value === "object" && "tableName" in value && "columns" in value) {
+    return toDslConfig(value as ModelDefinition) as unknown as ModelDSL;
+  }
+  return value as ModelDSL;
 }
 
 function loadServiceHooks(dir: string): ServiceHooks {
@@ -114,10 +126,12 @@ export function loadDslAppData(srcPath: string): DslAppData {
     const dsl = loadModelDSL(dir);
     if (!dsl) return;
 
-    const name = dsl.table || modelNameFromDir(dir, srcPath);
-    const tableName = dsl.table || basename(dir);
-
-    result.models[name] = { name, path: dir, dsl, modelConfig: dsl as unknown as DslModelEntry["modelConfig"] };
+    // model.ts can embed table config — extract table name
+    const embeddedTableName = (dsl as Record<string, unknown>).tableName as string | undefined;
+    const name = dsl.table && typeof dsl.table === "string" ? dsl.table
+      : embeddedTableName || modelNameFromDir(dir, srcPath);
+    const tableName = typeof dsl.table === "string" ? dsl.table
+      : embeddedTableName || basename(dir);
 
     if (dsl.dataResource) {
       result.dataResources[dsl.dataResource.resourceCode ?? name] = {
@@ -138,13 +152,21 @@ export function loadDslAppData(srcPath: string): DslAppData {
       }
     }
 
-    const table = loadTableDSL(dir);
-    result.tables[name] = table
-      ? { name, path: dir, table }
-      : { name, path: dir, table: { title: name, model: tableName } };
+    // Table: prefer model.ts embedded, fall back to table.json
+    const embeddedTable = (dsl as Record<string, unknown>).table as Record<string, unknown> | undefined;
+    result.tables[name] = embeddedTable
+      ? { name, path: dir, table: embeddedTable as TableDSL }
+      : (loadTableDSL(dir) ? { name, path: dir, table: loadTableDSL(dir)! } : { name, path: dir, table: { title: name, model: tableName } });
 
-    const acl = loadAclDSL(dir);
-    if (acl) result.acls[name] = { name, path: dir, acl };
+    // ACL: prefer model.ts embedded access, fall back to acl.json
+    const embeddedAccess = (dsl as Record<string, unknown>).access as Record<string, string[]> | undefined;
+    if (embeddedAccess && Object.keys(embeddedAccess).length > 0) {
+      result.acls[name] = { name, path: dir,
+        acl: { roles: Object.keys(embeddedAccess), rules: { "*": embeddedAccess } } as unknown as AclDSL };
+    } else {
+      const acl = loadAclDSL(dir);
+      if (acl) result.acls[name] = { name, path: dir, acl };
+    }
   }
 
   scan(srcPath);
