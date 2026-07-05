@@ -1,47 +1,162 @@
 const API_BASE = import.meta.env.VITE_API_BASE ?? ''
 
-export interface TableConfig {
-  title: string
-  model: string
-  list?: { columns: Array<{ title: string; field: string; width?: number; sortable?: boolean }>; pageSize?: number }
-  search?: { fields: Array<{ field: string; label: string; type?: string }>; showCount?: number }
-  form?: { groups: Array<{ title?: string; fields: Array<{ field: string; label: string; type?: string; required?: boolean; options?: Array<{ label: string; value: unknown }> }> }>; modes?: Record<string, unknown> }
-  rowActions?: Array<{ type: string; label: string; action?: string; confirm?: boolean }>
-  headerActions?: Array<{ type: string; label: string; action?: string }>
+export interface MenuNode {
+  key: string
+  label: string
+  icon: string
+  children?: MenuNode[]
 }
 
-export interface TableInfo {
+export interface TableMeta {
   name: string
   title: string
   model: string
 }
 
-/** Fetch all available tables for sidebar navigation. */
-export async function fetchTables(): Promise<TableInfo[]> {
-  const res = await fetch(`${API_BASE}/admin/api/tables`)
-  const json = await res.json()
-  if (json.errno !== 0) throw new Error(json.errmsg ?? 'Failed to fetch tables')
-  return json.data.tables
+export interface ColumnMeta {
+  field: string
+  title: string
+  width?: number
+  sortable?: boolean
+  type?: string
 }
 
-/** Fetch table config for a specific model. */
+export interface SearchFieldMeta {
+  field: string
+  label: string
+  type?: string
+  operator?: string
+  options?: Array<{ label: string; value: unknown }>
+}
+
+export interface FormFieldMeta {
+  field: string
+  label: string
+  type?: string
+  required?: boolean
+  options?: Array<{ label: string; value: unknown }>
+}
+
+export interface FormGroupMeta {
+  title?: string
+  columns?: number
+  fields: FormFieldMeta[]
+}
+
+export interface TableConfig {
+  title: string
+  model: string
+  primaryKey: string
+  list: {
+    columns: ColumnMeta[]
+    pageSize: number
+    orderBy?: { field: string; direction: 'asc' | 'desc' }
+  }
+  search: {
+    fields: SearchFieldMeta[]
+    showCount: number
+  }
+  form: {
+    groups: FormGroupMeta[]
+  }
+}
+
+export interface ListResult {
+  items: unknown[]
+  total: number
+  page: number
+  pageSize: number
+}
+
+async function request<T>(url: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(url, init)
+  if (!res.ok) {
+    let message = `Request failed: ${res.status} ${res.statusText}`
+    try {
+      const body = await res.json()
+      if (body?.error) message = body.error
+      else if (body?.message) message = body.message
+    } catch { /* ignore */ }
+    throw new Error(message)
+  }
+  return res.json() as Promise<T>
+}
+
+export async function fetchMenus(): Promise<MenuNode[]> {
+  const data = await request<{ menus: MenuNode[] }>(`${API_BASE}/admin/api/menus`)
+  return data.menus
+}
+
+export async function fetchTables(): Promise<TableMeta[]> {
+  const data = await request<{ tables: TableMeta[] }>(`${API_BASE}/admin/api/tables`)
+  return data.tables
+}
+
 export async function fetchTableConfig(model: string): Promise<TableConfig> {
-  const res = await fetch(`${API_BASE}/${model}/table`)
-  const json = await res.json()
-  if (json.errno !== 0) throw new Error(json.errmsg ?? 'Failed to fetch table config')
-  return json.data
+  const data = await request<{ table: TableConfig }>(
+    `${API_BASE}/admin/api/tables/${encodeURIComponent(model)}`,
+  )
+  return data.table
 }
 
-/** Fetch list data for a model. */
-export async function fetchList(model: string, params?: Record<string, unknown>): Promise<{ items: unknown[]; total: number }> {
-  const searchParams = new URLSearchParams()
+export async function fetchList(
+  model: string,
+  params?: Record<string, unknown>,
+): Promise<ListResult> {
+  const search = new URLSearchParams()
   if (params) {
-    for (const [k, v] of Object.entries(params)) {
-      if (v !== undefined && v !== null && v !== '') searchParams.set(k, String(v))
+    for (const [key, value] of Object.entries(params)) {
+      if (value !== undefined && value !== null) {
+        search.set(key, String(value))
+      }
     }
   }
-  const res = await fetch(`${API_BASE}/${model}/list?${searchParams}`)
-  const json = await res.json()
-  if (json.errno !== 0) throw new Error(json.errmsg ?? 'Failed to fetch list')
-  return json.data
+  const query = search.toString()
+  const url = `${API_BASE}/admin/api/tables/${encodeURIComponent(model)}/data${query ? `?${query}` : ''}`
+  const data = await request<{ list: ListResult }>(url)
+  return data.list
+}
+
+export async function fetchRecord(model: string, id: string): Promise<unknown> {
+  const data = await request<{ data: unknown }>(
+    `${API_BASE}/admin/api/forms/${encodeURIComponent(model)}/${encodeURIComponent(id)}`,
+  )
+  return data.data
+}
+
+export async function createRecord(
+  model: string,
+  data: Record<string, unknown>,
+): Promise<unknown> {
+  const res = await request<{ data: unknown }>(
+    `${API_BASE}/admin/api/actions/${encodeURIComponent(model)}/create`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    },
+  )
+  return res.data
+}
+
+export async function updateRecord(
+  model: string,
+  id: string,
+  data: Record<string, unknown>,
+): Promise<unknown> {
+  const res = await request<{ data: unknown }>(
+    `${API_BASE}/admin/api/actions/${encodeURIComponent(model)}/${encodeURIComponent(id)}`,
+    {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    },
+  )
+  return res.data
+}
+
+export async function deleteRecord(model: string, id: string): Promise<void> {
+  await request<unknown>(`${API_BASE}/admin/api/actions/${encodeURIComponent(model)}/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+  })
 }

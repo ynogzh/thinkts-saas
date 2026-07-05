@@ -8,20 +8,25 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table'
 import { DataTablePagination } from '@/components/data-table'
+import { Button } from '@/components/ui/button'
+import { Pencil, Trash2 } from 'lucide-react'
 import type { TableConfig } from '@/lib/admin-api'
 
 interface Props {
   config: TableConfig
   data: Record<string, unknown>[]
+  onEdit?: (record: Record<string, unknown>) => void
+  onDelete?: (record: Record<string, unknown>) => void
 }
 
-export function DynamicTable({ config, data }: Props) {
+export function DynamicTable({ config, data, onEdit, onDelete }: Props) {
+  const hasActions = !!(onEdit || onDelete)
+
   const columns = useMemo<ColumnDef<Record<string, unknown>>[]>(() => {
-    const cols = config.list?.columns ?? []
-    return cols.map((col) => ({
+    const cols = config.list.columns.map((col) => ({
       accessorKey: col.field,
       header: col.title ?? col.field,
-      cell: ({ getValue }) => {
+      cell: ({ getValue }: { getValue: () => unknown }) => {
         const val = getValue()
         if (val === null || val === undefined) return <span className='text-muted-foreground'>—</span>
         if (typeof val === 'object') return <span className='text-xs font-mono'>{JSON.stringify(val)}</span>
@@ -29,7 +34,31 @@ export function DynamicTable({ config, data }: Props) {
       },
       enableSorting: col.sortable ?? false,
     }))
-  }, [config])
+
+    if (hasActions) {
+      cols.push({
+        id: 'actions',
+        header: 'Actions',
+        cell: ({ row }) => (
+          <div className='flex items-center gap-1'>
+            {onEdit && (
+              <Button variant='ghost' size='icon' onClick={() => onEdit(row.original)}>
+                <Pencil className='h-4 w-4' />
+              </Button>
+            )}
+            {onDelete && (
+              <Button variant='ghost' size='icon' onClick={() => onDelete(row.original)}>
+                <Trash2 className='h-4 w-4 text-destructive' />
+              </Button>
+            )}
+          </div>
+        ),
+        enableSorting: false,
+      })
+    }
+
+    return cols
+  }, [config, hasActions, onEdit, onDelete])
 
   const table = useReactTable({
     data,
@@ -38,7 +67,7 @@ export function DynamicTable({ config, data }: Props) {
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    initialState: { pagination: { pageSize: config.list?.pageSize ?? 20 } },
+    initialState: { pagination: { pageSize: config.list.pageSize } },
   })
 
   return (

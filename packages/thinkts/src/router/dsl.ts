@@ -1,6 +1,6 @@
 import type { ThinkContext } from "../types";
 import type { DslAppData, DslModelEntry, DslServiceEntry } from "../model/registry";
-import { createAdminHandlers } from "../model/admin";
+import { createAdminApiHandlers } from "../model/admin-api";
 import { BaseService, bindServiceContext } from "../service";
 import type { RouteTable } from "./table";
 import { executeDslAction } from "../model/executor";
@@ -211,12 +211,51 @@ export function registerDslApiRoutes(
 }
 
 export function registerDslAdminRoutes(table: RouteTable, dslData: DslAppData): void {
-  const admin = createAdminHandlers(dslData);
-  table.exact.set("/admin/api/tables", {
-    match: "/admin/api/tables", type: "dsl-admin",
-    module: "admin", controller: "api/tables", action: "list",
-    handler: async () => admin.tablesAction(),
-  });
+  const admin = createAdminApiHandlers(dslData);
+
+  // Exact match routes (no params)
+  const exacts: Array<{ path: string; handler: (ctx: ThinkContext) => Promise<unknown> }> = [
+    { path: "/admin/api/menus", handler: async (ctx: ThinkContext) => admin.menusAction(ctx) },
+    { path: "/admin/api/tables", handler: async () => admin.tablesAction() },
+  ];
+  for (const { path, handler } of exacts) {
+    table.exact.set(path, { match: path, type: "dsl-admin", module: "admin", controller: path, action: "list", handler });
+  }
+
+  // Parameterized routes (radix tree)
+  const params: Array<{ path: string; handler: (ctx: ThinkContext) => Promise<unknown> }> = [
+    {
+      path: "/admin/api/tables/:model",
+      handler: async (ctx: ThinkContext) => admin.tableConfigAction(ctx.params?.model ?? ""),
+    },
+    {
+      path: "/admin/api/tables/:model/data",
+      handler: async (ctx: ThinkContext) => admin.listAction(ctx, ctx.params?.model ?? ""),
+    },
+    {
+      path: "/admin/api/forms/:model",
+      handler: async (ctx: ThinkContext) => admin.formConfigAction(ctx.params?.model ?? ""),
+    },
+    {
+      path: "/admin/api/forms/:model/:id",
+      handler: async (ctx: ThinkContext) => admin.getRecordAction(ctx, ctx.params?.model ?? "", ctx.params?.id ?? ""),
+    },
+    {
+      path: "/admin/api/actions/:model/create",
+      handler: async (ctx: ThinkContext) => admin.createAction(ctx, ctx.params?.model ?? ""),
+    },
+    {
+      path: "/admin/api/actions/:model/:id",
+      handler: async (ctx: ThinkContext) => admin.updateAction(ctx, ctx.params?.model ?? "", ctx.params?.id ?? ""),
+    },
+    {
+      path: "/admin/api/actions/:model/:id/delete",
+      handler: async (ctx: ThinkContext) => admin.deleteAction(ctx, ctx.params?.model ?? "", ctx.params?.id ?? ""),
+    },
+  ];
+  for (const { path, handler } of params) {
+    table.radix.insert(path, { match: path, type: "dsl-admin", module: "admin", controller: path, action: "data", handler });
+  }
 }
 
 export function hasDslModels(dslData?: DslAppData): boolean {
