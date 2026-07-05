@@ -19,9 +19,14 @@ thinkts-saas/
 │   └── ...
 ├── apps/
 │   └── iotbiz/           ← 产品：共享设备支付平台
+└── admin/                ← SaaS 管理后台
+```
+
+## 组成部分
+
 | 部分 | 说明 | 要求 |
 |------|------|------|
-| **thinkts** | 服务器框架，插件系统。抽象底层（路由、DB、中间件、认证、错误处理），上层只写业务 |
+| **thinkts** | 服务器框架，插件系统。抽象底层（路由、DB、中间件、认证、错误处理），上层只写业务 | |
 | **thinkts-cli** | 脚手架，compose 勾选插件生成产品 | 封装易用，一条命令 |
 | **thinkts-saas** | SaaS 管理后台 + 通用插件池 | 插件必须 SaaS 通用 |
 | **iotbiz** | 第一个组装产品 | 验证平台可用 |
@@ -30,5 +35,4 @@ thinkts-saas/
 
 - thinkts 和 thinkts-cli 服务于 thinkts-saas，可以改
 - 插件 SaaS 通用。业务特定逻辑放在 `apps/xxx/src/` 里
-
-后台基于 [shadcn-admin-2.2.0](https://github.com/shadcn-admin/shadcn-admin)，实现功能前先搜索现有组件，再利用组件实现。
+- 后台基于 [shadcn-admin-2.2.0](https://github.com/shadcn-admin/shadcn-admin)，先搜组件再实现
