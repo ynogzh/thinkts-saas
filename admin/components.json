@@ -18,6 +18,9 @@
     "hooks": "@/hooks"
   },
   "iconLibrary": "lucide",
+  "rtl": false,
+  "menuColor": "default",
+  "menuAccent": "subtle",
   "registries": {
     "@shadcnblocks": {
       "url": "https://proxy.collectui.pro/api/r/shadcnblocks/{name}",
