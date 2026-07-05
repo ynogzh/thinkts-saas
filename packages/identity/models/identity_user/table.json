@@ -1,0 +1,226 @@
+{
+  "title": "用户",
+  "model": "identity_user",
+  "list": {
+    "columns": [
+      {
+        "field": "user_type",
+        "title": "User type",
+        "width": 100,
+        "render": "tag"
+      },
+      {
+        "field": "phone",
+        "title": "Phone",
+        "width": 160
+      },
+      {
+        "field": "email",
+        "title": "Email",
+        "width": 160
+      },
+      {
+        "field": "tenant_id",
+        "title": "Tenant id",
+        "width": 80
+      },
+      {
+        "field": "username",
+        "title": "Username",
+        "width": 160
+      },
+      {
+        "field": "nickname",
+        "title": "Nickname",
+        "width": 160
+      },
+      {
+        "field": "avatar",
+        "title": "Avatar",
+        "width": 160
+      },
+      {
+        "field": "gender",
+        "title": "Gender",
+        "width": 160
+      }
+    ],
+    "orderBy": {
+      "field": "id",
+      "direction": "desc"
+    },
+    "pageSize": 20,
+    "rowActions": [
+      {
+        "type": "view",
+        "title": "查看"
+      },
+      {
+        "type": "edit",
+        "title": "编辑"
+      },
+      {
+        "type": "delete",
+        "title": "删除",
+        "confirm": "确认删除？"
+      }
+    ],
+    "headerActions": [
+      {
+        "type": "create",
+        "title": "新增Identity user",
+        "icon": "plus"
+      }
+    ]
+  },
+  "search": {
+    "fields": [
+      {
+        "field": "user_type",
+        "title": "User type",
+        "type": "select"
+      },
+      {
+        "field": "phone",
+        "title": "Phone",
+        "type": "input"
+      },
+      {
+        "field": "email",
+        "title": "Email",
+        "type": "input"
+      },
+      {
+        "field": "last_login_at",
+        "title": "Last login at",
+        "type": "daterange"
+      }
+    ],
+    "showCount": 3
+  },
+  "form": {
+    "groups": [
+      {
+        "title": "基本信息",
+        "columns": 2,
+        "fields": [
+          {
+            "field": "tenant_id",
+            "title": "Tenant id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "username",
+            "title": "Username",
+            "type": "input"
+          },
+          {
+            "field": "phone",
+            "title": "Phone",
+            "type": "phone"
+          },
+          {
+            "field": "email",
+            "title": "Email",
+            "type": "email"
+          },
+          {
+            "field": "nickname",
+            "title": "Nickname",
+            "type": "input"
+          },
+          {
+            "field": "avatar",
+            "title": "Avatar",
+            "type": "input"
+          },
+          {
+            "field": "gender",
+            "title": "Gender",
+            "type": "input"
+          },
+          {
+            "field": "user_type",
+            "title": "User type",
+            "type": "select"
+          },
+          {
+            "field": "main_dept_id",
+            "title": "Main dept id",
+            "type": "number"
+          },
+          {
+            "field": "dept_ids_json",
+            "title": "Dept ids json",
+            "type": "textarea",
+            "span": 2
+          },
+          {
+            "field": "status",
+            "title": "Status",
+            "type": "input"
+          },
+          {
+            "field": "last_login_at",
+            "title": "Last login at",
+            "type": "datetime"
+          }
+        ]
+      }
+    ],
+    "modes": {
+      "create": {
+        "fields": [
+          "tenant_id",
+          "username",
+          "phone",
+          "email",
+          "nickname",
+          "avatar",
+          "gender",
+          "user_type",
+          "main_dept_id",
+          "dept_ids_json",
+          "status",
+          "last_login_at"
+        ]
+      },
+      "edit": {
+        "fields": [
+          "tenant_id",
+          "username",
+          "phone",
+          "email",
+          "nickname",
+          "avatar",
+          "gender",
+          "user_type",
+          "main_dept_id",
+          "dept_ids_json",
+          "status",
+          "last_login_at"
+        ]
+      },
+      "view": {
+        "fields": [
+          "id",
+          "tenant_id",
+          "username",
+          "phone",
+          "email",
+          "nickname",
+          "avatar",
+          "gender",
+          "user_type",
+          "main_dept_id",
+          "dept_ids_json",
+          "status",
+          "last_login_at",
+          "created_at",
+          "updated_at"
+        ]
+      }
+    }
+  }
+}
