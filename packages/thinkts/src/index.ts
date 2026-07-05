@@ -69,3 +69,4 @@ export type { ModelDSL, TableDSL, AclDSL, ServiceHooks } from "./dsl-model";
 export { loadDslAppData } from "./dsl-model";
 export { defineModel, toDslConfig, type RowOf, type ModelDefinition, type ModelAcl, type ModelHooks } from "./dsl";
 export { t, required, optional, primary, autoIncrement, unique, index, defaultTo, defaultNow, comment, type ColumnDefinition } from "./dsl";
+export { PluginLoader, type Plugin, type PluginLoadContext } from "./plugin";

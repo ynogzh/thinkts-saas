@@ -22,7 +22,7 @@ function resolvePathWithExt(basePath: string): string | null {
  * Walk srcPath once, collecting controller/service/model/logic files.
  * Replaces 4 separate loadFeatureBased() calls (one per file type).
  */
-function loadAllFeatures(srcPath: string): {
+export function loadAllFeatures(srcPath: string): {
   controllers: Record<string, unknown>;
   logics: Record<string, unknown>;
   services: Record<string, unknown>;

@@ -8,6 +8,7 @@ import { loadConfig, watchConfig, getConfig } from "./config";
 import { loadAppData, loadRouterConfig, loadBootstrap, type LoadedData } from "./loader";
 import { parseRouterRules, buildRouteTable } from "./router";
 import { createThink } from "./think";
+import { PluginLoader } from "./plugin";
 import { generateTraceId } from "./error";
 import { toError, parseCookies, parseBody } from "./app/context";
 import { loadMiddlewares } from "./app/middleware-loader";
@@ -19,15 +20,24 @@ import {
   DefaultActionExecutorStrategy, DefaultResponderStrategy, DefaultErrorFormatterStrategy,
   toResponse, type KernelContext,
 } from "./kernel";
+import { generateOpenAPISpec, createDocsMiddleware } from "./openapi";
 
 export interface ApplicationOptions {
   ROOT_PATH: string;
+  packagesDir?: string;
   env?: string;
   port?: number;
   host?: string;
   websocket?: Record<string, unknown>;
   compression?: boolean;
   maxBodySize?: number;
+}
+
+/** Check if a value is a class with a `db` method on its prototype. */
+function hasDbFunction(value: unknown): value is { prototype: { db: (...args: unknown[]) => unknown } } {
+  if (typeof value !== "function") return false;
+  const proto = (value as { prototype?: unknown }).prototype;
+  return typeof proto === "object" && proto !== null && typeof (proto as Record<string, unknown>).db === "function";
 }
 
 export class Application {
@@ -125,6 +135,28 @@ export class Application {
     return this.composedResponse?.(ctx);
   }
 
+
+  /** Merge plugin data into app data. App data wins on key conflicts. */
+  private mergeData(app: LoadedData, plugin: LoadedData): LoadedData {
+    const merged: LoadedData = {
+      controllers: { ...plugin.controllers, ...app.controllers },
+      logics: { ...plugin.logics, ...app.logics },
+      services: { ...plugin.services, ...app.services },
+      models: { ...plugin.models, ...app.models },
+    };
+    if (app.dsl || plugin.dsl) {
+      merged.dsl = {
+        models: { ...(plugin.dsl?.models ?? {}), ...(app.dsl?.models ?? {}) },
+        services: { ...(plugin.dsl?.services ?? {}), ...(app.dsl?.services ?? {}) },
+        apis: { ...(plugin.dsl?.apis ?? {}), ...(app.dsl?.apis ?? {}) },
+        tables: { ...(plugin.dsl?.tables ?? {}), ...(app.dsl?.tables ?? {}) },
+        acls: { ...(plugin.dsl?.acls ?? {}), ...(app.dsl?.acls ?? {}) },
+        dataResources: { ...(plugin.dsl?.dataResources ?? {}), ...(app.dsl?.dataResources ?? {}) },
+      };
+    }
+    return merged;
+  }
+
   private wireDslAcl(data: LoadedData): void {
     if (!data.dsl?.acls || Object.keys(data.dsl.acls).length === 0) return;
     const baseAcl = (this.think.Model.acl as Record<string, unknown>) ?? {};
@@ -158,15 +190,25 @@ export class Application {
     const srcPath = `${this.options.ROOT_PATH}/src`;
     const think = createThink(this.options.ROOT_PATH, this.config);
     this.think = think;
-    const data = loadAppData(srcPath);
+
+    // Load app-level features (app's own src/)
+    const appData = loadAppData(srcPath);
+
+    // Load plugins if packagesDir is configured
+    let data = appData;
+    if (this.options.packagesDir) {
+      const loader = new PluginLoader(this.options.packagesDir);
+      const pluginData = await loader.load();
+      data = this.mergeData(appData, pluginData);
+    }
+
     think.controllers = data.controllers;
     think.logics = data.logics;
     think.services = data.services;
     think.models = Object.fromEntries(
       Object.entries(data.models).map(([name, entry]) => [
         name,
-        typeof entry === "function" && typeof (entry as { prototype?: { db?: unknown } }).prototype?.db === "function"
-          ? entry : think.Model,
+        hasDbFunction(entry) ? entry : think.Model,
       ])
     );
     think.dslServices = data.dsl
@@ -189,8 +231,7 @@ export class Application {
       parseRouterRules(routerConfig), data.dsl,
     );
 
-    if ((this.config as Record<string, unknown>).openapi) {
-      const { generateOpenAPISpec, createDocsMiddleware } = await import("./openapi");
+    if (this.config.openapi) {
       const spec = generateOpenAPISpec(this.routeTable, this.config, data.controllers);
       this.middlewares.push(createDocsMiddleware(spec));
     }
