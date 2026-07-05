@@ -1,0 +1,26 @@
+# ThinkTS 编码规则
+
+## 单文件行数
+- 单文件 ≤ 200 行。超过必须拆分。
+- 拆分原则：按职责垂直拆分（HTTP、ACL、Builder、Ops 各为独立模块）。
+
+## 代码风格
+- 优先顶层 `import`，避免运行时 `require()`（条件加载除外）。
+- 公共工具函数提取到 `src/utils.ts`，禁止多文件复制粘贴。
+- 热路径（请求处理链）禁止创建临时对象（`new URL()`, `new TextEncoder()`）。
+- 缓存策略：按实体全局缓存，禁止按实例重复缓存。
+
+## 类型安全
+- 公共 API MUST 有显式类型签名，不允许 `any`。
+- AVOID `as unknown as` — 如果需要，说明接口设计有问题。
+- 函数返回值 MUST 显式标注类型，不依赖推断。
+
+## 性能红线
+- 密码学操作必须在初始化时预计算，请求时复用。
+- Router handler 禁止在请求时动态 `require()`。
+- Model 层必须用连接池复用，禁止每次操作创建新连接。
+
+## 验证要求
+- 修改框架代码后 MUST 运行 `bun test`（90 tests）。
+- 修改后 MUST 在 iotbiz 中验证 API 正常（open/index + DSL routes）。
+- 禁止提交未经验证的代码。

@@ -1,0 +1,18 @@
+{
+  "name": "thinkts-saas",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "dev:api": "cd apps/iotbiz/api && bun dev",
+    "dev:admin": "cd apps/iotbiz/admin && pnpm dev",
+    "test:thinkts": "cd packages/thinkts && bun test",
+    "test:cli": "cd packages/thinkts-cli && bun test"
+  },
+  "devDependencies": {
+    "reflect-metadata": "^0.2.2",
+    "valibot": "^1.4.1",
+    "typescript": "^5.4.0",
+    "@types/bun": "latest"
+  }
+}

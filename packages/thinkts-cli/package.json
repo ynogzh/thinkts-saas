@@ -1,0 +1,22 @@
+{
+  "name": "thinkts-cli",
+  "version": "1.0.0",
+  "description": "ThinkTS CLI - project scaffolding and code generation",
+  "main": "src/index.ts",
+  "bin": {
+    "thinkts": "src/index.ts"
+  },
+  "scripts": {
+    "dev": "bun --watch src/index.ts"
+  },
+  "dependencies": {
+    "thinkts": "file:../thinkts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  }
+}

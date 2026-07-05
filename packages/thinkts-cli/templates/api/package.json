@@ -1,0 +1,17 @@
+{
+  "name": "thinkts-app-api",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "bun development.ts",
+    "start": "bun bootstrap/worker.ts"
+  },
+  "dependencies": {
+    "reflect-metadata": "^0.2.2",
+    "thinkts": "workspace:*",
+    "valibot": "^1.4.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/bun": "latest"
+  }
+}
