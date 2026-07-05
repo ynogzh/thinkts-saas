@@ -21,6 +21,14 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    proxy: {
+      '/admin/api': {
+        target: 'http://localhost:8360',
+        changeOrigin: true,
+      },
+    },
+  },
   test: {
     silent: 'passed-only',
     unstubEnvs: true,

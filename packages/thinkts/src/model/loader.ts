@@ -135,6 +135,14 @@ export function loadDslAppData(srcPath: string): DslAppData {
     const tableName = typeof dsl.table === "string" ? dsl.table
       : embeddedTableName || basename(dir);
 
+    // Register model entry for admin API
+    result.models[name] = {
+      name,
+      path: dir,
+      dsl,
+      modelConfig: { name, table: tableName } as never,
+    };
+
     if (dsl.dataResource) {
       result.dataResources[dsl.dataResource.resourceCode ?? name] = {
         resourceCode: dsl.dataResource.resourceCode ?? name,

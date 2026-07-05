@@ -95,6 +95,22 @@ function moduleIcon(name: string): string {
   return ICON_MAP[name] ?? "Folder";
 }
 
+function columnType(col: ColumnDSL): string {
+  if (col.options?.length) return "select";
+  switch (col.type) {
+    case "bigint": case "int": case "integer": case "tinyint": case "smallint": case "float": case "double": case "decimal":
+      return "number";
+    case "timestamp": case "datetime": case "date":
+      return "date";
+    case "text": case "longtext": case "mediumtext":
+      return "textarea";
+    case "boolean": case "tinyint(1)":
+      return "switch";
+    default:
+      return "text";
+  }
+}
+
 function resolveColType(field: string, cols: ColumnDSL[]): string {
   return columnType(cols.find((c) => c.name === field) ?? { name: field, type: "varchar" });
 }
