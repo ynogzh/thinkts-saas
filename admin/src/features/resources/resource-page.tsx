@@ -12,8 +12,7 @@ import {
 } from '@/lib/admin-api'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { DynamicForm } from '@/components/dynamic/dynamic-form'
 import { Plus, Loader2 } from 'lucide-react'
 
 interface Props {
@@ -118,7 +117,7 @@ export function ResourcePage({ resource }: Props) {
             <DialogHeader>
               <DialogTitle>{editingRecord ? 'Edit' : 'Create'} {config?.title}</DialogTitle>
             </DialogHeader>
-            <ResourceForm
+            <DynamicForm
               fields={fields}
               initialData={editingRecord ?? undefined}
               onSubmit={handleSubmit}
@@ -128,39 +127,5 @@ export function ResourcePage({ resource }: Props) {
         </Dialog>
       </Main>
     </>
-  )
-}
-
-function ResourceForm({
-  fields, initialData, onSubmit, loading,
-}: {
-  fields: Array<{ field: string; label: string; type?: string; required?: boolean; options?: Array<{ label: string; value: unknown }> }>
-  initialData?: Record<string, unknown>
-  onSubmit: (data: Record<string, unknown>) => Promise<void>
-  loading: boolean
-}) {
-  const [formData, setFormData] = useState<Record<string, unknown>>(initialData ?? {})
-
-  return (
-    <form
-      onSubmit={(e) => { e.preventDefault(); void onSubmit(formData) }}
-      className='space-y-4'
-    >
-      {fields.map((f) => (
-        <div key={f.field} className='space-y-1'>
-          <Label htmlFor={f.field}>{f.label}</Label>
-          <Input
-            id={f.field}
-            value={String(formData[f.field] ?? '')}
-            onChange={(e) => setFormData((prev) => ({ ...prev, [f.field]: e.target.value }))}
-            required={f.required}
-          />
-        </div>
-      ))}
-      <Button type='submit' disabled={loading}>
-        {loading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
-        Submit
-      </Button>
-    </form>
   )
 }
