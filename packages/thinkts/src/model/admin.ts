@@ -1,5 +1,5 @@
 import type { ThinkContext } from "../types";
-import type { DslAppData } from "./types";
+import type { DslAppData } from "./registry";
 
 export interface AdminTablesResponse {
   tables: Array<{ name: string; title: string; model: string }>;

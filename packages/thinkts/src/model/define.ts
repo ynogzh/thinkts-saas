@@ -1,4 +1,4 @@
-import type { ColumnDefinition } from "./types";
+import type { ColumnDefinition } from "./columns";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Cols = Record<string, ColumnDefinition<any>>;

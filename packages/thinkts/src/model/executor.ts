@@ -1,7 +1,7 @@
 import type { ThinkContext } from "../types";
-import type { Model } from "../model";
-import type { DslModelEntry, DslServiceEntry } from "./types";
-import { convertDslRelations, applyRelationsToModel } from "./relation";
+import type { ModelCore } from "./core";
+import type { DslModelEntry, DslServiceEntry } from "./registry";
+import { convertDslRelations, applyRelationsToModel } from "./dsl-relation";
 import { callDslHook, normalizeListResult, pickWritable, applyDefaults } from "./helpers";
 
 const relationsCache = new WeakMap<DslModelEntry, ReturnType<typeof convertDslRelations>>();
@@ -52,7 +52,6 @@ export async function executeDslAction(execCtx: DslExecutionContext): Promise<un
       const where: Record<string, unknown> = { ...opts };
       delete where.page; delete where.pageSize; delete where.limit;
       delete where.currentPage; delete where.current_page;
-      // Strip tenant_id if the model table doesn't have that column
       if (!modelEntry.dsl.columns.some((c) => c.name === "tenant_id")) {
         delete where.tenant_id;
       }

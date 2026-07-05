@@ -1,5 +1,5 @@
 import type { ThinkGlobal } from "./think";
-import type { DslServiceEntry } from "./dsl-model/types";
+import type { DslServiceEntry } from "./model/registry";
 import { toPascalCase } from "./utils";
 import { BaseService, bindServiceContext } from "./service";
 import { createBackgroundThinkContext } from "./think-context";

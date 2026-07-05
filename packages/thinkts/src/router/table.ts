@@ -1,5 +1,5 @@
 import type { ThinkContext, AppConfig, RouterRule } from "../types";
-import type { DslAppData } from "../dsl-model/types";
+import type { DslAppData } from "./model/registry";
 import { toKebabCase, toPascalCase } from "../utils";
 import { createHandler, normalizePath, type ParsedRoute, type RouteEntry } from "./handler";
 import { createResourceHandler } from "./resource";

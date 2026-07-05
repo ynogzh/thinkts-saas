@@ -1,10 +1,10 @@
 import type { LoadedData } from "./loader";
 import type { BeforeActionHook, AfterActionHook, RequestHook, ErrorHook } from "./kernel";
-import type { DslAppData } from "./dsl-model/types";
+import type { DslAppData } from "./model/registry";
 import { existsSync, readdirSync, statSync } from "fs";
 import { join, resolve } from "path";
 import { loadAllFeatures } from "./loader";
-import { loadDslAppData } from "./dsl-model/loader";
+import { loadDslAppData } from "./model/loader";
 
 /* ── Plugin interface ── */
 

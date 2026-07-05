@@ -1,6 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import { HAS_ONE, HAS_MANY, BELONG_TO, MANY_TO_MANY } from "../model/relation";
-import { convertDslRelations, applyRelationsToModel } from "./relation";
+import { convertDslRelations, applyRelationsToModel } from "./dsl-relation";
 
 class FakeModel {
   relations: Array<{ name: string; value: unknown }> = [];

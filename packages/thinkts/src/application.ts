@@ -14,7 +14,7 @@ import { toError, parseCookies, parseBody } from "./app/context";
 import { loadMiddlewares } from "./app/middleware-loader";
 import { checkHealth } from "./app/health";
 import { setupCronJobs } from "./app/cron";
-import { buildAclConfig } from "./dsl-model/helpers";
+import { buildAclConfig } from "./model/helpers";
 import {
   ThinkKernel, DefaultRouterStrategy, DefaultValidatorStrategy, DefaultAuthorizerStrategy,
   DefaultActionExecutorStrategy, DefaultResponderStrategy, DefaultErrorFormatterStrategy,

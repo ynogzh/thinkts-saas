@@ -1,6 +1,6 @@
 import { readdirSync, statSync, existsSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
-import { loadDslAppData, type DslAppData } from "./dsl-model/loader";
+import { loadDslAppData, type DslAppData } from "./model/loader";
 
 function loadClassFromFile(filePath: string): unknown {
   delete require.cache[require.resolve(filePath)];

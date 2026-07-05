@@ -6,7 +6,7 @@ export type {
   DslServiceEntry,
   DslTableEntry,
   DslAclEntry,
-} from "./types";
+} from "./registry";
 import type {
   ModelDSL,
   ServiceHooks,
@@ -15,14 +15,17 @@ import type {
   DataResourceMeta,
   DslAppData,
   DslModelEntry,
-} from "./types";
-import { BaseModelDSL } from "./base";
+} from "./registry";
+import { toDslConfig } from "./define";
+import type { ModelDefinition } from "./define";
 
-const LIFECYCLE_HOOKS = new Set([
-  "beforeCreate", "afterCreate", "beforeUpdate", "afterUpdate",
-  "beforeDelete", "afterDelete", "beforeFind", "afterFind",
-  "afterGet", "beforeList", "afterList",
-]);
+const LIFECYCLE_HOOKS: Record<string, boolean> = {
+  beforeCreate: true, afterCreate: true,
+  beforeUpdate: true, afterUpdate: true,
+  beforeDelete: true, afterDelete: true,
+  beforeFind: true, afterFind: true,
+  afterGet: true, beforeList: true, afterList: true,
+};
 
 function tryImport<T>(path: string): T | undefined {
   if (!existsSync(path)) return undefined;
@@ -47,20 +50,19 @@ function tryReadJSON<T>(path: string): T | undefined {
 }
 
 import { join, basename } from "path";
-import { toDslConfig } from "../dsl/define";
-import type { ModelDefinition } from "../dsl/define";
+import { toDslConfig } from "./define";
+import type { ModelDefinition } from "./define";
 
 function loadModelDSL(dir: string): ModelDSL | undefined {
   // Prefer TS (defineModel), then JS, then JSON
-  const tsValue = tryImport<ModelDefinition | BaseModelDSL | ModelDSL>(join(dir, "model.ts"));
+  const tsValue = tryImport<ModelDefinition | ModelDSL>(join(dir, "model.ts"));
   if (tsValue) return resolveModelImport(tsValue);
-  const jsValue = tryImport<BaseModelDSL | ModelDSL>(join(dir, "model.js"));
+  const jsValue = tryImport<ModelDSL>(join(dir, "model.js"));
   if (jsValue) return resolveModelImport(jsValue);
   return tryReadJSON<ModelDSL>(join(dir, "model.json"));
 }
 
-function resolveModelImport(value: ModelDefinition | BaseModelDSL | ModelDSL | Record<string, unknown>): ModelDSL | undefined {
-  if (value instanceof BaseModelDSL) return value.toModelConfig();
+function resolveModelImport(value: ModelDefinition | ModelDSL | Record<string, unknown>): ModelDSL | undefined {
   // defineModel export — has tableName + columns (not _sqlType)
   if (typeof value === "object" && "tableName" in value && "columns" in value) {
     return toDslConfig(value as ModelDefinition) as unknown as ModelDSL;
@@ -79,7 +81,7 @@ function loadApiRoutes(name: string, path: string, hooks: ServiceHooks): Array<{
 }> | undefined {
   const routes: Array<{ method: string; path: string; handler: string }> = [];
   for (const key of Object.keys(hooks)) {
-    if (LIFECYCLE_HOOKS.has(key)) continue;
+    if (LIFECYCLE_HOOKS[key]) continue;
     if (typeof hooks[key] !== "function") continue;
     // Auto-register non-hook exports as POST routes
     routes.push({

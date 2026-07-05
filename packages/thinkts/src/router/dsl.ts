@@ -1,9 +1,9 @@
 import type { ThinkContext } from "../types";
-import type { DslAppData, DslModelEntry, DslServiceEntry } from "../dsl-model/types";
-import { createAdminHandlers } from "../dsl-model/admin";
+import type { DslAppData, DslModelEntry, DslServiceEntry } from "../model/registry";
+import { createAdminHandlers } from "../model/admin";
 import { BaseService, bindServiceContext } from "../service";
 import type { RouteTable } from "./table";
-import { executeDslAction } from "../dsl-model/executor";
+import { executeDslAction } from "../model/executor";
 
 export function parseModelRoute(name: string): { module: string; resource: string; path: string } {
   const parts = name.split("_");

@@ -10,7 +10,7 @@ import { thinkFetch } from "./fetch";
 import type { FetchOptions, FetchResponse } from "./fetch";
 import { createSessionStore, generateSid } from "./session";
 import type { SessionConfig } from "./session";
-import type { DataResourceMeta, DslServiceEntry } from "./dsl-model/types";
+import type { DataResourceMeta, DslServiceEntry } from "./model/registry";
 import type { ThinkKernel, KernelContext } from "./kernel";
 import { ServiceResolver } from "./service-resolver";
 

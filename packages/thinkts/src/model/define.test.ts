@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { defineModel, toDslConfig } from "./define";
-import { t, required, primary, unique, label, listable } from "./types";
+import { t, required, primary, unique, label, listable } from "./columns";
 
 describe("defineModel", () => {
   const DeviceCategory = defineModel("iotbiz_device_category", {

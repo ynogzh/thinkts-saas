@@ -1,5 +1,5 @@
 import type { ThinkContext } from "../types";
-import type { ModelConfig } from "../model";
+import type { ModelConfig } from "./core";
 
 export interface ColumnDSL {
   name: string;

@@ -1,7 +1,7 @@
 import type { ParseOptions } from "./parser";
 import type { ThinkContext } from "../types";
 import type { AclConfig, AclRule } from "../acl";
-import type { DataResourceMeta } from "../dsl-model/types";
+import type { DataResourceMeta } from "./model/registry";
 import { AclError } from "../error";
 import { ModelCore } from "./core";
 

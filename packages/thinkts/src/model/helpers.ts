@@ -1,6 +1,6 @@
 import type { ThinkContext } from "../types";
 import { BaseService, bindServiceContext } from "../service";
-import type { DslModelEntry, DslServiceEntry, ServiceHookName, DslAclEntry } from "./types";
+import type { DslModelEntry, DslServiceEntry, ServiceHookName, DslAclEntry } from "./registry";
 import type { AclConfig, AclRule } from "../acl";
 
 /**
