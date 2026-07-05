@@ -30,12 +30,25 @@ export interface ModelHooks<T extends Cols> {
   beforeDelete?: (record: RowOf<T>, ctx: unknown) => void | Promise<void>;
 }
 
+
+export interface ModelSystem {
+  /** Auto-add WHERE tenant_id = ? to all queries */
+  tenantAware?: boolean;
+  /** Soft delete via deleted_at column */
+  softDelete?: boolean;
+  /** Fields that cannot be edited via CRUD API */
+  immutableFields?: string[];
+}
+
 export interface ModelDefinition<T extends Cols = Cols> {
   readonly tableName: string;
   readonly columns: T;
   readonly primaryKey: string;
-  readonly acl?: ModelAcl;
   readonly hooks?: ModelHooks<T>;
+  /** System invariants (framework-enforced) */
+  readonly system?: ModelSystem;
+  /** Default access for business roles (can be overridden via admin) */
+  readonly access?: Record<string, string[]>;
 }
 
 /**
@@ -53,19 +66,24 @@ export interface ModelDefinition<T extends Cols = Cols> {
  */
 export function defineModel<T extends Cols>(
   tableName: string,
-  def: { columns: T; primaryKey?: string; acl?: ModelAcl; hooks?: ModelHooks<T> },
+  def: { columns: T; primaryKey?: string; hooks?: ModelHooks<T>; system?: ModelSystem; access?: Record<string, string[]> },
 ): ModelDefinition<T> {
   const primaryKey = def.primaryKey
     ?? Object.entries(def.columns).find(([, c]) => c.primary)?.[0]
     ?? "id";
-  return { tableName, columns: def.columns, primaryKey, acl: def.acl, hooks: def.hooks };
+  return { tableName, columns: def.columns, primaryKey, hooks: def.hooks, system: def.system, access: def.access };
 }
 
-/** Convert ModelDefinition to model.json compatible object for the DSL loader. */
+/**
+ * Convert ModelDefinition to internal DSL format with:
+ * - modelConfig: column definitions (SQL schema)
+ * - tableConfig: admin table UI configuration
+ * - accessConfig: default role access
+ */
 export function toDslConfig<T extends Cols>(model: ModelDefinition<T>): Record<string, unknown> {
   const columns = Object.entries(model.columns).map(([name, col]) => {
     const entry: Record<string, unknown> = {
-      name: col.columnName ?? name, type: col._sqlType, label: name,
+      name: col.columnName ?? name, type: col._sqlType, label: col.label ?? name,
     };
     if (col.primary) entry.primary = true;
     if (col.required) entry.required = true;
@@ -82,7 +100,26 @@ export function toDslConfig<T extends Cols>(model: ModelDefinition<T>): Record<s
     return entry;
   });
   return {
-    name: model.tableName, table: model.tableName, primaryKey: model.primaryKey,
-    columns, option: { timestamps: true, softDeletes: false },
+    name: model.tableName, tableName: model.tableName, primaryKey: model.primaryKey,
+    columns, option: { timestamps: true, softDeletes: model.system?.softDelete ?? false },
+    // Table UI config — derived from column metadata
+    table: {
+      title: model.tableName, model: model.tableName,
+      list: {
+        columns: Object.entries(model.columns)
+          .filter(([, c]) => c.listable)
+          .map(([name, c]) => ({ field: name, label: c.label ?? name })),
+        orderBy: { field: model.primaryKey, direction: "desc" },
+      },
+      search: {
+        fields: Object.entries(model.columns)
+          .filter(([, c]) => c.searchable)
+          .map(([name, c]) => ({ field: name, label: c.label ?? name })),
+      },
+    },
+    // Access config
+    access: model.access ?? {},
+    // System invariants
+    system: model.system ?? {},
   };
 }

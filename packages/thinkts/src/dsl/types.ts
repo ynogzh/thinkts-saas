@@ -28,15 +28,21 @@ export interface ColumnDefinition<T = unknown> {
   readonly defaultValue?: unknown;
   /** Comment */
   readonly comment?: string;
+  /** Admin UI: column label */
+  readonly label?: string;
+  /** Admin UI: show in list table */
+  readonly listable: boolean;
+  /** Admin UI: show in search fields */
+  readonly searchable: boolean;
+  /** Admin UI: show in table filter dropdown */
+  readonly filterable: boolean;
 }
-
-type ColumnInit = Partial<Omit<ColumnDefinition, "_sqlType" | "_tsType">>;
-
 function col<T>(sqlType: string, init?: ColumnInit): ColumnDefinition<T> {
   return {
     _sqlType: sqlType,
     primary: false, required: false, unique: false,
     autoIncrement: false, index: false, nullable: false,
+    listable: false, searchable: false, filterable: false,
     ...init,
   };
 }
@@ -132,4 +138,24 @@ export function onUpdateNow<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
 /** Add column comment */
 export function comment<T>(text: string): (col: ColumnDefinition<T>) => ColumnDefinition<T> {
   return (col) => ({ ...col, comment: text });
+}
+
+/** Admin UI label */
+export function label<T>(text: string): (col: ColumnDefinition<T>) => ColumnDefinition<T> {
+  return (col) => ({ ...col, label: text, listable: true });
+}
+
+/** Show in list table */
+export function listable<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
+  return { ...col, listable: true };
+}
+
+/** Show in search fields */
+export function searchable<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
+  return { ...col, searchable: true };
+}
+
+/** Show in filter dropdown */
+export function filterable<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
+  return { ...col, filterable: true };
 }
