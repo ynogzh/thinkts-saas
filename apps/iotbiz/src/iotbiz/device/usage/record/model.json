@@ -1,0 +1,151 @@
+{
+  "name": "iotbiz_device_usage_record",
+  "table": "iotbiz_device_usage_record",
+  "comment": "iotbiz_device_usage_record",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "ID",
+      "autoIncrement": true
+    },
+    {
+      "name": "tenant_id",
+      "type": "bigInteger",
+      "label": "Tenant",
+      "nullable": false
+    },
+    {
+      "name": "user_id",
+      "type": "bigInteger",
+      "label": "User",
+      "nullable": false
+    },
+    {
+      "name": "device_id",
+      "type": "bigInteger",
+      "label": "Device",
+      "nullable": false
+    },
+    {
+      "name": "category_id",
+      "type": "bigInteger",
+      "label": "Category",
+      "nullable": false
+    },
+    {
+      "name": "session_id",
+      "type": "bigInteger",
+      "label": "Session",
+      "nullable": false
+    },
+    {
+      "name": "sku_id",
+      "type": "bigInteger",
+      "label": "Sku",
+      "nullable": true
+    },
+    {
+      "name": "usage_type",
+      "type": "string",
+      "label": "Usage type",
+      "length": 32,
+      "default": "single_use",
+      "nullable": false
+    },
+    {
+      "name": "amount",
+      "type": "decimal",
+      "label": "Amount",
+      "precision": 10,
+      "scale": 2,
+      "default": "0.00",
+      "nullable": false
+    },
+    {
+      "name": "started_at",
+      "type": "timestamp",
+      "label": "Started at",
+      "nullable": false
+    },
+    {
+      "name": "finished_at",
+      "type": "timestamp",
+      "label": "Finished at",
+      "nullable": true
+    },
+    {
+      "name": "extra_json",
+      "type": "json",
+      "label": "Extra json",
+      "nullable": true
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "label": "Status",
+      "length": 32,
+      "default": "enabled",
+      "nullable": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp",
+      "label": "Updated at",
+      "nullable": false
+    }
+  ],
+  "indexes": [
+    {
+      "name": "idx_tenant_user",
+      "fields": [
+        "tenant_id",
+        "user_id"
+      ],
+      "unique": false
+    },
+    {
+      "name": "idx_tenant_device",
+      "fields": [
+        "tenant_id",
+        "device_id"
+      ],
+      "unique": false
+    },
+    {
+      "name": "idx_tenant_category",
+      "fields": [
+        "tenant_id",
+        "category_id"
+      ],
+      "unique": false
+    },
+    {
+      "name": "idx_tenant_session",
+      "fields": [
+        "tenant_id",
+        "session_id"
+      ],
+      "unique": false
+    },
+    {
+      "name": "idx_tenant_status",
+      "fields": [
+        "tenant_id",
+        "status"
+      ],
+      "unique": false
+    }
+  ],
+  "dataResource": {
+    "resourceCode": "iotbiz_device_usage_record",
+    "tenantField": "tenant_id"
+  }
+}

@@ -1,0 +1,199 @@
+{
+  "title": "会员套餐订单",
+  "model": "iotbiz_package_order",
+  "list": {
+    "columns": [
+      {
+        "field": "order_no",
+        "title": "Order no",
+        "width": 140
+      },
+      {
+        "field": "user_id",
+        "title": "User id",
+        "width": 100
+      },
+      {
+        "field": "package_id",
+        "title": "Package id",
+        "width": 100
+      },
+      {
+        "field": "quantity",
+        "title": "Quantity",
+        "width": 80
+      },
+      {
+        "field": "pay_amount",
+        "title": "Pay amount",
+        "width": 100,
+        "render": "money"
+      },
+      {
+        "field": "status",
+        "title": "Status",
+        "width": 100,
+        "render": "tag"
+      }
+    ],
+    "orderBy": {
+      "field": "id",
+      "direction": "desc"
+    },
+    "pageSize": 20,
+    "rowActions": [
+      {
+        "type": "view",
+        "title": "查看"
+      },
+      {
+        "type": "edit",
+        "title": "编辑"
+      },
+      {
+        "type": "delete",
+        "title": "删除",
+        "confirm": "确认删除？"
+      }
+    ],
+    "headerActions": [
+      {
+        "type": "create",
+        "title": "新增会员套餐订单",
+        "icon": "plus"
+      }
+    ]
+  },
+  "search": {
+    "fields": [
+      {
+        "field": "order_no",
+        "title": "Order no",
+        "type": "input"
+      },
+      {
+        "field": "user_id",
+        "title": "User id",
+        "type": "numberRange"
+      },
+      {
+        "field": "status",
+        "title": "Status",
+        "type": "input"
+      }
+    ],
+    "showCount": 3
+  },
+  "form": {
+    "groups": [
+      {
+        "title": "基本信息",
+        "columns": 2,
+        "fields": [
+          {
+            "field": "tenant_id",
+            "title": "Tenant id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "user_id",
+            "title": "User id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "package_id",
+            "title": "Package id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "order_no",
+            "title": "Order no",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "quantity",
+            "title": "Quantity",
+            "type": "number"
+          },
+          {
+            "field": "pay_amount",
+            "title": "Pay amount",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "trade_order_id",
+            "title": "Trade order id",
+            "type": "number"
+          },
+          {
+            "field": "payment_order_id",
+            "title": "Payment order id",
+            "type": "number"
+          },
+          {
+            "field": "status",
+            "title": "Status",
+            "type": "input"
+          },
+          {
+            "field": "paid_at",
+            "title": "Paid at",
+            "type": "datetime"
+          }
+        ]
+      }
+    ],
+    "modes": {
+      "create": {
+        "fields": [
+          "tenant_id",
+          "user_id",
+          "package_id",
+          "order_no",
+          "quantity",
+          "pay_amount",
+          "trade_order_id",
+          "payment_order_id",
+          "status",
+          "paid_at"
+        ]
+      },
+      "edit": {
+        "fields": [
+          "tenant_id",
+          "user_id",
+          "package_id",
+          "order_no",
+          "quantity",
+          "pay_amount",
+          "trade_order_id",
+          "payment_order_id",
+          "status",
+          "paid_at"
+        ]
+      },
+      "view": {
+        "fields": [
+          "id",
+          "tenant_id",
+          "user_id",
+          "package_id",
+          "order_no",
+          "quantity",
+          "pay_amount",
+          "trade_order_id",
+          "payment_order_id",
+          "status",
+          "paid_at",
+          "created_at",
+          "updated_at"
+        ]
+      }
+    }
+  }
+}

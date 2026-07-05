@@ -1,0 +1,146 @@
+{
+  "name": "iotbiz_device_profile",
+  "table": "iotbiz_device_profile",
+  "comment": "iotbiz_device_profile",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "ID",
+      "autoIncrement": true
+    },
+    {
+      "name": "tenant_id",
+      "type": "bigInteger",
+      "label": "Tenant",
+      "nullable": false
+    },
+    {
+      "name": "category_id",
+      "type": "bigInteger",
+      "label": "Category",
+      "nullable": false
+    },
+    {
+      "name": "code",
+      "type": "string",
+      "label": "Code",
+      "length": 64,
+      "nullable": false
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "label": "Name",
+      "length": 128,
+      "nullable": false
+    },
+    {
+      "name": "start_mode",
+      "type": "string",
+      "label": "Start mode",
+      "length": 32,
+      "default": "mock",
+      "nullable": false
+    },
+    {
+      "name": "billing_mode",
+      "type": "string",
+      "label": "Billing mode",
+      "length": 32,
+      "default": "per_use",
+      "nullable": false
+    },
+    {
+      "name": "unit_price",
+      "type": "decimal",
+      "label": "Unit price",
+      "precision": 10,
+      "scale": 2,
+      "default": "0.00",
+      "nullable": false
+    },
+    {
+      "name": "duration_seconds",
+      "type": "integer",
+      "label": "Duration seconds",
+      "nullable": true
+    },
+    {
+      "name": "fault_threshold_json",
+      "type": "json",
+      "label": "Fault threshold json",
+      "nullable": true
+    },
+    {
+      "name": "start_command_json",
+      "type": "json",
+      "label": "Start command json",
+      "nullable": true
+    },
+    {
+      "name": "status_json",
+      "type": "json",
+      "label": "Status json",
+      "nullable": true
+    },
+    {
+      "name": "extra_json",
+      "type": "json",
+      "label": "Extra json",
+      "nullable": true
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "label": "Status",
+      "length": 32,
+      "default": "enabled",
+      "nullable": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp",
+      "label": "Updated at",
+      "nullable": false
+    }
+  ],
+  "indexes": [
+    {
+      "name": "uk_tenant_category_code",
+      "fields": [
+        "tenant_id",
+        "category_id",
+        "code"
+      ],
+      "unique": true
+    },
+    {
+      "name": "idx_tenant_category",
+      "fields": [
+        "tenant_id",
+        "category_id"
+      ],
+      "unique": false
+    },
+    {
+      "name": "idx_tenant_status",
+      "fields": [
+        "tenant_id",
+        "status"
+      ],
+      "unique": false
+    }
+  ],
+  "dataResource": {
+    "resourceCode": "iotbiz_device_profile",
+    "tenantField": "tenant_id"
+  }
+}

@@ -1,0 +1,195 @@
+{
+  "name": "iotbiz_session",
+  "table": "iotbiz_session",
+  "comment": "iotbiz_session",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "Id",
+      "required": true,
+      "primary": true,
+      "autoIncrement": true,
+      "index": true
+    },
+    {
+      "name": "tenant_id",
+      "type": "bigInteger",
+      "label": "Tenant id",
+      "required": true,
+      "index": true
+    },
+    {
+      "name": "session_no",
+      "type": "string",
+      "label": "Session no",
+      "length": 64,
+      "required": true
+    },
+    {
+      "name": "device_id",
+      "type": "bigInteger",
+      "label": "Device id",
+      "required": true
+    },
+    {
+      "name": "merchant_id",
+      "type": "bigInteger",
+      "label": "Merchant id",
+      "required": true
+    },
+    {
+      "name": "agent_id",
+      "type": "bigInteger",
+      "label": "Agent id",
+      "required": true
+    },
+    {
+      "name": "user_id",
+      "type": "bigInteger",
+      "label": "User id",
+      "required": true
+    },
+    {
+      "name": "consume_mode",
+      "type": "string",
+      "label": "Consume mode",
+      "length": 32,
+      "required": true
+    },
+    {
+      "name": "package_id",
+      "type": "bigInteger",
+      "label": "Package id",
+      "nullable": true
+    },
+    {
+      "name": "entitlement_id",
+      "type": "bigInteger",
+      "label": "Entitlement id",
+      "nullable": true
+    },
+    {
+      "name": "trade_order_id",
+      "type": "bigInteger",
+      "label": "Trade order id",
+      "nullable": true
+    },
+    {
+      "name": "payment_order_id",
+      "type": "bigInteger",
+      "label": "Payment order id",
+      "nullable": true
+    },
+    {
+      "name": "unit_price",
+      "type": "decimal",
+      "label": "Unit price",
+      "precision": 12,
+      "scale": 2,
+      "default": 0
+    },
+    {
+      "name": "quantity",
+      "type": "integer",
+      "label": "Quantity",
+      "default": 1
+    },
+    {
+      "name": "duration_seconds",
+      "type": "integer",
+      "label": "Duration seconds",
+      "nullable": true
+    },
+    {
+      "name": "amount",
+      "type": "decimal",
+      "label": "Amount",
+      "precision": 12,
+      "scale": 2,
+      "default": 0
+    },
+    {
+      "name": "payable_amount",
+      "type": "decimal",
+      "label": "Payable amount",
+      "precision": 12,
+      "scale": 2,
+      "default": 0
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "label": "Status",
+      "length": 32,
+      "default": "created"
+    },
+    {
+      "name": "started_at",
+      "type": "timestamp",
+      "label": "Started at",
+      "nullable": true
+    },
+    {
+      "name": "ended_at",
+      "type": "timestamp",
+      "label": "Ended at",
+      "nullable": true
+    },
+    {
+      "name": "finish_reason",
+      "type": "string",
+      "label": "Finish reason",
+      "length": 64,
+      "nullable": true
+    },
+    {
+      "name": "start_payload_json",
+      "type": "json",
+      "label": "Start payload json",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "required": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp",
+      "label": "Updated at",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "name": "uk_tenant_session_no",
+      "columns": [
+        "tenant_id",
+        "session_no"
+      ],
+      "unique": true
+    },
+    {
+      "name": "idx_tenant_device_status",
+      "columns": [
+        "tenant_id",
+        "device_id",
+        "status"
+      ],
+      "unique": false
+    }
+  ],
+  "option": {
+    "timestamps": true,
+    "softDeletes": false
+  },
+  "dataResource": {
+    "resourceCode": "iotbiz_session",
+    "tenantField": "tenant_id",
+    "ownerField": "user_id",
+    "agentField": "agent_id"
+  }
+}

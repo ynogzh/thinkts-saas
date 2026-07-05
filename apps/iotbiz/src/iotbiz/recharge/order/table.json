@@ -1,0 +1,200 @@
+{
+  "title": "会员充值订单",
+  "model": "iotbiz_recharge_order",
+  "list": {
+    "columns": [
+      {
+        "field": "recharge_no",
+        "title": "Recharge no",
+        "width": 140
+      },
+      {
+        "field": "user_id",
+        "title": "User id",
+        "width": 100
+      },
+      {
+        "field": "asset_type",
+        "title": "Asset type",
+        "width": 120
+      },
+      {
+        "field": "amount",
+        "title": "Amount",
+        "width": 100,
+        "render": "money"
+      },
+      {
+        "field": "bonus_amount",
+        "title": "Bonus",
+        "width": 100,
+        "render": "money"
+      },
+      {
+        "field": "status",
+        "title": "Status",
+        "width": 100,
+        "render": "tag"
+      }
+    ],
+    "orderBy": {
+      "field": "id",
+      "direction": "desc"
+    },
+    "pageSize": 20,
+    "rowActions": [
+      {
+        "type": "view",
+        "title": "查看"
+      },
+      {
+        "type": "edit",
+        "title": "编辑"
+      },
+      {
+        "type": "delete",
+        "title": "删除",
+        "confirm": "确认删除？"
+      }
+    ],
+    "headerActions": [
+      {
+        "type": "create",
+        "title": "新增会员充值订单",
+        "icon": "plus"
+      }
+    ]
+  },
+  "search": {
+    "fields": [
+      {
+        "field": "recharge_no",
+        "title": "Recharge no",
+        "type": "input"
+      },
+      {
+        "field": "user_id",
+        "title": "User id",
+        "type": "numberRange"
+      },
+      {
+        "field": "status",
+        "title": "Status",
+        "type": "input"
+      }
+    ],
+    "showCount": 3
+  },
+  "form": {
+    "groups": [
+      {
+        "title": "基本信息",
+        "columns": 2,
+        "fields": [
+          {
+            "field": "tenant_id",
+            "title": "Tenant id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "user_id",
+            "title": "User id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "recharge_no",
+            "title": "Recharge no",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "asset_type",
+            "title": "Asset type",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "amount",
+            "title": "Amount",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "bonus_amount",
+            "title": "Bonus amount",
+            "type": "number"
+          },
+          {
+            "field": "trade_order_id",
+            "title": "Trade order id",
+            "type": "number"
+          },
+          {
+            "field": "payment_order_id",
+            "title": "Payment order id",
+            "type": "number"
+          },
+          {
+            "field": "status",
+            "title": "Status",
+            "type": "input"
+          },
+          {
+            "field": "paid_at",
+            "title": "Paid at",
+            "type": "datetime"
+          }
+        ]
+      }
+    ],
+    "modes": {
+      "create": {
+        "fields": [
+          "tenant_id",
+          "user_id",
+          "recharge_no",
+          "asset_type",
+          "amount",
+          "bonus_amount",
+          "trade_order_id",
+          "payment_order_id",
+          "status",
+          "paid_at"
+        ]
+      },
+      "edit": {
+        "fields": [
+          "tenant_id",
+          "user_id",
+          "recharge_no",
+          "asset_type",
+          "amount",
+          "bonus_amount",
+          "trade_order_id",
+          "payment_order_id",
+          "status",
+          "paid_at"
+        ]
+      },
+      "view": {
+        "fields": [
+          "id",
+          "tenant_id",
+          "user_id",
+          "recharge_no",
+          "asset_type",
+          "amount",
+          "bonus_amount",
+          "trade_order_id",
+          "payment_order_id",
+          "status",
+          "paid_at",
+          "created_at",
+          "updated_at"
+        ]
+      }
+    }
+  }
+}

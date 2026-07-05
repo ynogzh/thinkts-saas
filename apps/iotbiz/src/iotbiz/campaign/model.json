@@ -1,0 +1,140 @@
+{
+  "name": "iotbiz_campaign",
+  "table": "iotbiz_campaign",
+  "comment": "iotbiz_campaign",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "Id",
+      "required": true,
+      "primary": true,
+      "autoIncrement": true,
+      "index": true
+    },
+    {
+      "name": "tenant_id",
+      "type": "bigInteger",
+      "label": "Tenant id",
+      "required": true,
+      "index": true
+    },
+    {
+      "name": "code",
+      "type": "string",
+      "label": "Code",
+      "length": 64,
+      "required": true
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "label": "Name",
+      "length": 128,
+      "required": true
+    },
+    {
+      "name": "campaign_type",
+      "type": "string",
+      "label": "Campaign type",
+      "length": 64,
+      "required": true
+    },
+    {
+      "name": "scene_code",
+      "type": "string",
+      "label": "Scene code",
+      "length": 64,
+      "nullable": true
+    },
+    {
+      "name": "device_scope_json",
+      "type": "json",
+      "label": "Device scope json",
+      "nullable": true
+    },
+    {
+      "name": "package_scope_json",
+      "type": "json",
+      "label": "Package scope json",
+      "nullable": true
+    },
+    {
+      "name": "coupon_template_id",
+      "type": "bigInteger",
+      "label": "Coupon template id",
+      "nullable": true
+    },
+    {
+      "name": "start_at",
+      "type": "timestamp",
+      "label": "Start at",
+      "nullable": true
+    },
+    {
+      "name": "end_at",
+      "type": "timestamp",
+      "label": "End at",
+      "nullable": true
+    },
+    {
+      "name": "rule_json",
+      "type": "json",
+      "label": "Rule json",
+      "nullable": true
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "label": "Status",
+      "length": 32,
+      "default": "draft"
+    },
+    {
+      "name": "published_at",
+      "type": "timestamp",
+      "label": "Published at",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "required": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp",
+      "label": "Updated at",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "name": "uk_tenant_code",
+      "columns": [
+        "tenant_id",
+        "code"
+      ],
+      "unique": true
+    },
+    {
+      "name": "idx_tenant_status_scene",
+      "columns": [
+        "tenant_id",
+        "status",
+        "scene_code"
+      ],
+      "unique": false
+    }
+  ],
+  "option": {
+    "timestamps": true,
+    "softDeletes": false
+  },
+  "dataResource": {
+    "resourceCode": "iotbiz_campaign",
+    "tenantField": "tenant_id"
+  }
+}

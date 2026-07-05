@@ -1,0 +1,221 @@
+{
+  "title": "会员套餐",
+  "model": "iotbiz_package",
+  "list": {
+    "columns": [
+      {
+        "field": "code",
+        "title": "Code",
+        "width": 120
+      },
+      {
+        "field": "name",
+        "title": "Name",
+        "width": 150
+      },
+      {
+        "field": "package_type",
+        "title": "Package type",
+        "width": 120,
+        "render": "tag"
+      },
+      {
+        "field": "sale_price",
+        "title": "Sale price",
+        "width": 100,
+        "render": "money"
+      },
+      {
+        "field": "status",
+        "title": "Status",
+        "width": 100,
+        "render": "tag"
+      }
+    ],
+    "orderBy": {
+      "field": "id",
+      "direction": "desc"
+    },
+    "pageSize": 20,
+    "rowActions": [
+      {
+        "type": "view",
+        "title": "查看"
+      },
+      {
+        "type": "edit",
+        "title": "编辑"
+      },
+      {
+        "type": "delete",
+        "title": "删除",
+        "confirm": "确认删除？"
+      }
+    ],
+    "headerActions": [
+      {
+        "type": "create",
+        "title": "新增会员套餐",
+        "icon": "plus"
+      }
+    ]
+  },
+  "search": {
+    "fields": [
+      {
+        "field": "code",
+        "title": "Code",
+        "type": "input"
+      },
+      {
+        "field": "package_type",
+        "title": "Package type",
+        "type": "input"
+      },
+      {
+        "field": "status",
+        "title": "Status",
+        "type": "input"
+      }
+    ],
+    "showCount": 3
+  },
+  "form": {
+    "groups": [
+      {
+        "title": "基本信息",
+        "columns": 2,
+        "fields": [
+          {
+            "field": "tenant_id",
+            "title": "Tenant id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "code",
+            "title": "Code",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "name",
+            "title": "Name",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "package_type",
+            "title": "Package type",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "sale_price",
+            "title": "Sale price",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "recharge_amount",
+            "title": "Recharge amount",
+            "type": "number"
+          },
+          {
+            "field": "bonus_amount",
+            "title": "Bonus amount",
+            "type": "number"
+          },
+          {
+            "field": "total_times",
+            "title": "Total times",
+            "type": "number"
+          },
+          {
+            "field": "total_duration_seconds",
+            "title": "Total duration seconds",
+            "type": "number"
+          },
+          {
+            "field": "validity_days",
+            "title": "Validity days",
+            "type": "number"
+          },
+          {
+            "field": "status",
+            "title": "Status",
+            "type": "input"
+          },
+          {
+            "field": "device_type_scope_json",
+            "title": "Device type scope json",
+            "type": "textarea",
+            "span": 2
+          },
+          {
+            "field": "benefits_json",
+            "title": "Benefits json",
+            "type": "textarea",
+            "span": 2
+          }
+        ]
+      }
+    ],
+    "modes": {
+      "create": {
+        "fields": [
+          "tenant_id",
+          "code",
+          "name",
+          "package_type",
+          "sale_price",
+          "recharge_amount",
+          "bonus_amount",
+          "total_times",
+          "total_duration_seconds",
+          "validity_days",
+          "status",
+          "device_type_scope_json",
+          "benefits_json"
+        ]
+      },
+      "edit": {
+        "fields": [
+          "tenant_id",
+          "code",
+          "name",
+          "package_type",
+          "sale_price",
+          "recharge_amount",
+          "bonus_amount",
+          "total_times",
+          "total_duration_seconds",
+          "validity_days",
+          "status",
+          "device_type_scope_json",
+          "benefits_json"
+        ]
+      },
+      "view": {
+        "fields": [
+          "id",
+          "tenant_id",
+          "code",
+          "name",
+          "package_type",
+          "sale_price",
+          "recharge_amount",
+          "bonus_amount",
+          "total_times",
+          "total_duration_seconds",
+          "validity_days",
+          "status",
+          "device_type_scope_json",
+          "benefits_json",
+          "created_at",
+          "updated_at"
+        ]
+      }
+    }
+  }
+}

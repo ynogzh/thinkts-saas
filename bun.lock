@@ -11,6 +11,55 @@
         "valibot": "^1.4.1",
       },
     },
+    "apps/iotbiz": {
+      "name": "@app/iotbiz",
+      "version": "0.1.0",
+      "dependencies": {
+        "@thinkts/cms": "workspace:*",
+        "@thinkts/identity": "workspace:*",
+        "@thinkts/payment": "workspace:*",
+        "@thinkts/permission": "workspace:*",
+        "@thinkts/promote": "workspace:*",
+        "@thinkts/tenant": "workspace:*",
+        "@thinkts/trade": "workspace:*",
+        "thinkts": "workspace:*",
+      },
+    },
+    "packages/cms": {
+      "name": "@thinkts/cms",
+      "version": "0.1.0",
+      "dependencies": {
+        "thinkts": "workspace:*",
+      },
+    },
+    "packages/identity": {
+      "name": "@thinkts/identity",
+      "version": "0.1.0",
+      "dependencies": {
+        "thinkts": "workspace:*",
+      },
+    },
+    "packages/payment": {
+      "name": "@thinkts/payment",
+      "version": "0.1.0",
+      "dependencies": {
+        "thinkts": "workspace:*",
+      },
+    },
+    "packages/permission": {
+      "name": "@thinkts/permission",
+      "version": "0.1.0",
+      "dependencies": {
+        "thinkts": "workspace:*",
+      },
+    },
+    "packages/promote": {
+      "name": "@thinkts/promote",
+      "version": "0.1.0",
+      "dependencies": {
+        "thinkts": "workspace:*",
+      },
+    },
     "packages/tenant": {
       "name": "@thinkts/tenant",
       "version": "0.1.0",
@@ -36,9 +85,30 @@
         "typescript": "^5.4.0",
       },
     },
+    "packages/trade": {
+      "name": "@thinkts/trade",
+      "version": "0.1.0",
+      "dependencies": {
+        "thinkts": "workspace:*",
+      },
+    },
   },
   "packages": {
+    "@app/iotbiz": ["@app/iotbiz@workspace:apps/iotbiz"],
+
+    "@thinkts/cms": ["@thinkts/cms@workspace:packages/cms"],
+
+    "@thinkts/identity": ["@thinkts/identity@workspace:packages/identity"],
+
+    "@thinkts/payment": ["@thinkts/payment@workspace:packages/payment"],
+
+    "@thinkts/permission": ["@thinkts/permission@workspace:packages/permission"],
+
+    "@thinkts/promote": ["@thinkts/promote@workspace:packages/promote"],
+
     "@thinkts/tenant": ["@thinkts/tenant@workspace:packages/tenant"],
+
+    "@thinkts/trade": ["@thinkts/trade@workspace:packages/trade"],
 
     "@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
 

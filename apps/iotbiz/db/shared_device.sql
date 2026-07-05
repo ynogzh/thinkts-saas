@@ -1,0 +1,335 @@
+CREATE TABLE IF NOT EXISTS iotbiz_merchant (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  tenant_id BIGINT NOT NULL,
+  merchant_no VARCHAR(64) NOT NULL,
+  name VARCHAR(128) NOT NULL,
+  agent_id BIGINT NOT NULL,
+  contact_user_id BIGINT NULL,
+  contact_name VARCHAR(64) NULL,
+  contact_phone VARCHAR(32) NULL,
+  merchant_share_rate DECIMAL(6,4) NOT NULL DEFAULT 0.7000,
+  settlement_cycle VARCHAR(32) NOT NULL DEFAULT 'weekly',
+  signed_at TIMESTAMP NULL,
+  status VARCHAR(32) NOT NULL DEFAULT 'enabled',
+  extra_json JSON NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_tenant_merchant_no (tenant_id, merchant_no),
+  KEY idx_tenant_agent (tenant_id, agent_id)
+);
+
+CREATE TABLE IF NOT EXISTS iotbiz_device_type (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  tenant_id BIGINT NOT NULL,
+  code VARCHAR(64) NOT NULL,
+  name VARCHAR(128) NOT NULL,
+  category VARCHAR(64) NOT NULL,
+  billing_mode VARCHAR(32) NOT NULL,
+  default_unit_price DECIMAL(12,2) NOT NULL DEFAULT 0,
+  default_duration_seconds INT NULL,
+  start_mode VARCHAR(32) NOT NULL DEFAULT 'mock',
+  config_json JSON NULL,
+  status VARCHAR(32) NOT NULL DEFAULT 'enabled',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_tenant_code (tenant_id, code)
+);
+
+CREATE TABLE IF NOT EXISTS iotbiz_device (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  tenant_id BIGINT NOT NULL,
+  device_no VARCHAR(64) NOT NULL,
+  name VARCHAR(128) NOT NULL,
+  merchant_id BIGINT NOT NULL,
+  agent_id BIGINT NOT NULL,
+  type_id BIGINT NOT NULL,
+  location_label VARCHAR(255) NULL,
+  online_status VARCHAR(32) NOT NULL DEFAULT 'offline',
+  start_mode VARCHAR(32) NOT NULL DEFAULT 'mock',
+  pricing_json JSON NULL,
+  start_config_json JSON NULL,
+  last_heartbeat_at TIMESTAMP NULL,
+  last_start_at TIMESTAMP NULL,
+  status VARCHAR(32) NOT NULL DEFAULT 'enabled',
+  metadata_json JSON NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_tenant_device_no (tenant_id, device_no),
+  KEY idx_tenant_merchant (tenant_id, merchant_id)
+);
+
+CREATE TABLE IF NOT EXISTS iotbiz_site (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  tenant_id BIGINT NOT NULL,
+  site_no VARCHAR(64) NOT NULL,
+  name VARCHAR(128) NOT NULL,
+  merchant_id BIGINT NOT NULL,
+  agent_id BIGINT NOT NULL,
+  address VARCHAR(255) NULL,
+  location_label VARCHAR(255) NULL,
+  latitude DECIMAL(10,6) NULL,
+  longitude DECIMAL(10,6) NULL,
+  contact_name VARCHAR(64) NULL,
+  contact_phone VARCHAR(32) NULL,
+  device_capacity INT NOT NULL DEFAULT 0,
+  status VARCHAR(32) NOT NULL DEFAULT 'enabled',
+  metadata_json JSON NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_tenant_site_no (tenant_id, site_no),
+  KEY idx_tenant_merchant (tenant_id, merchant_id)
+);
+
+CREATE TABLE IF NOT EXISTS iotbiz_param_template (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  tenant_id BIGINT NOT NULL,
+  code VARCHAR(64) NOT NULL,
+  name VARCHAR(128) NOT NULL,
+  type_id BIGINT NULL,
+  start_mode VARCHAR(32) NOT NULL DEFAULT 'mock',
+  pricing_json JSON NULL,
+  start_config_json JSON NULL,
+  metadata_json JSON NULL,
+  status VARCHAR(32) NOT NULL DEFAULT 'enabled',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_tenant_code (tenant_id, code),
+  KEY idx_tenant_type_status (tenant_id, type_id, status)
+);
+
+CREATE TABLE IF NOT EXISTS iotbiz_command_log (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  tenant_id BIGINT NOT NULL,
+  device_id BIGINT NOT NULL,
+  session_id BIGINT NULL,
+  command_type VARCHAR(64) NOT NULL,
+  request_payload_json JSON NULL,
+  response_payload_json JSON NULL,
+  status VARCHAR(32) NOT NULL DEFAULT 'pending',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_tenant_device (tenant_id, device_id)
+);
+
+CREATE TABLE IF NOT EXISTS iotbiz_package (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  tenant_id BIGINT NOT NULL,
+  code VARCHAR(64) NOT NULL,
+  name VARCHAR(128) NOT NULL,
+  package_type VARCHAR(32) NOT NULL,
+  sale_price DECIMAL(12,2) NOT NULL,
+  recharge_amount DECIMAL(12,2) NULL,
+  bonus_amount DECIMAL(12,2) NOT NULL DEFAULT 0,
+  total_times INT NULL,
+  total_duration_seconds INT NULL,
+  validity_days INT NULL,
+  device_type_scope_json JSON NULL,
+  benefits_json JSON NULL,
+  status VARCHAR(32) NOT NULL DEFAULT 'enabled',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_tenant_code (tenant_id, code)
+);
+
+CREATE TABLE IF NOT EXISTS iotbiz_entitlement (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  tenant_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  package_id BIGINT NOT NULL,
+  package_order_id BIGINT NOT NULL,
+  package_type VARCHAR(32) NOT NULL,
+  granted_amount DECIMAL(12,2) NOT NULL DEFAULT 0,
+  used_amount DECIMAL(12,2) NOT NULL DEFAULT 0,
+  remaining_times INT NOT NULL DEFAULT 0,
+  remaining_duration_seconds INT NOT NULL DEFAULT 0,
+  expires_at TIMESTAMP NULL,
+  status VARCHAR(32) NOT NULL DEFAULT 'enabled',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_tenant_user_status (tenant_id, user_id, status)
+);
+
+CREATE TABLE IF NOT EXISTS iotbiz_recharge_order (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  tenant_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  recharge_no VARCHAR(64) NOT NULL,
+  asset_type VARCHAR(64) NOT NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  bonus_amount DECIMAL(12,2) NOT NULL DEFAULT 0,
+  trade_order_id BIGINT NULL,
+  payment_order_id BIGINT NULL,
+  status VARCHAR(32) NOT NULL DEFAULT 'created',
+  paid_at TIMESTAMP NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_tenant_recharge_no (tenant_id, recharge_no)
+);
+
+CREATE TABLE IF NOT EXISTS iotbiz_package_order (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  tenant_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  package_id BIGINT NOT NULL,
+  order_no VARCHAR(64) NOT NULL,
+  quantity INT NOT NULL DEFAULT 1,
+  pay_amount DECIMAL(12,2) NOT NULL,
+  trade_order_id BIGINT NULL,
+  payment_order_id BIGINT NULL,
+  status VARCHAR(32) NOT NULL DEFAULT 'created',
+  paid_at TIMESTAMP NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_tenant_order_no (tenant_id, order_no)
+);
+
+CREATE TABLE IF NOT EXISTS iotbiz_session (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  tenant_id BIGINT NOT NULL,
+  session_no VARCHAR(64) NOT NULL,
+  device_id BIGINT NOT NULL,
+  merchant_id BIGINT NOT NULL,
+  agent_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  consume_mode VARCHAR(32) NOT NULL,
+  package_id BIGINT NULL,
+  entitlement_id BIGINT NULL,
+  trade_order_id BIGINT NULL,
+  payment_order_id BIGINT NULL,
+  unit_price DECIMAL(12,2) NOT NULL DEFAULT 0,
+  quantity INT NOT NULL DEFAULT 1,
+  duration_seconds INT NULL,
+  amount DECIMAL(12,2) NOT NULL DEFAULT 0,
+  payable_amount DECIMAL(12,2) NOT NULL DEFAULT 0,
+  status VARCHAR(32) NOT NULL DEFAULT 'created',
+  started_at TIMESTAMP NULL,
+  ended_at TIMESTAMP NULL,
+  finish_reason VARCHAR(64) NULL,
+  start_payload_json JSON NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_tenant_session_no (tenant_id, session_no),
+  KEY idx_tenant_device_status (tenant_id, device_id, status)
+);
+
+CREATE TABLE IF NOT EXISTS iotbiz_revenue_share (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  tenant_id BIGINT NOT NULL,
+  biz_type VARCHAR(64) NOT NULL,
+  biz_id BIGINT NOT NULL,
+  session_id BIGINT NOT NULL,
+  trade_order_id BIGINT NOT NULL,
+  receiver_type VARCHAR(32) NOT NULL,
+  receiver_id BIGINT NULL,
+  rule_type VARCHAR(64) NOT NULL,
+  rate DECIMAL(6,4) NOT NULL DEFAULT 0,
+  amount DECIMAL(12,2) NOT NULL,
+  settle_order_id BIGINT NULL,
+  status VARCHAR(32) NOT NULL DEFAULT 'pending',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_tenant_receiver_status (tenant_id, receiver_type, receiver_id, status)
+);
+
+CREATE TABLE IF NOT EXISTS iotbiz_campaign (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  tenant_id BIGINT NOT NULL,
+  code VARCHAR(64) NOT NULL,
+  name VARCHAR(128) NOT NULL,
+  campaign_type VARCHAR(64) NOT NULL,
+  scene_code VARCHAR(64) NULL,
+  device_scope_json JSON NULL,
+  package_scope_json JSON NULL,
+  coupon_template_id BIGINT NULL,
+  start_at TIMESTAMP NULL,
+  end_at TIMESTAMP NULL,
+  rule_json JSON NULL,
+  status VARCHAR(32) NOT NULL DEFAULT 'draft',
+  published_at TIMESTAMP NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_tenant_code (tenant_id, code),
+  KEY idx_tenant_status_scene (tenant_id, status, scene_code)
+);
+CREATE TABLE IF NOT EXISTS iotbiz_device_category (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  tenant_id BIGINT NOT NULL,
+  code VARCHAR(64) NOT NULL,
+  name VARCHAR(128) NOT NULL,
+  description VARCHAR(500) NULL,
+  icon VARCHAR(128) NULL,
+  sort_order INT NOT NULL DEFAULT 0,
+  status VARCHAR(32) NOT NULL DEFAULT 'enabled',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_tenant_code (tenant_id, code),
+  KEY idx_tenant_status (tenant_id, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='设备品类定义（娃娃机/按摩椅/售货机）';
+
+CREATE TABLE IF NOT EXISTS iotbiz_device_profile (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  tenant_id BIGINT NOT NULL,
+  category_id BIGINT NOT NULL,
+  code VARCHAR(64) NOT NULL,
+  name VARCHAR(128) NOT NULL,
+  start_mode VARCHAR(32) NOT NULL DEFAULT 'mock',
+  billing_mode VARCHAR(32) NOT NULL DEFAULT 'per_use',
+  unit_price DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+  duration_seconds INT NULL,
+  fault_threshold_json JSON NULL,
+  start_command_json JSON NULL,
+  status_json JSON NULL,
+  extra_json JSON NULL,
+  status VARCHAR(32) NOT NULL DEFAULT 'enabled',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_tenant_category_code (tenant_id, category_id, code),
+  KEY idx_tenant_category (tenant_id, category_id),
+  KEY idx_tenant_status (tenant_id, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='设备品类专属配置';
+
+CREATE TABLE IF NOT EXISTS iotbiz_device_sku (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  tenant_id BIGINT NOT NULL,
+  category_id BIGINT NOT NULL,
+  profile_id BIGINT NOT NULL,
+  code VARCHAR(64) NOT NULL,
+  name VARCHAR(128) NOT NULL,
+  sale_mode VARCHAR(32) NOT NULL DEFAULT 'single_use',
+  price DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+  original_price DECIMAL(10, 2) NULL,
+  package_quantity INT NULL,
+  validity_days INT NULL,
+  benefits_json JSON NULL,
+  extra_json JSON NULL,
+  status VARCHAR(32) NOT NULL DEFAULT 'enabled',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_tenant_code (tenant_id, code),
+  KEY idx_tenant_category (tenant_id, category_id),
+  KEY idx_tenant_profile (tenant_id, profile_id),
+  KEY idx_tenant_status (tenant_id, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='设备商品 SKU（按品类区分）';
+
+CREATE TABLE IF NOT EXISTS iotbiz_device_usage_record (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  tenant_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  device_id BIGINT NOT NULL,
+  category_id BIGINT NOT NULL,
+  session_id BIGINT NOT NULL,
+  sku_id BIGINT NULL,
+  usage_type VARCHAR(32) NOT NULL DEFAULT 'single_use',
+  amount DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+  started_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  finished_at TIMESTAMP NULL,
+  extra_json JSON NULL,
+  status VARCHAR(32) NOT NULL DEFAULT 'enabled',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_tenant_user (tenant_id, user_id),
+  KEY idx_tenant_device (tenant_id, device_id),
+  KEY idx_tenant_category (tenant_id, category_id),
+  KEY idx_tenant_session (tenant_id, session_id),
+  KEY idx_tenant_status (tenant_id, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='会员设备使用记录';

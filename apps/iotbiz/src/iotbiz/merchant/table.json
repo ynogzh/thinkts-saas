@@ -1,0 +1,224 @@
+{
+  "title": "商家",
+  "model": "iotbiz_merchant",
+  "list": {
+    "columns": [
+      {
+        "field": "merchant_no",
+        "title": "Merchant no",
+        "width": 140
+      },
+      {
+        "field": "name",
+        "title": "Name",
+        "width": 160
+      },
+      {
+        "field": "agent_id",
+        "title": "Agent id",
+        "width": 100
+      },
+      {
+        "field": "contact_name",
+        "title": "Contact name",
+        "width": 120
+      },
+      {
+        "field": "contact_phone",
+        "title": "Contact phone",
+        "width": 120
+      },
+      {
+        "field": "merchant_share_rate",
+        "title": "Share rate",
+        "width": 100
+      },
+      {
+        "field": "status",
+        "title": "Status",
+        "width": 100,
+        "render": "tag"
+      }
+    ],
+    "orderBy": {
+      "field": "id",
+      "direction": "desc"
+    },
+    "pageSize": 20,
+    "rowActions": [
+      {
+        "type": "view",
+        "title": "查看"
+      },
+      {
+        "type": "edit",
+        "title": "编辑"
+      },
+      {
+        "type": "delete",
+        "title": "删除",
+        "confirm": "确认删除？"
+      }
+    ],
+    "headerActions": [
+      {
+        "type": "create",
+        "title": "新增商家",
+        "icon": "plus"
+      }
+    ]
+  },
+  "search": {
+    "fields": [
+      {
+        "field": "merchant_no",
+        "title": "Merchant no",
+        "type": "input"
+      },
+      {
+        "field": "name",
+        "title": "Name",
+        "type": "input"
+      },
+      {
+        "field": "agent_id",
+        "title": "Agent id",
+        "type": "numberRange"
+      },
+      {
+        "field": "status",
+        "title": "Status",
+        "type": "input"
+      }
+    ],
+    "showCount": 3
+  },
+  "form": {
+    "groups": [
+      {
+        "title": "基本信息",
+        "columns": 2,
+        "fields": [
+          {
+            "field": "tenant_id",
+            "title": "Tenant id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "merchant_no",
+            "title": "Merchant no",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "name",
+            "title": "Name",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "agent_id",
+            "title": "Agent id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "contact_user_id",
+            "title": "Contact user id",
+            "type": "number"
+          },
+          {
+            "field": "contact_name",
+            "title": "Contact name",
+            "type": "input"
+          },
+          {
+            "field": "contact_phone",
+            "title": "Contact phone",
+            "type": "input"
+          },
+          {
+            "field": "merchant_share_rate",
+            "title": "Share rate",
+            "type": "number"
+          },
+          {
+            "field": "settlement_cycle",
+            "title": "Settlement cycle",
+            "type": "input"
+          },
+          {
+            "field": "signed_at",
+            "title": "Signed at",
+            "type": "datetime"
+          },
+          {
+            "field": "status",
+            "title": "Status",
+            "type": "input"
+          },
+          {
+            "field": "extra_json",
+            "title": "Extra json",
+            "type": "textarea",
+            "span": 2
+          }
+        ]
+      }
+    ],
+    "modes": {
+      "create": {
+        "fields": [
+          "tenant_id",
+          "merchant_no",
+          "name",
+          "agent_id",
+          "contact_user_id",
+          "contact_name",
+          "contact_phone",
+          "merchant_share_rate",
+          "settlement_cycle",
+          "signed_at",
+          "status",
+          "extra_json"
+        ]
+      },
+      "edit": {
+        "fields": [
+          "tenant_id",
+          "merchant_no",
+          "name",
+          "agent_id",
+          "contact_user_id",
+          "contact_name",
+          "contact_phone",
+          "merchant_share_rate",
+          "settlement_cycle",
+          "signed_at",
+          "status",
+          "extra_json"
+        ]
+      },
+      "view": {
+        "fields": [
+          "id",
+          "tenant_id",
+          "merchant_no",
+          "name",
+          "agent_id",
+          "contact_user_id",
+          "contact_name",
+          "contact_phone",
+          "merchant_share_rate",
+          "settlement_cycle",
+          "signed_at",
+          "status",
+          "extra_json",
+          "created_at",
+          "updated_at"
+        ]
+      }
+    }
+  }
+}

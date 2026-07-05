@@ -1,0 +1,41 @@
+{
+  "title": "设备点位",
+  "model": "iotbiz_site",
+  "list": {
+    "pageSize": 20,
+    "columns": [
+      { "field": "id", "title": "ID", "width": 80 },
+      { "field": "name", "title": "名称", "width": 160 },
+      { "field": "merchant_id", "title": "商家", "width": 100 },
+      { "field": "agent_id", "title": "代理", "width": 100 },
+      { "field": "device_capacity", "title": "容量", "width": 80 },
+      { "field": "status", "title": "状态", "width": 100, "render": "tag" }
+    ]
+  },
+  "search": { "fields": [ { "field": "name", "title": "名称", "type": "input" }, { "field": "status", "title": "状态", "type": "select" } ] },
+  "form": {
+    "groups": [
+      { "title": "点位信息", "columns": 2, "fields": [
+        { "field": "tenant_id", "title": "租户", "type": "number", "required": true },
+        { "field": "site_no", "title": "点位编号", "type": "input", "required": true },
+        { "field": "name", "title": "名称", "type": "input", "required": true },
+        { "field": "merchant_id", "title": "商家", "type": "select", "required": true, "optionsSource": { "resourcePath": "iotbiz/merchant", "labelFields": ["name", "merchant_no"], "valueField": "id" } },
+        { "field": "agent_id", "title": "代理", "type": "select", "required": true, "optionsSource": { "resourcePath": "promote/agent", "labelFields": ["name", "agent_no"], "valueField": "id" } },
+        { "field": "address", "title": "地址", "type": "input" },
+        { "field": "location_label", "title": "位置标签", "type": "input" },
+        { "field": "latitude", "title": "纬度", "type": "number" },
+        { "field": "longitude", "title": "经度", "type": "number" },
+        { "field": "contact_name", "title": "联系人", "type": "input" },
+        { "field": "contact_phone", "title": "联系电话", "type": "input" },
+        { "field": "device_capacity", "title": "设备容量", "type": "number" },
+        { "field": "status", "title": "状态", "type": "select", "options": [ { "label": "启用", "value": "enabled" }, { "label": "停用", "value": "disabled" } ] },
+        { "field": "metadata_json", "title": "扩展信息", "type": "json", "span": 2 }
+      ] }
+    ],
+    "modes": {
+      "create": { "fields": ["tenant_id", "site_no", "name", "merchant_id", "agent_id", "address", "location_label", "latitude", "longitude", "contact_name", "contact_phone", "device_capacity", "status", "metadata_json"] },
+      "edit": { "fields": ["name", "merchant_id", "agent_id", "address", "location_label", "latitude", "longitude", "contact_name", "contact_phone", "device_capacity", "status", "metadata_json"] },
+      "view": { "fields": ["tenant_id", "site_no", "name", "merchant_id", "agent_id", "address", "location_label", "latitude", "longitude", "contact_name", "contact_phone", "device_capacity", "status", "metadata_json"] }
+    }
+  }
+}

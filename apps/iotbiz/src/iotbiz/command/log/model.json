@@ -1,0 +1,92 @@
+{
+  "name": "iotbiz_command_log",
+  "table": "iotbiz_command_log",
+  "comment": "iotbiz_command_log",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "Id",
+      "required": true,
+      "primary": true,
+      "autoIncrement": true,
+      "index": true
+    },
+    {
+      "name": "tenant_id",
+      "type": "bigInteger",
+      "label": "Tenant id",
+      "required": true,
+      "index": true
+    },
+    {
+      "name": "device_id",
+      "type": "bigInteger",
+      "label": "Device id",
+      "required": true
+    },
+    {
+      "name": "session_id",
+      "type": "bigInteger",
+      "label": "Session id",
+      "nullable": true
+    },
+    {
+      "name": "command_type",
+      "type": "string",
+      "label": "Command type",
+      "length": 64,
+      "required": true
+    },
+    {
+      "name": "request_payload_json",
+      "type": "json",
+      "label": "Request payload json",
+      "nullable": true
+    },
+    {
+      "name": "response_payload_json",
+      "type": "json",
+      "label": "Response payload json",
+      "nullable": true
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "label": "Status",
+      "length": 32,
+      "default": "pending"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "required": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp",
+      "label": "Updated at",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "name": "idx_tenant_device",
+      "columns": [
+        "tenant_id",
+        "device_id"
+      ],
+      "unique": false
+    }
+  ],
+  "option": {
+    "timestamps": true,
+    "softDeletes": false
+  },
+  "dataResource": {
+    "resourceCode": "iotbiz_command_log",
+    "tenantField": "tenant_id"
+  }
+}

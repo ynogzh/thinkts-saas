@@ -1,0 +1,83 @@
+{
+  "name": "mall_product",
+  "table": "mall_product",
+  "comment": "mall_product",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "Id",
+      "required": true,
+      "primary": true,
+      "autoIncrement": true,
+      "index": true
+    },
+    {
+      "name": "tenant_id",
+      "type": "bigInteger",
+      "label": "Tenant id",
+      "required": true,
+      "index": true
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "label": "Name",
+      "length": 255,
+      "required": true
+    },
+    {
+      "name": "price",
+      "type": "decimal",
+      "label": "Price",
+      "precision": 12,
+      "scale": 2,
+      "required": true
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "label": "Status",
+      "length": 32,
+      "default": "enabled"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "required": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp",
+      "label": "Updated at",
+      "required": true
+    },
+    {
+      "name": "deleted_at",
+      "type": "timestamp",
+      "label": "Deleted at",
+      "nullable": true
+    }
+  ],
+  "indexes": [
+    {
+      "name": "idx_tenant_status",
+      "columns": [
+        "tenant_id",
+        "status"
+      ],
+      "unique": false
+    }
+  ],
+  "option": {
+    "timestamps": true,
+    "softDeletes": false
+  },
+  "dataResource": {
+    "resourceCode": "mall_product",
+    "tenantField": "tenant_id",
+    "ownerField": "user_id"
+  }
+}

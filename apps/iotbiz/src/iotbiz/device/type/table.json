@@ -1,0 +1,200 @@
+{
+  "title": "设备类型",
+  "model": "iotbiz_device_type",
+  "list": {
+    "columns": [
+      {
+        "field": "code",
+        "title": "Code",
+        "width": 120
+      },
+      {
+        "field": "name",
+        "title": "Name",
+        "width": 160
+      },
+      {
+        "field": "category",
+        "title": "Category",
+        "width": 120
+      },
+      {
+        "field": "billing_mode",
+        "title": "Billing mode",
+        "width": 120
+      },
+      {
+        "field": "default_unit_price",
+        "title": "Unit price",
+        "width": 100,
+        "render": "money"
+      },
+      {
+        "field": "status",
+        "title": "Status",
+        "width": 100,
+        "render": "tag"
+      }
+    ],
+    "orderBy": {
+      "field": "id",
+      "direction": "desc"
+    },
+    "pageSize": 20,
+    "rowActions": [
+      {
+        "type": "view",
+        "title": "查看"
+      },
+      {
+        "type": "edit",
+        "title": "编辑"
+      },
+      {
+        "type": "delete",
+        "title": "删除",
+        "confirm": "确认删除？"
+      }
+    ],
+    "headerActions": [
+      {
+        "type": "create",
+        "title": "新增设备类型",
+        "icon": "plus"
+      }
+    ]
+  },
+  "search": {
+    "fields": [
+      {
+        "field": "code",
+        "title": "Code",
+        "type": "input"
+      },
+      {
+        "field": "category",
+        "title": "Category",
+        "type": "input"
+      },
+      {
+        "field": "billing_mode",
+        "title": "Billing mode",
+        "type": "input"
+      }
+    ],
+    "showCount": 3
+  },
+  "form": {
+    "groups": [
+      {
+        "title": "基本信息",
+        "columns": 2,
+        "fields": [
+          {
+            "field": "tenant_id",
+            "title": "Tenant id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "code",
+            "title": "Code",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "name",
+            "title": "Name",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "category",
+            "title": "Category",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "billing_mode",
+            "title": "Billing mode",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "default_unit_price",
+            "title": "Unit price",
+            "type": "number"
+          },
+          {
+            "field": "default_duration_seconds",
+            "title": "Default duration seconds",
+            "type": "number"
+          },
+          {
+            "field": "start_mode",
+            "title": "Start mode",
+            "type": "input"
+          },
+          {
+            "field": "status",
+            "title": "Status",
+            "type": "input"
+          },
+          {
+            "field": "config_json",
+            "title": "Config json",
+            "type": "textarea",
+            "span": 2
+          }
+        ]
+      }
+    ],
+    "modes": {
+      "create": {
+        "fields": [
+          "tenant_id",
+          "code",
+          "name",
+          "category",
+          "billing_mode",
+          "default_unit_price",
+          "default_duration_seconds",
+          "start_mode",
+          "status",
+          "config_json"
+        ]
+      },
+      "edit": {
+        "fields": [
+          "tenant_id",
+          "code",
+          "name",
+          "category",
+          "billing_mode",
+          "default_unit_price",
+          "default_duration_seconds",
+          "start_mode",
+          "status",
+          "config_json"
+        ]
+      },
+      "view": {
+        "fields": [
+          "id",
+          "tenant_id",
+          "code",
+          "name",
+          "category",
+          "billing_mode",
+          "default_unit_price",
+          "default_duration_seconds",
+          "start_mode",
+          "status",
+          "config_json",
+          "created_at",
+          "updated_at"
+        ]
+      }
+    }
+  }
+}

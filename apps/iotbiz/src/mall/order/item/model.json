@@ -1,0 +1,26 @@
+{
+  "name": "mall_order_item",
+  "table": "mall_order_item",
+  "comment": "mall_order_item",
+  "primaryKey": "id",
+  "columns": [
+    {"name": "id", "type": "bigInteger", "label": "Id", "required": true, "primary": true, "autoIncrement": true, "index": true},
+    {"name": "tenant_id", "type": "bigInteger", "label": "Tenant id", "required": true, "index": true},
+    {"name": "order_id", "type": "bigInteger", "label": "Order id", "required": true},
+    {"name": "product_id", "type": "bigInteger", "label": "Product id", "required": true},
+    {"name": "product_name", "type": "string", "label": "Product name", "length": 255, "required": true},
+    {"name": "quantity", "type": "integer", "label": "Quantity", "required": true},
+    {"name": "price", "type": "decimal", "label": "Price", "precision": 12, "scale": 2, "required": true},
+    {"name": "amount", "type": "decimal", "label": "Amount", "precision": 12, "scale": 2, "required": true},
+    {"name": "created_at", "type": "timestamp", "label": "Created at", "required": true}
+  ],
+  "indexes": [
+    {"name": "idx_tenant_order", "columns": ["tenant_id", "order_id"], "unique": false}
+  ],
+  "option": {"timestamps": true, "softDeletes": false},
+  "dataResource": {"resourceCode": "mall_order_item", "tenantField": "tenant_id"},
+  "relations": {
+    "order": {"model": "mall_order", "type": "belongsTo", "foreignKey": "order_id", "localKey": "id"},
+    "product": {"model": "mall_product", "type": "belongsTo", "foreignKey": "product_id", "localKey": "id"}
+  }
+}

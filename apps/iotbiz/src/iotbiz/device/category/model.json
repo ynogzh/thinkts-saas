@@ -1,0 +1,97 @@
+{
+  "name": "iotbiz_device_category",
+  "table": "iotbiz_device_category",
+  "comment": "iotbiz_device_category",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "ID",
+      "autoIncrement": true
+    },
+    {
+      "name": "tenant_id",
+      "type": "bigInteger",
+      "label": "Tenant",
+      "nullable": false
+    },
+    {
+      "name": "code",
+      "type": "string",
+      "label": "Code",
+      "length": 64,
+      "nullable": false
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "label": "Name",
+      "length": 128,
+      "nullable": false
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "label": "Description",
+      "length": 500,
+      "nullable": true
+    },
+    {
+      "name": "icon",
+      "type": "string",
+      "label": "Icon",
+      "length": 128,
+      "nullable": true
+    },
+    {
+      "name": "sort_order",
+      "type": "integer",
+      "label": "Sort order",
+      "default": 0,
+      "nullable": false
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "label": "Status",
+      "length": 32,
+      "default": "enabled",
+      "nullable": false
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "nullable": false
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp",
+      "label": "Updated at",
+      "nullable": false
+    }
+  ],
+  "indexes": [
+    {
+      "name": "uk_tenant_code",
+      "fields": [
+        "tenant_id",
+        "code"
+      ],
+      "unique": true
+    },
+    {
+      "name": "idx_tenant_status",
+      "fields": [
+        "tenant_id",
+        "status"
+      ],
+      "unique": false
+    }
+  ],
+  "dataResource": {
+    "resourceCode": "iotbiz_device_category",
+    "tenantField": "tenant_id"
+  }
+}

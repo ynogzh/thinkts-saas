@@ -1,0 +1,116 @@
+{
+  "name": "iotbiz_device_type",
+  "table": "iotbiz_device_type",
+  "comment": "iotbiz_device_type",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "Id",
+      "required": true,
+      "primary": true,
+      "autoIncrement": true,
+      "index": true
+    },
+    {
+      "name": "tenant_id",
+      "type": "bigInteger",
+      "label": "Tenant id",
+      "required": true,
+      "index": true
+    },
+    {
+      "name": "code",
+      "type": "string",
+      "label": "Code",
+      "length": 64,
+      "required": true
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "label": "Name",
+      "length": 128,
+      "required": true
+    },
+    {
+      "name": "category",
+      "type": "string",
+      "label": "Category",
+      "length": 64,
+      "required": true
+    },
+    {
+      "name": "billing_mode",
+      "type": "string",
+      "label": "Billing mode",
+      "length": 32,
+      "required": true
+    },
+    {
+      "name": "default_unit_price",
+      "type": "decimal",
+      "label": "Default unit price",
+      "precision": 12,
+      "scale": 2,
+      "default": 0
+    },
+    {
+      "name": "default_duration_seconds",
+      "type": "integer",
+      "label": "Default duration seconds",
+      "nullable": true
+    },
+    {
+      "name": "start_mode",
+      "type": "string",
+      "label": "Start mode",
+      "length": 32,
+      "default": "mock"
+    },
+    {
+      "name": "config_json",
+      "type": "json",
+      "label": "Config json",
+      "nullable": true
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "label": "Status",
+      "length": 32,
+      "default": "enabled"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "required": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp",
+      "label": "Updated at",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "name": "uk_tenant_code",
+      "columns": [
+        "tenant_id",
+        "code"
+      ],
+      "unique": true
+    }
+  ],
+  "option": {
+    "timestamps": true,
+    "softDeletes": false
+  },
+  "dataResource": {
+    "resourceCode": "iotbiz_device_type",
+    "tenantField": "tenant_id"
+  }
+}
