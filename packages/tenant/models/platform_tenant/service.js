@@ -1,14 +1,8 @@
 /**
- * Tenant plugin service hooks.
- * SaaS-generic — no product-specific module catalog.
+ * Tenant business service — SaaS-generic.
+ * Hooks (beforeCreate etc.) are in model.ts.
+ * Cross-module operations that span multiple tables go here.
  */
-export function beforeCreate(data) {
-  if (!data.code) throw new Error("tenant code is required");
-  if (!data.name) throw new Error("tenant name is required");
-  return data;
-}
 
-export function beforeUpdate(data) {
-  if (data.code === "") throw new Error("tenant code cannot be empty");
-  return data;
-}
+// Future: tenant provisioning, module assignment, billing integration will go here.
+// Placeholder — the base CRUD is handled by the framework via model.ts
