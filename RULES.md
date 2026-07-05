@@ -1,33 +1,10 @@
 # ThinkTS Project Rules
-## 0. 深度思考 — 每个变更前必须回答的三个问题
-
-### 0.1 问题是什么？
-- 用一句话描述用户看到/遇到的**实际问题**
-- 不能是"代码不够优雅"、"继承太深"、"可以用 xx 模式" — 这些不是问题
-- 如果是自己推测的问题，必须先在 iotbiz 中复现确认
-
-### 0.2 这个问题造成了什么后果？
-- 如果没有后果 → 不改
-- 如果是理论上的后果但从未实际发生 → 不改
-- 如果是性能问题 → 必须有 benchmark 数据
-- 如果是 DX 问题 → 必须有具体场景描述
-
-### 0.3 最简单的修复是什么？
-- 3 行代码能解决吗？优先 3 行
-- 需要新增文件吗？优先不改结构
-- 能在一个模块内解决吗？优先不动其他模块
-- 用户的调用方式会变吗？变了就再想想
-
-**反例**：看到 5 层继承 → "应该用 mixin" → 新增 5 个文件 → 用户调用方式全变
-**正例**：`_currentCtx` 可变全局 → 请求可能读错上下文 → 删掉 `_currentCtx`，调用方传 `_aclCtx`
-
----
 
 
 ## 1. 代码规范
 
 ### 文件长度
-- 每个源文件 MUST 不超过 200 行
+- 每个源文件 MUST 尽量不超过 300 行
 - 超过的 MUST 按职责拆分为独立模块
 - 拆分的模块 MUST 放在同一目录下，用清晰的命名表达职责
 
@@ -74,9 +51,7 @@
 - CI 不过的代码 MUST NOT push
 
 ### 端到端验证
-- 修改 thinkts 框架后 MUST 验证 iotbiz API 是否正常工作
-- 修改 CLI 模板后 MUST 运行 `thinkts new test-app` 验证脚手架可用
-- 修改 admin 模板后 MUST 运行 `npx next build` 验证编译通过
+- 修改逻辑后，必须写端到端测试  MUST 验证是否正常工作 
 
 ## 4. 架构决策
 
@@ -106,7 +81,7 @@
 - 模板中的 `.env` MUST 只包含占位值，不能有真实凭证
 
 ### Admin 模板
-- admin 模板基于 shadcnblocks，组件统计一风格
+- admin 模板基于 shadcn-admin-2.2.0，组件统计一风格
 - admin 中不能有业务特定的硬编码数据
 - 所有 admin 页面 MUST 通过配置驱动（catalog / menu / resource）
 
@@ -129,10 +104,9 @@ thinkts-saas/ (monorepo 根)
 ### Git 仓库
 | 仓库 | URL |
 |------|-----|
-| thinkts | https://github.com/ynogzh/thinkts |
-| thinkts-cli | https://github.com/ynogzh/thinkts-cli |
+| 
 | thinkts-saas | https://github.com/ynogzh/thinkts-saas |
-| iotbiz | https://github.com/ynogzh/iotbiz |
+| iotbiz | https://github.com/ynogzh/iotbiz | 之前实现的iotbiz 里面有admin 有api 方便你接下来做 apps/iotbiz
 
 ### 验证链路
 ```
