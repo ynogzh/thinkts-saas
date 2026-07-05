@@ -1,0 +1,96 @@
+{
+  "name": "permission_data_scope",
+  "table": "permission_data_scope",
+  "comment": "permission_data_scope",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "Id",
+      "required": true,
+      "primary": true,
+      "autoIncrement": true,
+      "index": true
+    },
+    {
+      "name": "tenant_id",
+      "type": "bigInteger",
+      "label": "Tenant id",
+      "required": true,
+      "index": true
+    },
+    {
+      "name": "role_id",
+      "type": "bigInteger",
+      "label": "Role id",
+      "required": true
+    },
+    {
+      "name": "module_code",
+      "type": "string",
+      "label": "Module code",
+      "length": 64,
+      "required": true
+    },
+    {
+      "name": "resource_code",
+      "type": "string",
+      "label": "Resource code",
+      "length": 128,
+      "required": true
+    },
+    {
+      "name": "scope_type",
+      "type": "string",
+      "label": "Scope type",
+      "length": 64,
+      "required": true
+    },
+    {
+      "name": "scope_value_json",
+      "type": "json",
+      "label": "Scope value json",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "required": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp",
+      "label": "Updated at",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "name": "uk_tenant_role_resource",
+      "columns": [
+        "tenant_id",
+        "role_id",
+        "resource_code"
+      ],
+      "unique": true
+    },
+    {
+      "name": "idx_tenant_role",
+      "columns": [
+        "tenant_id",
+        "role_id"
+      ],
+      "unique": false
+    }
+  ],
+  "option": {
+    "timestamps": true,
+    "softDeletes": false
+  },
+  "dataResource": {
+    "resourceCode": "permission_data_scope",
+    "tenantField": "tenant_id"
+  }
+}

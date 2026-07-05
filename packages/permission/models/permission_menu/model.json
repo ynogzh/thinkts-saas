@@ -1,0 +1,105 @@
+{
+  "name": "permission_menu",
+  "table": "permission_menu",
+  "comment": "permission_menu",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "Id",
+      "required": true,
+      "primary": true,
+      "autoIncrement": true,
+      "index": true
+    },
+    {
+      "name": "module_code",
+      "type": "string",
+      "label": "Module code",
+      "length": 64,
+      "required": true,
+      "index": true
+    },
+    {
+      "name": "parent_id",
+      "type": "bigInteger",
+      "label": "Parent id",
+      "nullable": true
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "label": "Name",
+      "length": 100,
+      "required": true
+    },
+    {
+      "name": "path",
+      "type": "string",
+      "label": "Path",
+      "length": 255,
+      "nullable": true
+    },
+    {
+      "name": "component",
+      "type": "string",
+      "label": "Component",
+      "length": 255,
+      "nullable": true
+    },
+    {
+      "name": "icon",
+      "type": "string",
+      "label": "Icon",
+      "length": 100,
+      "nullable": true
+    },
+    {
+      "name": "permission_code",
+      "type": "string",
+      "label": "Permission code",
+      "length": 128,
+      "nullable": true
+    },
+    {
+      "name": "sort",
+      "type": "integer",
+      "label": "Sort",
+      "default": 0
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "label": "Status",
+      "length": 32,
+      "default": "enabled"
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "required": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp",
+      "label": "Updated at",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "name": "idx_module_parent",
+      "columns": [
+        "module_code",
+        "parent_id"
+      ],
+      "unique": false
+    }
+  ],
+  "option": {
+    "timestamps": true,
+    "softDeletes": false
+  }
+}

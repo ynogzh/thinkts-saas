@@ -1,0 +1,62 @@
+{
+  "name": "permission_role_permission",
+  "table": "permission_role_permission",
+  "comment": "permission_role_permission",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "Id",
+      "required": true,
+      "primary": true,
+      "autoIncrement": true,
+      "index": true
+    },
+    {
+      "name": "tenant_id",
+      "type": "bigInteger",
+      "label": "Tenant id",
+      "required": true,
+      "index": true
+    },
+    {
+      "name": "role_id",
+      "type": "bigInteger",
+      "label": "Role id",
+      "required": true
+    },
+    {
+      "name": "permission_code",
+      "type": "string",
+      "label": "Permission code",
+      "length": 128,
+      "required": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "name": "uk_tenant_role_perm",
+      "columns": [
+        "tenant_id",
+        "role_id",
+        "permission_code"
+      ],
+      "unique": true
+    }
+  ],
+  "option": {
+    "timestamps": true,
+    "softDeletes": false
+  },
+  "dataResource": {
+    "resourceCode": "permission_role_permission",
+    "tenantField": "tenant_id"
+  }
+}

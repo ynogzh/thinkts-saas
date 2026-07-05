@@ -1,0 +1,202 @@
+{
+  "title": "数据权限资源声明",
+  "model": "permission_data_resource",
+  "list": {
+    "columns": [
+      {
+        "field": "resource_name",
+        "title": "Resource name",
+        "width": 200
+      },
+      {
+        "field": "table_name",
+        "title": "Table name",
+        "width": 200
+      },
+      {
+        "field": "module_code",
+        "title": "Module code",
+        "width": 160
+      },
+      {
+        "field": "resource_code",
+        "title": "Resource code",
+        "width": 160
+      },
+      {
+        "field": "tenant_field",
+        "title": "Tenant field",
+        "width": 160
+      },
+      {
+        "field": "owner_field",
+        "title": "Owner field",
+        "width": 160
+      },
+      {
+        "field": "dept_field",
+        "title": "Dept field",
+        "width": 160
+      },
+      {
+        "field": "agent_field",
+        "title": "Agent field",
+        "width": 160
+      }
+    ],
+    "orderBy": {
+      "field": "id",
+      "direction": "desc"
+    },
+    "pageSize": 20,
+    "rowActions": [
+      {
+        "type": "view",
+        "title": "查看"
+      },
+      {
+        "type": "edit",
+        "title": "编辑"
+      },
+      {
+        "type": "delete",
+        "title": "删除",
+        "confirm": "确认删除？"
+      }
+    ],
+    "headerActions": [
+      {
+        "type": "create",
+        "title": "新增Permission data resource",
+        "icon": "plus"
+      }
+    ]
+  },
+  "search": {
+    "fields": [
+      {
+        "field": "resource_name",
+        "title": "Resource name",
+        "type": "input"
+      },
+      {
+        "field": "table_name",
+        "title": "Table name",
+        "type": "input"
+      },
+      {
+        "field": "module_code",
+        "title": "Module code",
+        "type": "input"
+      },
+      {
+        "field": "resource_code",
+        "title": "Resource code",
+        "type": "input"
+      }
+    ],
+    "showCount": 3
+  },
+  "form": {
+    "groups": [
+      {
+        "title": "基本信息",
+        "columns": 2,
+        "fields": [
+          {
+            "field": "module_code",
+            "title": "Module code",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "resource_code",
+            "title": "Resource code",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "resource_name",
+            "title": "Resource name",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "table_name",
+            "title": "Table name",
+            "type": "input"
+          },
+          {
+            "field": "tenant_field",
+            "title": "Tenant field",
+            "type": "input"
+          },
+          {
+            "field": "owner_field",
+            "title": "Owner field",
+            "type": "input"
+          },
+          {
+            "field": "dept_field",
+            "title": "Dept field",
+            "type": "input"
+          },
+          {
+            "field": "agent_field",
+            "title": "Agent field",
+            "type": "input"
+          },
+          {
+            "field": "region_field",
+            "title": "Region field",
+            "type": "input"
+          }
+        ]
+      }
+    ],
+    "modes": {
+      "create": {
+        "fields": [
+          "module_code",
+          "resource_code",
+          "resource_name",
+          "table_name",
+          "tenant_field",
+          "owner_field",
+          "dept_field",
+          "agent_field",
+          "region_field"
+        ]
+      },
+      "edit": {
+        "fields": [
+          "module_code",
+          "resource_code",
+          "resource_name",
+          "table_name",
+          "tenant_field",
+          "owner_field",
+          "dept_field",
+          "agent_field",
+          "region_field"
+        ]
+      },
+      "view": {
+        "fields": [
+          "id",
+          "module_code",
+          "resource_code",
+          "resource_name",
+          "table_name",
+          "tenant_field",
+          "owner_field",
+          "dept_field",
+          "agent_field",
+          "region_field",
+          "created_at",
+          "updated_at"
+        ]
+      }
+    }
+  }
+}

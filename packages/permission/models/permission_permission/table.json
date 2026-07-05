@@ -1,0 +1,187 @@
+{
+  "title": "权限点",
+  "model": "permission_permission",
+  "list": {
+    "columns": [
+      {
+        "field": "name",
+        "title": "Name",
+        "width": 200
+      },
+      {
+        "field": "module_code",
+        "title": "Module code",
+        "width": 160
+      },
+      {
+        "field": "code",
+        "title": "Code",
+        "width": 160
+      },
+      {
+        "field": "type",
+        "title": "Type",
+        "width": 160
+      },
+      {
+        "field": "parent_code",
+        "title": "Parent code",
+        "width": 160
+      },
+      {
+        "field": "api_method",
+        "title": "Api method",
+        "width": 160
+      },
+      {
+        "field": "api_path",
+        "title": "Api path",
+        "width": 160
+      },
+      {
+        "field": "id",
+        "title": "Id",
+        "width": 80
+      }
+    ],
+    "orderBy": {
+      "field": "id",
+      "direction": "desc"
+    },
+    "pageSize": 20,
+    "rowActions": [
+      {
+        "type": "view",
+        "title": "查看"
+      },
+      {
+        "type": "edit",
+        "title": "编辑"
+      },
+      {
+        "type": "delete",
+        "title": "删除",
+        "confirm": "确认删除？"
+      }
+    ],
+    "headerActions": [
+      {
+        "type": "create",
+        "title": "新增Permission permission",
+        "icon": "plus"
+      }
+    ]
+  },
+  "search": {
+    "fields": [
+      {
+        "field": "name",
+        "title": "Name",
+        "type": "input"
+      },
+      {
+        "field": "module_code",
+        "title": "Module code",
+        "type": "input"
+      },
+      {
+        "field": "code",
+        "title": "Code",
+        "type": "input"
+      },
+      {
+        "field": "type",
+        "title": "Type",
+        "type": "input"
+      }
+    ],
+    "showCount": 3
+  },
+  "form": {
+    "groups": [
+      {
+        "title": "基本信息",
+        "columns": 2,
+        "fields": [
+          {
+            "field": "module_code",
+            "title": "Module code",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "code",
+            "title": "Code",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "name",
+            "title": "Name",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "type",
+            "title": "Type",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "parent_code",
+            "title": "Parent code",
+            "type": "input"
+          },
+          {
+            "field": "api_method",
+            "title": "Api method",
+            "type": "input"
+          },
+          {
+            "field": "api_path",
+            "title": "Api path",
+            "type": "file"
+          }
+        ]
+      }
+    ],
+    "modes": {
+      "create": {
+        "fields": [
+          "module_code",
+          "code",
+          "name",
+          "type",
+          "parent_code",
+          "api_method",
+          "api_path"
+        ]
+      },
+      "edit": {
+        "fields": [
+          "module_code",
+          "code",
+          "name",
+          "type",
+          "parent_code",
+          "api_method",
+          "api_path"
+        ]
+      },
+      "view": {
+        "fields": [
+          "id",
+          "module_code",
+          "code",
+          "name",
+          "type",
+          "parent_code",
+          "api_method",
+          "api_path",
+          "created_at",
+          "updated_at"
+        ]
+      }
+    }
+  }
+}

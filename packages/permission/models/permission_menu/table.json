@@ -1,0 +1,201 @@
+{
+  "title": "菜单",
+  "model": "permission_menu",
+  "list": {
+    "columns": [
+      {
+        "field": "name",
+        "title": "Name",
+        "width": 200
+      },
+      {
+        "field": "module_code",
+        "title": "Module code",
+        "width": 160
+      },
+      {
+        "field": "parent_id",
+        "title": "Parent id",
+        "width": 80
+      },
+      {
+        "field": "path",
+        "title": "Path",
+        "width": 160
+      },
+      {
+        "field": "component",
+        "title": "Component",
+        "width": 160
+      },
+      {
+        "field": "icon",
+        "title": "Icon",
+        "width": 160
+      },
+      {
+        "field": "permission_code",
+        "title": "Permission code",
+        "width": 160
+      },
+      {
+        "field": "sort",
+        "title": "Sort",
+        "width": 80
+      }
+    ],
+    "orderBy": {
+      "field": "id",
+      "direction": "desc"
+    },
+    "pageSize": 20,
+    "rowActions": [
+      {
+        "type": "view",
+        "title": "查看"
+      },
+      {
+        "type": "edit",
+        "title": "编辑"
+      },
+      {
+        "type": "delete",
+        "title": "删除",
+        "confirm": "确认删除？"
+      }
+    ],
+    "headerActions": [
+      {
+        "type": "create",
+        "title": "新增Permission menu",
+        "icon": "plus"
+      }
+    ]
+  },
+  "search": {
+    "fields": [
+      {
+        "field": "name",
+        "title": "Name",
+        "type": "input"
+      },
+      {
+        "field": "module_code",
+        "title": "Module code",
+        "type": "input"
+      },
+      {
+        "field": "parent_id",
+        "title": "Parent id",
+        "type": "numberRange"
+      },
+      {
+        "field": "path",
+        "title": "Path",
+        "type": "input"
+      }
+    ],
+    "showCount": 3
+  },
+  "form": {
+    "groups": [
+      {
+        "title": "基本信息",
+        "columns": 2,
+        "fields": [
+          {
+            "field": "module_code",
+            "title": "Module code",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "parent_id",
+            "title": "Parent id",
+            "type": "number"
+          },
+          {
+            "field": "name",
+            "title": "Name",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "path",
+            "title": "Path",
+            "type": "input"
+          },
+          {
+            "field": "component",
+            "title": "Component",
+            "type": "input"
+          },
+          {
+            "field": "icon",
+            "title": "Icon",
+            "type": "input"
+          },
+          {
+            "field": "permission_code",
+            "title": "Permission code",
+            "type": "input"
+          },
+          {
+            "field": "sort",
+            "title": "Sort",
+            "type": "number"
+          },
+          {
+            "field": "status",
+            "title": "Status",
+            "type": "input"
+          }
+        ]
+      }
+    ],
+    "modes": {
+      "create": {
+        "fields": [
+          "module_code",
+          "parent_id",
+          "name",
+          "path",
+          "component",
+          "icon",
+          "permission_code",
+          "sort",
+          "status"
+        ]
+      },
+      "edit": {
+        "fields": [
+          "module_code",
+          "parent_id",
+          "name",
+          "path",
+          "component",
+          "icon",
+          "permission_code",
+          "sort",
+          "status"
+        ]
+      },
+      "view": {
+        "fields": [
+          "id",
+          "module_code",
+          "parent_id",
+          "name",
+          "path",
+          "component",
+          "icon",
+          "permission_code",
+          "sort",
+          "status",
+          "created_at",
+          "updated_at"
+        ]
+      }
+    }
+  }
+}

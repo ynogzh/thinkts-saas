@@ -1,0 +1,159 @@
+{
+  "title": "角色",
+  "model": "permission_role",
+  "list": {
+    "columns": [
+      {
+        "field": "name",
+        "title": "Name",
+        "width": 200
+      },
+      {
+        "field": "tenant_id",
+        "title": "Tenant id",
+        "width": 80
+      },
+      {
+        "field": "code",
+        "title": "Code",
+        "width": 160
+      },
+      {
+        "field": "status",
+        "title": "Status",
+        "width": 160
+      },
+      {
+        "field": "id",
+        "title": "Id",
+        "width": 80
+      },
+      {
+        "field": "created_at",
+        "title": "Created at",
+        "width": 160,
+        "render": "datetime"
+      },
+      {
+        "field": "updated_at",
+        "title": "Updated at",
+        "width": 160,
+        "render": "datetime"
+      }
+    ],
+    "orderBy": {
+      "field": "id",
+      "direction": "desc"
+    },
+    "pageSize": 20,
+    "rowActions": [
+      {
+        "type": "view",
+        "title": "查看"
+      },
+      {
+        "type": "edit",
+        "title": "编辑"
+      },
+      {
+        "type": "delete",
+        "title": "删除",
+        "confirm": "确认删除？"
+      }
+    ],
+    "headerActions": [
+      {
+        "type": "create",
+        "title": "新增Permission role",
+        "icon": "plus"
+      }
+    ]
+  },
+  "search": {
+    "fields": [
+      {
+        "field": "name",
+        "title": "Name",
+        "type": "input"
+      },
+      {
+        "field": "tenant_id",
+        "title": "Tenant id",
+        "type": "numberRange"
+      },
+      {
+        "field": "code",
+        "title": "Code",
+        "type": "input"
+      },
+      {
+        "field": "status",
+        "title": "Status",
+        "type": "input"
+      }
+    ],
+    "showCount": 3
+  },
+  "form": {
+    "groups": [
+      {
+        "title": "基本信息",
+        "columns": 2,
+        "fields": [
+          {
+            "field": "tenant_id",
+            "title": "Tenant id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "name",
+            "title": "Name",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "code",
+            "title": "Code",
+            "type": "input",
+            "required": true
+          },
+          {
+            "field": "status",
+            "title": "Status",
+            "type": "input"
+          }
+        ]
+      }
+    ],
+    "modes": {
+      "create": {
+        "fields": [
+          "tenant_id",
+          "name",
+          "code",
+          "status"
+        ]
+      },
+      "edit": {
+        "fields": [
+          "tenant_id",
+          "name",
+          "code",
+          "status"
+        ]
+      },
+      "view": {
+        "fields": [
+          "id",
+          "tenant_id",
+          "name",
+          "code",
+          "status",
+          "created_at",
+          "updated_at"
+        ]
+      }
+    }
+  }
+}

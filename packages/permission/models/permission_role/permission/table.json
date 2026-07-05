@@ -1,0 +1,134 @@
+{
+  "title": "角色权限关系",
+  "model": "permission_role_permission",
+  "list": {
+    "columns": [
+      {
+        "field": "tenant_id",
+        "title": "Tenant id",
+        "width": 80
+      },
+      {
+        "field": "role_id",
+        "title": "Role id",
+        "width": 80
+      },
+      {
+        "field": "permission_code",
+        "title": "Permission code",
+        "width": 160
+      },
+      {
+        "field": "id",
+        "title": "Id",
+        "width": 80
+      },
+      {
+        "field": "created_at",
+        "title": "Created at",
+        "width": 160,
+        "render": "datetime"
+      }
+    ],
+    "orderBy": {
+      "field": "id",
+      "direction": "desc"
+    },
+    "pageSize": 20,
+    "rowActions": [
+      {
+        "type": "view",
+        "title": "查看"
+      },
+      {
+        "type": "edit",
+        "title": "编辑"
+      },
+      {
+        "type": "delete",
+        "title": "删除",
+        "confirm": "确认删除？"
+      }
+    ],
+    "headerActions": [
+      {
+        "type": "create",
+        "title": "新增Permission role permission",
+        "icon": "plus"
+      }
+    ]
+  },
+  "search": {
+    "fields": [
+      {
+        "field": "tenant_id",
+        "title": "Tenant id",
+        "type": "numberRange"
+      },
+      {
+        "field": "role_id",
+        "title": "Role id",
+        "type": "numberRange"
+      },
+      {
+        "field": "permission_code",
+        "title": "Permission code",
+        "type": "input"
+      }
+    ],
+    "showCount": 3
+  },
+  "form": {
+    "groups": [
+      {
+        "title": "基本信息",
+        "columns": 2,
+        "fields": [
+          {
+            "field": "tenant_id",
+            "title": "Tenant id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "role_id",
+            "title": "Role id",
+            "type": "number",
+            "required": true
+          },
+          {
+            "field": "permission_code",
+            "title": "Permission code",
+            "type": "input",
+            "required": true
+          }
+        ]
+      }
+    ],
+    "modes": {
+      "create": {
+        "fields": [
+          "tenant_id",
+          "role_id",
+          "permission_code"
+        ]
+      },
+      "edit": {
+        "fields": [
+          "tenant_id",
+          "role_id",
+          "permission_code"
+        ]
+      },
+      "view": {
+        "fields": [
+          "id",
+          "tenant_id",
+          "role_id",
+          "permission_code",
+          "created_at"
+        ]
+      }
+    }
+  }
+}

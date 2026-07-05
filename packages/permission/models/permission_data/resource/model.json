@@ -1,0 +1,107 @@
+{
+  "name": "permission_data_resource",
+  "table": "permission_data_resource",
+  "comment": "permission_data_resource",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "Id",
+      "required": true,
+      "primary": true,
+      "autoIncrement": true,
+      "index": true
+    },
+    {
+      "name": "module_code",
+      "type": "string",
+      "label": "Module code",
+      "length": 64,
+      "required": true,
+      "index": true
+    },
+    {
+      "name": "resource_code",
+      "type": "string",
+      "label": "Resource code",
+      "length": 128,
+      "required": true
+    },
+    {
+      "name": "resource_name",
+      "type": "string",
+      "label": "Resource name",
+      "length": 100,
+      "required": true
+    },
+    {
+      "name": "table_name",
+      "type": "string",
+      "label": "Table name",
+      "length": 128,
+      "nullable": true
+    },
+    {
+      "name": "tenant_field",
+      "type": "string",
+      "label": "Tenant field",
+      "length": 64,
+      "default": "tenant_id"
+    },
+    {
+      "name": "owner_field",
+      "type": "string",
+      "label": "Owner field",
+      "length": 64,
+      "nullable": true
+    },
+    {
+      "name": "dept_field",
+      "type": "string",
+      "label": "Dept field",
+      "length": 64,
+      "nullable": true
+    },
+    {
+      "name": "agent_field",
+      "type": "string",
+      "label": "Agent field",
+      "length": 64,
+      "nullable": true
+    },
+    {
+      "name": "region_field",
+      "type": "string",
+      "label": "Region field",
+      "length": 64,
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "required": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp",
+      "label": "Updated at",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "name": "uk_module_resource",
+      "columns": [
+        "module_code",
+        "resource_code"
+      ],
+      "unique": true
+    }
+  ],
+  "option": {
+    "timestamps": true,
+    "softDeletes": false
+  }
+}
