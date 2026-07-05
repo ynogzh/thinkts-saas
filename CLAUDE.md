@@ -7,4 +7,4 @@ Monorepo：框架 + CLI + 插件 + 产品。目标是把 thinkts 搞成插件系
 - `packages/*/` — 通用 SaaS 插件
 - `apps/iotbiz/` — 共享设备支付平台
 
-改代码前读 GOAL.md 和 RULES.md。
+读 GOAL.md 了解目标。读 RULES.md 了解规范。
