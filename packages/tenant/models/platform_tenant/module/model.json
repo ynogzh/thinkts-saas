@@ -1,0 +1,87 @@
+{
+  "name": "platform_tenant_module",
+  "table": "platform_tenant_module",
+  "comment": "platform_tenant_module",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "Id",
+      "required": true,
+      "primary": true,
+      "autoIncrement": true,
+      "index": true
+    },
+    {
+      "name": "tenant_id",
+      "type": "bigInteger",
+      "label": "Tenant id",
+      "required": true,
+      "index": true
+    },
+    {
+      "name": "module_code",
+      "type": "string",
+      "label": "Module code",
+      "length": 64,
+      "required": true
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "label": "Status",
+      "length": 32,
+      "default": "enabled"
+    },
+    {
+      "name": "expire_at",
+      "type": "timestamp",
+      "label": "Expire at",
+      "nullable": true
+    },
+    {
+      "name": "limit_json",
+      "type": "json",
+      "label": "Limit json",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "required": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp",
+      "label": "Updated at",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "name": "uk_tenant_module",
+      "columns": [
+        "tenant_id",
+        "module_code"
+      ],
+      "unique": true
+    },
+    {
+      "name": "idx_tenant_id",
+      "columns": [
+        "tenant_id"
+      ],
+      "unique": false
+    }
+  ],
+  "option": {
+    "timestamps": true,
+    "softDeletes": false
+  },
+  "dataResource": {
+    "resourceCode": "platform_tenant_module",
+    "tenantField": "tenant_id"
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "name": "platform_tenant",
+  "table": "platform_tenant",
+  "comment": "platform_tenant",
+  "primaryKey": "id",
+  "columns": [
+    {
+      "name": "id",
+      "type": "bigInteger",
+      "label": "Id",
+      "required": true,
+      "primary": true,
+      "autoIncrement": true,
+      "index": true
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "label": "Name",
+      "length": 100,
+      "required": true
+    },
+    {
+      "name": "code",
+      "type": "string",
+      "label": "Code",
+      "length": 64,
+      "required": true,
+      "unique": true,
+      "index": true
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "label": "Status",
+      "length": 32,
+      "default": "enabled"
+    },
+    {
+      "name": "admin_user_id",
+      "type": "bigInteger",
+      "label": "Admin user id",
+      "nullable": true
+    },
+    {
+      "name": "package_id",
+      "type": "bigInteger",
+      "label": "Package id",
+      "nullable": true
+    },
+    {
+      "name": "expire_at",
+      "type": "timestamp",
+      "label": "Expire at",
+      "nullable": true
+    },
+    {
+      "name": "config_json",
+      "type": "json",
+      "label": "Config json",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp",
+      "label": "Created at",
+      "required": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp",
+      "label": "Updated at",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "name": "uk_code",
+      "columns": [
+        "code"
+      ],
+      "unique": true
+    }
+  ],
+  "option": {
+    "timestamps": true,
+    "softDeletes": false
+  }
+}
