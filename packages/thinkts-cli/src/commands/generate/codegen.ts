@@ -1,4 +1,3 @@
-import { generateTableJson as generateTableJsonHelper } from "../generate-helpers";
 import type { TableMeta } from "../generate";
 
 function toLabel(str: string): string {
@@ -8,102 +7,95 @@ function toLabel(str: string): string {
     .join(" ");
 }
 
-/** Generate model.js — schema definition with column metadata. */
-export function generateModelJs(table: TableMeta): string {
+function dbTypeToTsType(col: TableMeta["columns"][number]): string {
+  const t = col.dataType.toLowerCase();
+  if (t.includes("int") || t === "bigint" || t === "tinyint" || t === "smallint") return "t.bigint()";
+  if (t === "float" || t === "double" || t === "decimal") return "t.decimal()";
+  if (t === "timestamp" || t === "datetime") return "t.timestamp()";
+  if (t === "date") return "t.date()";
+  if (t === "boolean" || t === "tinyint(1)") return "t.boolean()";
+  if (t === "text" || t === "longtext" || t === "mediumtext") return "t.text()";
+  return `t.varchar(${col.length ?? 255})`;
+}
+
+/** Generate model.ts — defineModel with columns, hooks, system, access. */
+export function generateModelTs(table: TableMeta): string {
   const columns = table.columns.map((c) => {
-    const col: Record<string, unknown> = {
-      name: c.name,
-      type: c.type,
-      label: toLabel(c.name),
-    };
-    if (c.length) col.length = c.length;
-    if (c.precision !== undefined) col.precision = c.precision;
-    if (c.scale !== undefined) col.scale = c.scale;
-    if (!c.nullable && c.defaultValue === undefined) col.required = true;
-    if (c.nullable) col.nullable = true;
-    if (c.defaultValue !== undefined) col.default = c.defaultValue;
-    if (c.isPrimary) col.primary = true;
-    if (c.autoIncrement) col.autoIncrement = true;
-    if (c.isUnique) col.unique = true;
-    if (c.isIndex) col.index = true;
-    if (c.comment) col.comment = c.comment;
-    return col;
+    let line = `    ${c.name}: ${dbTypeToTsType(c)}`;
+    if (c.isPrimary) line += ".primary()";
+    if (c.autoIncrement) line += ".autoIncrement()";
+    if (!c.nullable && c.defaultValue === undefined) line += ".required()";
+    if (c.nullable) line += ".nullable()";
+    if (c.isUnique) line += ".unique()";
+    if (c.isIndex) line += ".index()";
+    if (c.defaultValue !== undefined && c.defaultValue !== null) {
+      line += `.default(${typeof c.defaultValue === "string" ? JSON.stringify(c.defaultValue) : c.defaultValue})`;
+    }
+    if (c.comment) line += `.comment(${JSON.stringify(c.comment)})`;
+    return `${line},`;
   });
 
-  return `export default {
-  name: "${table.name}",
-  table: "${table.name}",
-  primaryKey: "${table.columns.find((c) => c.isPrimary)?.name ?? "id"}",
-  columns: ${JSON.stringify(columns, null, 2)},
-  indexes: ${JSON.stringify(table.indexes.map((i) => ({ name: i.name, columns: i.columns, unique: i.unique })), null, 2)},
-  option: { timestamps: true, softDeletes: false },
-};
+  const modelName = table.name;
+
+  return `import { defineModel, t } from "thinkts";
+
+/**
+ * ${modelName} — ${table.comment ?? "auto-generated from database"}
+ */
+export default defineModel("${modelName}", {
+  columns: {
+${columns.join("\n")}
+  },
+
+  hooks: {
+    // beforeCreate(data, ctx) {
+    //   return data;
+    // },
+  },
+
+  system: {
+    // tenantAware: true,
+    // softDelete: true,
+  },
+
+  access: {
+    // admin: { create: true, read: true, update: true, delete: true },
+    // user:  { create: false, read: true, update: false, delete: false },
+  },
+});
 `;
 }
 
-/** Generate table.js — admin table configuration. */
+/** Generate service.ts — business logic class. */
+export function generateServiceTs(): string {
+  return `import { BaseService } from "thinkts";
+
+export class Service extends BaseService {
+  // Business methods go here.
+  // Use this.model(), this.create(), this.update() etc.
+}
+`;
+}
+
+// Kept for backward compatibility
+export { generateModelTs as generateModelJs };
 export function generateTableJs(table: TableMeta): string {
-  const cols = table.columns.map((c) => ({
-    field: c.name,
-    title: c.comment || toLabel(c.name),
-    type: c.type === "enum" ? "select" : c.type.includes("int") ? "number" : c.type.includes("text") ? "text" : "text",
-    width: c.isPrimary ? 80 : c.name.length > 20 ? 200 : 160,
-  }));
-  return `export default {
-  title: "${toLabel(table.name)}",
-  model: "${table.name}",
-  list: {
-    pageSize: 20,
-    columns: ${JSON.stringify(cols, null, 2)},
-  },
-  form: {
-    sections: [{
-      title: "基本信息",
-      fields: [${table.columns.filter((c) => !c.isPrimary && !["created_at", "updated_at"].includes(c.name)).map((c) => `"${c.name}"`).join(", ")}],
-    }],
-  },
-};
-`;
+  return generateModelTs(table);
 }
-
-/** Generate acl.js — access control rules. */
-export function generateAclJs(): string {
-  return `export default {
-  superadmin: { allow: ["select", "find", "add", "update", "delete"] },
-  admin: { allow: ["select", "find", "add", "update", "delete"] },
-  user: { allow: ["select", "find"] },
-  guest: { allow: ["select", "find"] },
-};
-`;
+export function generateTableJson(table: TableMeta): string {
+  return generateModelTs(table);
 }
-
-/** Generate service.js — lifecycle hooks + custom API routes. */
+export function generateModelJson(table: TableMeta): string {
+  return generateModelTs(table);
+}
+export function generateAclJson(): string {
+  return `// ACL is now part of model.ts access field
+export default {};`;
+}
 export function generateServiceJs(): string {
-  return `// Lifecycle hooks — auto-detected by framework
-export async function beforeCreate(ctx, data) {
-  data.created_at = new Date();
-  return data;
+  return generateServiceTs();
 }
-
-export async function afterCreate(ctx, record) {
-  return record;
-}
-
-export async function beforeUpdate(ctx, id, data) {
-  data.updated_at = new Date();
-  return data;
-}
-
-export async function beforeList(ctx, query) {
-  return query;
-}
-
-// Add custom API routes as exports here.
-// Any export NOT matching a lifecycle hook name is auto-registered as a route.
-// Example:
-//   export async function myCustomAction(ctx, input) {
-//     const list = await ctx.think.model("${"table_name"}").where({}).select();
-//     return { data: list };
-//   }
-`;
+export function generateTableTs(): string {
+  return `// Table config is now auto-derived from model.ts columns
+export default {};`;
 }

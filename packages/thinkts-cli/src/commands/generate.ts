@@ -65,15 +65,11 @@ export async function generateFromDB(rootPath: string, _useJs = false): Promise<
     const dir = join(rootPath, "src", dslPath);
     mkdirSync(dir, { recursive: true });
 
-    // JSON schema definition
-    writeFileSync(join(dir, "model.json"), generateModelJson(table));
-    writeFileSync(join(dir, "table.json"), generateTableJson(table));
-    writeFileSync(join(dir, "acl.json"), generateAclJson());
+    // model.ts — single source of truth (columns, hooks, system, access)
+    writeFileSync(join(dir, "model.ts"), generateModelTs(table));
 
-    // TypeScript DSL with type annotations
+    // service.ts — business logic (extends BaseService)
     writeFileSync(join(dir, "service.ts"), generateServiceTs());
-    writeFileSync(join(dir, "model.ts"), generateModelTs(table.name));
-    writeFileSync(join(dir, "table.ts"), generateTableTs());
 
     console.log(`Generated: src/${dslPath}/`);
   }
