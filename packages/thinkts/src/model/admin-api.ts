@@ -313,7 +313,7 @@ export function createAdminApiHandlers(dslData: DslAppData): AdminHandlers {
   async function createAction(ctx: ThinkContext, model: string): Promise<{ data: Record<string, unknown> }> {
     const modelEntry = findModel(model);
     if (!modelEntry) throw new Error(`Model not found: ${model}`);
-    const body = await ctx.request.json();
+    const body = (ctx.body as Record<string, unknown>) ?? {};
     const m = ctx.think.model(modelEntry.name, { _aclCtx: ctx });
     const record = await m.add(body);
     return { data: record as Record<string, unknown> };
@@ -322,7 +322,7 @@ export function createAdminApiHandlers(dslData: DslAppData): AdminHandlers {
   async function updateAction(ctx: ThinkContext, model: string, id: string): Promise<{ data: Record<string, unknown> }> {
     const modelEntry = findModel(model);
     if (!modelEntry) throw new Error(`Model not found: ${model}`);
-    const body = await ctx.request.json();
+    const body = (ctx.body as Record<string, unknown>) ?? {};
     const pk = modelEntry.dsl.primaryKey ?? "id";
     const m = ctx.think.model(modelEntry.name, { _aclCtx: ctx });
     await m.where({ [pk]: id }).update(body);
