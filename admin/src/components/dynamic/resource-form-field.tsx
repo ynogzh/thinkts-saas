@@ -23,16 +23,16 @@ export function ResourceFormField({
   const readOnly = field.readonly ?? false
 
   return (
-    <div className='space-y-1.5'>
-      <Label>{field.label}</Label>
+    <div className='grid grid-cols-6 items-center gap-x-4 gap-y-1'>
+      <Label className='col-span-2 text-end'>{field.label}</Label>
 
       {mode === 'view' ? (
-        <div className='min-h-9 rounded-md border bg-muted/50 px-3 py-1.5 text-sm'>{value || '—'}</div>
+        <div className='col-span-4 min-h-9 rounded-md border bg-muted/50 px-3 py-1.5 text-sm'>{value || '—'}</div>
       ) : field.type === 'textarea' || field.type === 'json' ? (
-        <Textarea value={value} onChange={(e) => onChange(field.field, e.target.value)} rows={field.type === 'json' ? 6 : 3} placeholder={placeholder} />
+        <Textarea value={value} onChange={(e) => onChange(field.field, e.target.value)} rows={field.type === 'json' ? 6 : 3} placeholder={placeholder} className='col-span-4' />
       ) : field.type === 'select' ? (
         <Select value={value} onValueChange={(v) => onChange(field.field, v)}>
-          <SelectTrigger>
+          <SelectTrigger className='col-span-4'>
             <SelectValue placeholder={loadingOptions ? '加载...' : placeholder} />
           </SelectTrigger>
           <SelectContent>
@@ -42,12 +42,12 @@ export function ResourceFormField({
           </SelectContent>
         </Select>
       ) : field.type === 'boolean' ? (
-        <div className='flex items-center gap-2 pt-0.5'>
+        <div className='col-span-4 flex items-center gap-2'>
           <Switch checked={value === 'true' || value === '1'} onCheckedChange={(c) => onChange(field.field, String(c))} disabled={readOnly || pending} />
           <span className='text-sm text-muted-foreground'>{value === 'true' || value === '1' ? '是' : '否'}</span>
         </div>
       ) : field.type === 'file' || field.type === 'image' ? (
-        <div className='space-y-1.5'>
+        <div className='col-span-4 space-y-1.5'>
           <Input value={value} onChange={(e) => onChange(field.field, e.target.value)} readOnly={readOnly} placeholder={placeholder} />
           {mode !== 'view' && onUpload && (
             <Input type='file' accept={field.accept ?? (field.type === 'image' ? 'image/*' : undefined)} disabled={pending || readOnly}
@@ -58,7 +58,7 @@ export function ResourceFormField({
         <Input
           type={field.type === 'number' ? 'number' : field.type === 'email' ? 'email' : field.type === 'password' ? 'password' : 'text'}
           value={value} onChange={(e) => onChange(field.field, e.target.value)}
-          readOnly={readOnly} placeholder={placeholder}
+          readOnly={readOnly} placeholder={placeholder} className='col-span-4'
         />
       )}
     </div>
