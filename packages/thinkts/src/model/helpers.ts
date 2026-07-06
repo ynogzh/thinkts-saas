@@ -7,10 +7,33 @@ import type { AclConfig, AclRule } from "../acl";
  * DSL helpers: hooks, CRUD utilities, timestamp defaults, and ACL config builder.
  */
 
-const BUILT_IN_HOOKS: Partial<Record<ServiceHookName, (data: Record<string, unknown>) => Record<string, unknown>>> = {
-  beforeCreate(data) { if ("created_at" in data) data.created_at = new Date(); return data; },
-  beforeUpdate(data) { if ("updated_at" in data) data.updated_at = new Date(); return data; },
+function normalizeJson(val: unknown): unknown {
+  if (val === undefined || val === null || val === "") return null;
+  if (typeof val === "string") return val; // already a string
+  return JSON.stringify(val);
+}
+
+/** Built-in hooks — always run before user hooks. */
+const BUILT_IN_HOOKS: Partial<Record<ServiceHookName, (data: Record<string, unknown>, modelEntry: DslModelEntry) => void>> = {
+  beforeCreate(data, modelEntry) {
+    const now = new Date();
+    if ("created_at" in data) data.created_at = now;
+    if ("updated_at" in data) data.updated_at = now;
+    applyJsonNormalize(data, modelEntry);
+  },
+  beforeUpdate(data, modelEntry) {
+    if ("updated_at" in data) data.updated_at = new Date();
+    applyJsonNormalize(data, modelEntry);
+  },
 };
+
+function applyJsonNormalize(data: Record<string, unknown>, modelEntry: DslModelEntry) {
+  for (const col of modelEntry.dsl.columns) {
+    if (col.type === "json" && col.name in data) {
+      data[col.name] = normalizeJson(data[col.name]);
+    }
+  }
+}
 
 export async function callDslHook<T>(
   ctx: ThinkContext,
@@ -20,6 +43,13 @@ export async function callDslHook<T>(
   payload: T,
   ...extras: unknown[]
 ): Promise<T> {
+  const data = payload as Record<string, unknown>;
+  // Built-in hooks ALWAYS run first
+  const builtIn = BUILT_IN_HOOKS[name];
+  if (builtIn && typeof data === "object" && data && !Array.isArray(data)) {
+    builtIn(data, modelEntry);
+  }
+  // Then user hook
   const hook = serviceEntry?.hooks[name] as
     | ((ctx: ThinkContext, ...args: unknown[]) => T | Promise<T> | undefined | void)
     | undefined;
@@ -30,10 +60,6 @@ export async function callDslHook<T>(
     });
     const result = await hook.call(serviceContext, ctx, ...extras, payload);
     return result === undefined ? payload : (result as T);
-  }
-  const builtIn = BUILT_IN_HOOKS[name];
-  if (builtIn && payload && typeof payload === "object" && !Array.isArray(payload)) {
-    builtIn(payload as Record<string, unknown>);
   }
   return payload;
 }
