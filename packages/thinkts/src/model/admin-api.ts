@@ -397,6 +397,49 @@ function resolveColType(field: string, cols: ColumnDSL[]): string {
   return columnType(cols.find((c) => c.name === field) ?? { name: field, type: "varchar" });
 }
 
+/** Generate search field options for common enum columns when none are explicitly defined. */
+function searchFieldOptions(field: string, col: ColumnDSL): SearchFieldMeta["options"] {
+  // Use explicit model options if available
+  if (col.options?.length) {
+    return col.options.map((o) => {
+      if (typeof o === "string") return { label: o, value: o };
+      return { label: o.label, value: o.value };
+    });
+  }
+  // Infer from common field patterns
+  const inferred: Record<string, Array<{ label: string; value: unknown }>> = {
+    status: [{ label: "启用", value: "enabled" }, { label: "禁用", value: "disabled" }],
+    online_status: [{ label: "在线", value: "online" }, { label: "离线", value: "offline" }],
+    user_type: [{ label: "超级管理员", value: "superadmin" }, { label: "管理员", value: "admin" }, { label: "用户", value: "customer" }],
+    gender: [{ label: "男", value: "male" }, { label: "女", value: "female" }],
+    start_mode: [{ label: "模拟", value: "mock" }, { label: "真实", value: "real" }],
+    pay_status: [{ label: "未支付", value: "unpaid" }, { label: "已支付", value: "paid" }, { label: "已退款", value: "refunded" }],
+    scope_type: [{ label: "全部", value: "all" }, { label: "指定", value: "specific" }],
+    include_type: [{ label: "包含", value: "include" }, { label: "排除", value: "exclude" }],
+    coupon_type: [{ label: "满减", value: "discount" }, { label: "折扣", value: "rate" }],
+    valid_type: [{ label: "固定时间", value: "fixed" }, { label: "领取后天数", value: "days" }],
+    campaign_type: [{ label: "满减", value: "discount" }, { label: "赠品", value: "gift" }],
+    sale_mode: [{ label: "售卖", value: "sale" }, { label: "租赁", value: "rent" }],
+    charge_type: [{ label: "按时", value: "hourly" }, { label: "按次", value: "per_use" }, { label: "包月", value: "monthly" }],
+    consume_mode: [{ label: "按时", value: "hourly" }, { label: "按次", value: "per_use" }],
+    usage_type: [{ label: "按时", value: "hourly" }, { label: "按次", value: "per_use" }],
+    billing_mode: [{ label: "按时", value: "hourly" }, { label: "按次", value: "per_use" }, { label: "包月", value: "monthly" }],
+    asset_type: [{ label: "余额", value: "balance" }, { label: "积分", value: "points" }],
+    receiver_type: [{ label: "商户", value: "merchant" }, { label: "代理", value: "agent" }],
+    rule_type: [{ label: "固定比例", value: "fixed_rate" }, { label: "阶梯", value: "tiered" }],
+    package_type: [{ label: "计时", value: "duration" }, { label: "计次", value: "times" }, { label: "充值", value: "recharge" }],
+    item_type: [{ label: "产品", value: "product" }, { label: "服务", value: "service" }],
+    biz_type: [{ label: "设备", value: "device" }, { label: "套餐", value: "package" }, { label: "充值", value: "recharge" }, { label: "商城", value: "mall" }],
+    command_type: [{ label: "启动", value: "start" }, { label: "停止", value: "stop" }],
+    callback_type: [{ label: "支付回调", value: "pay" }, { label: "退款回调", value: "refund" }],
+    login_type: [{ label: "密码登录", value: "password" }, { label: "短信登录", value: "sms" }],
+    settlement_cycle: [{ label: "每天", value: "daily" }, { label: "每周", value: "weekly" }, { label: "每月", value: "monthly" }],
+    handle_status: [{ label: "待处理", value: "pending" }, { label: "已完成", value: "done" }, { label: "失败", value: "failed" }],
+    verify_status: [{ label: "待验证", value: "pending" }, { label: "已验证", value: "verified" }, { label: "失败", value: "failed" }],
+  };
+  return inferred[field];
+}
+
 function buildTableConfig(entry: DslTableEntry, modelEntry: DslModelEntry): TableConfig {
   const { table } = entry;
   const rawColumns = table.list?.columns ?? modelEntry.dsl.columns.map((c) => ({
@@ -412,13 +455,16 @@ function buildTableConfig(entry: DslTableEntry, modelEntry: DslModelEntry): Tabl
     type: resolveColType(tc.field, modelEntry.dsl.columns),
   }));
 
-  const searchFields: SearchFieldMeta[] = (table.search?.fields ?? []).map((sf) => ({
-    field: sf.field,
-    label: zh(sf.title, sf.field),
-    type: sf.type,
-    operator: sf.operator,
-    options: sf.options,
-  }));
+  const searchFields: SearchFieldMeta[] = (table.search?.fields ?? []).map((sf) => {
+    const col = modelEntry.dsl.columns.find((c) => c.name === sf.field);
+    return {
+      field: sf.field,
+      label: zh(sf.title, sf.field),
+      type: sf.type,
+      operator: sf.operator,
+      options: searchFieldOptions(sf.field, col ?? { name: sf.field, type: "varchar" }),
+    };
+  });
   const formGroups: FormGroupMeta[] = (table.form?.groups ?? []).map((g) => ({
     title: g.title,
     columns: g.columns,
