@@ -12,7 +12,7 @@ export default defineModel("payment_refund", {
     amount: label("金额")(listable(t.decimal())),
     reason: label("原因")(listable(nullable(t.string()))),
     status: label("状态")(listable(searchable(t.string()))),
-    third_refund_no: label("第三方退款号")(listable(nullable(t.string()))),
+    third_refund_no: label("第三方退款号")(listable(searchable(nullable(t.string())))),
     created_at: t.timestamp(),
     updated_at: t.timestamp()
   },

@@ -591,6 +591,9 @@ export interface AdminHandlers {
   createAction(ctx: ThinkContext, model: string): Promise<{ data: Record<string, unknown> }>;
   updateAction(ctx: ThinkContext, model: string, id: string): Promise<{ data: Record<string, unknown> }>;
   deleteAction(ctx: ThinkContext, model: string, id: string): Promise<{ ok: boolean }>;
+  batchLookupAction(ctx: ThinkContext): Promise<Record<string, Record<string, string>>>;
+  entityDetailAction(ctx: ThinkContext, model: string, id: string): Promise<{ data: Record<string, unknown> | null }>;
+  entityListAction(ctx: ThinkContext): Promise<{ data: Record<string, unknown>[] }>;
 }
 
 export function createAdminApiHandlers(dslData: DslAppData): AdminHandlers {
@@ -693,24 +696,6 @@ export function createAdminApiHandlers(dslData: DslAppData): AdminHandlers {
     const raw = await query.page(page, pageSize).countSelect();
     const items = (raw.data ?? []) as Record<string, unknown>[];
 
-    // Enrich FK display values
-    const tableConfig = buildTableConfig(tableEntry!, modelEntry, dslData.models);
-    const fkCols = tableConfig.list.columns.filter((c) => c.displayField && c.refModel);
-    if (fkCols.length > 0 && items.length > 0) {
-      for (const fkCol of fkCols) {
-        const ids = [...new Set(items.map((r) => r[fkCol.field]).filter(Boolean))];
-        if (ids.length === 0) continue;
-        const refModel = ctx.think.model(fkCol.refModel!, { _aclCtx: ctx });
-        const refRows = await refModel.where({ id: ["in", ids] } as unknown as Record<string, unknown>).select() as Record<string, unknown>[];
-        const lookup = new Map(refRows.map((r) => [String(r.id), String(r[fkCol.displayField!] ?? r.id)]));
-        const displayKey = `${fkCol.field.replace(/_id$/, "")}_${fkCol.displayField}`;
-        for (const row of items) {
-          const fkVal = row[fkCol.field];
-          if (fkVal != null) (row as Record<string, unknown>)[displayKey] = lookup.get(String(fkVal)) ?? String(fkVal);
-        }
-      }
-    }
-
     return {
       list: {
         items,
@@ -719,6 +704,51 @@ export function createAdminApiHandlers(dslData: DslAppData): AdminHandlers {
         pageSize,
       },
     };
+  }
+
+  // ── batch FK lookup (client-side) ──
+
+  async function batchLookupAction(ctx: ThinkContext): Promise<Record<string, Record<string, string>>> {
+    const body = (ctx.body ?? {}) as { lookups?: Array<{ model: string; ids: (number | string)[]; field: string }> };
+    const lookups = body.lookups ?? [];
+    const result: Record<string, Record<string, string>> = {};
+
+    for (const lk of lookups) {
+      const modelEntry = findModel(lk.model);
+      if (!modelEntry) continue;
+      const ids = lk.ids.filter(Boolean);
+      if (ids.length === 0) continue;
+      const field = lk.field ?? "name";
+      const m = ctx.think.model(modelEntry.name, { _aclCtx: ctx });
+      const rows = await m.where({ id: ["in", ids] } as unknown as Record<string, unknown>).field([["id", field].join(",")]).select() as Record<string, unknown>[];
+      const map: Record<string, string> = {};
+      for (const row of rows) {
+        map[String(row.id)] = String(row[field] ?? row.id ?? "");
+      }
+      result[lk.model] = map;
+    }
+    return result;
+  }
+
+  async function entityDetailAction(ctx: ThinkContext, model: string, id: string): Promise<{ data: Record<string, unknown> | null }> {
+    const modelEntry = findModel(model);
+    if (!modelEntry) throw new Error(`Model not found: ${model}`);
+    const pk = modelEntry.dsl.primaryKey ?? "id";
+    const m = ctx.think.model(modelEntry.name, { _aclCtx: ctx });
+    const record = await m.where({ [pk]: id }).find();
+    return { data: record as Record<string, unknown> | null };
+  }
+
+  async function entityListAction(ctx: ThinkContext): Promise<{ data: Record<string, unknown>[] }> {
+    const body = (ctx.body ?? {}) as { model?: string; ids?: (number | string)[]; fields?: string[] };
+    const modelEntry = findModel(body.model ?? "");
+    if (!modelEntry) throw new Error(`Model not found: ${body.model}`);
+    const ids = (body.ids ?? []).filter(Boolean);
+    if (ids.length === 0) return { data: [] };
+    const fields = body.fields ?? ["id"];
+    const m = ctx.think.model(modelEntry.name, { _aclCtx: ctx });
+    const rows = await m.where({ id: ["in", ids] } as unknown as Record<string, unknown>).field(fields.join(",")).select() as Record<string, unknown>[];
+    return { data: rows };
   }
 
   function formConfigAction(model: string): { form: FormGroupMeta[] } | { error: string } {
@@ -776,6 +806,58 @@ export function createAdminApiHandlers(dslData: DslAppData): AdminHandlers {
     return { ok: true };
   }
 
+  async function batchLookupAction(ctx: ThinkContext): Promise<Record<string, Record<string, string>>> {
+    const body = (ctx.body as { lookups: Array<{ model: string; ids: (string | number)[]; field: string }> }) ?? { lookups: [] };
+    const result: Record<string, Record<string, string>> = {};
+    for (const entry of body.lookups) {
+      const m = ctx.think.model(entry.model, { _aclCtx: ctx });
+      const rows = (await m.where({ id: ["in", entry.ids] } as unknown as Record<string, unknown>).select()) as Record<string, unknown>[];
+      const map: Record<string, string> = {};
+      for (const row of rows) {
+        map[String(row.id)] = String(row[entry.field] ?? row.id);
+      }
+      result[entry.model] = map;
+    }
+    return result;
+  }
+
+  async function entityDetailAction(ctx: ThinkContext, modelName: string, id: string): Promise<{ data: Record<string, unknown> | null }> {
+    const url = new URL(ctx.request.url);
+    const fieldsParam = url.searchParams.get("fields");
+    const modelEntry = findModel(modelName);
+    if (!modelEntry) throw new Error(`Model not found: ${modelName}`);
+    const pk = modelEntry.dsl.primaryKey ?? "id";
+    const m = ctx.think.model(modelEntry.name, { _aclCtx: ctx });
+    const record = (await m.where({ [pk]: id }).find()) as Record<string, unknown> | null;
+    if (!record) return { data: null };
+    if (fieldsParam) {
+      const fields = fieldsParam.split(",").map((f) => f.trim()).filter(Boolean);
+      const filtered: Record<string, unknown> = {};
+      for (const f of fields) {
+        if (f in record) filtered[f] = record[f];
+      }
+      return { data: filtered };
+    }
+    return { data: record };
+  }
+
+  async function entityListAction(ctx: ThinkContext): Promise<{ data: Record<string, unknown>[] }> {
+    const body = (ctx.body as { model: string; ids: (string | number)[]; fields?: string[] }) ?? { model: "", ids: [] };
+    const modelEntry = findModel(body.model);
+    if (!modelEntry) throw new Error(`Model not found: ${body.model}`);
+    const m = ctx.think.model(modelEntry.name, { _aclCtx: ctx });
+    const rows = (await m.where({ id: ["in", body.ids] } as unknown as Record<string, unknown>).select()) as Record<string, unknown>[];
+    if (!body.fields || body.fields.length === 0) return { data: rows };
+    const result = rows.map((r) => {
+      const filtered: Record<string, unknown> = {};
+      for (const f of body.fields!) {
+        if (f in r) filtered[f] = r[f];
+      }
+      return filtered;
+    });
+    return { data: result };
+  }
+
   return {
     menusAction,
     tablesAction,
@@ -786,5 +868,64 @@ export function createAdminApiHandlers(dslData: DslAppData): AdminHandlers {
     createAction,
     updateAction,
     deleteAction,
+    batchLookupAction,
+    entityDetailAction,
+    entityListAction,
   };
+}
+
+// ── Module-level exports for external callers ──
+
+export async function batchLookup(
+  ctx: ThinkContext,
+  lookups: Array<{ model: string; ids: (string | number)[]; field: string }>,
+): Promise<Record<string, Record<string, string>>> {
+  const result: Record<string, Record<string, string>> = {};
+  for (const entry of lookups) {
+    const m = ctx.think.model(entry.model, { _aclCtx: ctx });
+    const rows = (await m.where({ id: ["in", entry.ids] } as unknown as Record<string, unknown>).select()) as Record<string, unknown>[];
+    const map: Record<string, string> = {};
+    for (const row of rows) {
+      map[String(row.id)] = String(row[entry.field] ?? row.id);
+    }
+    result[entry.model] = map;
+  }
+  return result;
+}
+
+export async function entityDetail(
+  ctx: ThinkContext,
+  modelName: string,
+  id: string,
+  fields?: string[],
+): Promise<Record<string, unknown> | null> {
+  const m = ctx.think.model(modelName, { _aclCtx: ctx });
+  const record = (await m.where({ id }).find()) as Record<string, unknown> | null;
+  if (!record) return null;
+  if (fields && fields.length > 0) {
+    const filtered: Record<string, unknown> = {};
+    for (const f of fields) {
+      if (f in record) filtered[f] = record[f];
+    }
+    return filtered;
+  }
+  return record;
+}
+
+export async function entityList(
+  ctx: ThinkContext,
+  modelName: string,
+  ids: (string | number)[],
+  fields?: string[],
+): Promise<Record<string, unknown>[]> {
+  const m = ctx.think.model(modelName, { _aclCtx: ctx });
+  const rows = (await m.where({ id: ["in", ids] } as unknown as Record<string, unknown>).select()) as Record<string, unknown>[];
+  if (!fields || fields.length === 0) return rows;
+  return rows.map((r) => {
+    const filtered: Record<string, unknown> = {};
+    for (const f of fields) {
+      if (f in r) filtered[f] = r[f];
+    }
+    return filtered;
+  });
 }

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import {
   type ColumnDef, type ColumnFiltersState,
   type SortingState, type VisibilityState,
@@ -19,6 +19,8 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import type { TableConfig, ColumnMeta, SearchFieldMeta } from '@/lib/admin-api'
+import { ReferenceCell } from '@/components/dynamic/reference-cell'
+import { clearFkCache } from '@/lib/fk-cache'
 
 export interface DynamicTableProps {
   config: TableConfig
@@ -66,7 +68,6 @@ function renderCellValue(val: unknown, col: ColumnMeta, row?: Record<string, unk
     const s = String(val)
     return <Badge variant={s === 'enabled' || s === 'active' ? 'default' : 'secondary'}>{s}</Badge>
   }
-  // FK display: show display value if available in row data, otherwise show ID
   if (col.displayField && row) {
     const displayKey = `${col.field.replace(/_id$/, '')}_${col.displayField}`
     const displayVal = row[displayKey]
@@ -75,7 +76,13 @@ function renderCellValue(val: unknown, col: ColumnMeta, row?: Record<string, unk
   return <span>{String(val)}</span>
 }
 
-function buildFacetedFilter(f: SearchFieldMeta) {
+interface FacetedFilterDef {
+  columnId: string
+  title: string
+  options: Array<{ label: string; value: string }>
+}
+
+function buildFacetedFilter(f: SearchFieldMeta): FacetedFilterDef | undefined {
   if (!f.options?.length) return undefined
   return {
     columnId: f.field,
@@ -96,14 +103,35 @@ export function DynamicTable({
   const tableKey = `table-${config.model}`
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(() => loadVisibility(tableKey))
   const [rowSelection, setRowSelection] = useState({})
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(() => loadVisibility(tableKey))
 
   const hasActions = !!(onView || onEdit || onDelete)
   const searchFields = config.search?.fields ?? []
-  const facetedFilters = searchFields.filter((f) => f.options?.length).map(buildFacetedFilter).filter(Boolean) as NonNullable<ReturnType<typeof buildFacetedFilter>>[]
-  const textFields = searchFields.filter((f) => !f.options?.length).slice(0, 3)  // max 3 text inputs
+  const facetedFilters = searchFields.filter((f) => f.options?.length).map(buildFacetedFilter).filter(Boolean) as FacetedFilterDef[]
+  const textFields = searchFields.filter((f) => !f.options?.length).slice(0, 3)
   const searchKey = textFields[0]?.field
+
+  // Collect FK reference IDs per column for batch fetching
+  const fkIdsByColumn = useMemo(() => {
+    const byCol: Record<string, (string | number)[]> = {}
+    const fkCols = config.list.columns.filter((c) => c.refModel)
+    if (fkCols.length === 0) return byCol
+    for (const col of fkCols) {
+      const ids: (string | number)[] = []
+      for (const row of data) {
+        const val = row[col.field]
+        if (val != null) ids.push(val as string | number)
+      }
+      byCol[col.field] = [...new Set(ids.map((id) => String(id)))].map((s) => (/^\d+$/.test(s) ? Number(s) : s))
+    }
+    return byCol
+  }, [config, data])
+
+  // Clear FK cache on data change (page navigation / filter change)
+  useEffect(() => {
+    clearFkCache()
+  }, [data])
 
   const columns: ColumnDef<Record<string, unknown>>[] = useMemo(() => {
     const cols: ColumnDef<Record<string, unknown>>[] = [
@@ -126,9 +154,22 @@ export function DynamicTable({
       cols.push({
         accessorKey: col.field,
         header: ({ column }) => <DataTableColumnHeader column={column} title={col.title ?? col.field} />,
-        cell: ({ getValue, row }) => (
-          <div className='max-w-[180px] truncate'>{renderCellValue(getValue(), col, row.original)}</div>
-        ),
+        cell: ({ getValue, row }) => {
+          const val = getValue() as string | number | null
+          if (col.refModel && col.displayField) {
+            return (
+              <div className='max-w-[180px] truncate'>
+                <ReferenceCell
+                  value={val}
+                  model={col.refModel}
+                  displayField={col.displayField}
+                  allPageIds={fkIdsByColumn[col.field]}
+                />
+              </div>
+            )
+          }
+          return <div className='max-w-[180px] truncate'>{renderCellValue(val, col, row.original)}</div>
+        },
         enableSorting: col.sortable ?? true,
       })
     }
@@ -157,7 +198,7 @@ export function DynamicTable({
       })
     }
     return cols
-  }, [config, hasActions, onView, onEdit, onDelete])
+  }, [config, hasActions, onView, onEdit, onDelete, fkIdsByColumn])
 
   const table = useReactTable({
     data,

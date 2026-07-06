@@ -7,7 +7,7 @@ export default defineModel("promote_commission_rule", {
   columns: {
     id: autoIncrement(primary(t.bigint())),
     tenant_id: label("租户")(listable(searchable(index(t.bigint())))),
-    biz_type: label("业务类型")(listable(index(t.string()))),
+    biz_type: label("业务类型")(listable(searchable(index(t.string())))),
     level_id: label("等级")(listable(searchable(index(t.bigint())))),
     rate: label("比率")(listable(t.decimal())),
     condition_json: nullable(t.json()),  // jsonSchema(t.json(), [{ key: "condition_type", label: "条件类型", type: "string", default: "" }]),

@@ -229,3 +229,67 @@ export async function uploadFile(file: File): Promise<{ url: string }> {
   )
   return { url: data.file_url }
 }
+
+// ── Entity / FK lookup ──────────────────────────────────────
+
+export interface EntityListRequest {
+  model: string
+  ids: (string | number)[]
+  fields: string[]
+}
+
+export interface EntityListResponse {
+  data: Record<string, unknown>[]
+}
+
+export interface BatchLookupRequest {
+  lookups: Array<{
+    model: string
+    ids: (string | number)[]
+    field: string
+  }>
+}
+
+export interface BatchLookupResponse {
+  [model: string]: Record<string, string>
+}
+
+/** Fetch entity detail by model and id. */
+export async function fetchEntityDetail(
+  model: string,
+  id: string | number,
+): Promise<Record<string, unknown>> {
+  const url = `${API_BASE}/admin/api/entity?model=${encodeURIComponent(model)}&id=${encodeURIComponent(String(id))}`
+  const data = await request<{ data: Record<string, unknown> | null }>(url)
+  if (!data.data) throw new Error('Entity not found')
+  return data.data
+}
+
+/** Fetch a list of entities for a given model, filtered by ids. */
+export async function fetchEntityList(
+  body: EntityListRequest,
+): Promise<Record<string, unknown>[]> {
+  const data = await request<EntityListResponse>(
+    `${API_BASE}/admin/api/entity/list`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    },
+  )
+  return data.data ?? []
+}
+
+/** Batch lookup display values for multiple models in one request. */
+export async function batchLookup(
+  body: BatchLookupRequest,
+): Promise<BatchLookupResponse> {
+  return request<BatchLookupResponse>(
+    `${API_BASE}/admin/api/batch-lookup`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    },
+  )
+}

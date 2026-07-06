@@ -9,7 +9,7 @@ export default defineModel("promote_coupon_use_record", {
     tenant_id: label("租户")(listable(searchable(index(t.bigint())))),
     user_coupon_id: label("用户优惠券")(listable(searchable(index(t.bigint())))),
     user_id: label("用户")(listable(searchable(t.bigint()))),
-    biz_type: label("业务类型")(listable(index(t.string()))),
+    biz_type: label("业务类型")(listable(searchable(index(t.string())))),
     biz_id: label("业务ID")(listable(searchable(index(t.bigint())))),
     discount_amount: label("折扣金额")(listable(t.decimal())),
     status: label("状态")(listable(searchable(t.string()))),

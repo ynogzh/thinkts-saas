@@ -8,7 +8,7 @@ export default defineModel("permission_role_permission", {
     id: autoIncrement(primary(t.bigint())),
     tenant_id: label("租户")(listable(searchable(index(t.bigint())))),
     role_id: label("角色")(listable(searchable(index(t.bigint())))),
-    permission_code: label("Permission Code")(listable(index(t.string()))),
+    permission_code: label("Permission Code")(listable(searchable(index(t.string())))),
     created_at: t.timestamp()
   },
 

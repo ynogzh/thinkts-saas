@@ -252,6 +252,23 @@ export function registerDslAdminRoutes(table: RouteTable, dslData: DslAppData): 
       path: "/admin/api/actions/:model/:id/delete",
       handler: async (ctx: ThinkContext) => admin.deleteAction(ctx, ctx.params?.model ?? "", ctx.params?.id ?? ""),
     },
+    {
+      path: "/admin/api/batch-lookup",
+      handler: async (ctx: ThinkContext) => admin.batchLookupAction(ctx),
+    },
+    {
+      path: "/admin/api/entity",
+      handler: async (ctx: ThinkContext) => {
+        const url = new URL(ctx.request.url);
+        const model = url.searchParams.get("model") ?? "";
+        const id = url.searchParams.get("id") ?? "";
+        return admin.entityDetailAction(ctx, model, id);
+      },
+    },
+    {
+      path: "/admin/api/entity/list",
+      handler: async (ctx: ThinkContext) => admin.entityListAction(ctx),
+    },
   ];
   for (const { path, handler } of params) {
     table.radix.insert(path, { match: path, type: "dsl-admin", module: "admin", controller: path, action: "data", handler });

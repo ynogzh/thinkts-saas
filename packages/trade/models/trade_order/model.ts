@@ -8,7 +8,7 @@ export default defineModel("trade_order", {
     id: autoIncrement(primary(t.bigint())),
     tenant_id: label("租户")(listable(searchable(index(t.bigint())))),
     order_no: label("订单号")(listable(searchable(index(t.string())))),
-    biz_type: label("业务类型")(listable(index(t.string()))),
+    biz_type: label("业务类型")(listable(searchable(index(t.string())))),
     biz_id: label("业务ID")(listable(searchable(index(t.bigint())))),
     user_id: label("用户")(listable(searchable(t.bigint()))),
     amount: label("金额")(listable(t.decimal())),

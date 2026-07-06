@@ -8,7 +8,7 @@ export default defineModel("promote_commission_record", {
     id: autoIncrement(primary(t.bigint())),
     tenant_id: label("租户")(listable(searchable(index(t.bigint())))),
     agent_id: label("代理")(listable(searchable(index(t.bigint())))),
-    biz_type: label("业务类型")(listable(index(t.string()))),
+    biz_type: label("业务类型")(listable(searchable(index(t.string())))),
     biz_id: label("业务ID")(listable(searchable(index(t.bigint())))),
     amount: label("金额")(listable(t.decimal())),
     commission_amount: label("佣金金额")(listable(t.decimal())),
