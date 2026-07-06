@@ -1,31 +1,25 @@
-import { defineModel, t } from "thinkts";
+import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
 
 export default defineModel("iotbiz_package_order", {
   columns: {
-    id: t.varchar(255).primary().autoIncrement().required().index(),
-    tenant_id: t.varchar(255).required().index(),
-    user_id: t.varchar(255).required(),
-    package_id: t.varchar(255).required(),
-    order_no: t.varchar(255).required(),
-    quantity: t.varchar(255).required(),
-    pay_amount: t.decimal().required(),
-    trade_order_id: t.varchar(255).nullable(),
-    payment_order_id: t.varchar(255).nullable(),
-    status: t.varchar(255).required(),
-    paid_at: t.timestamp().nullable(),
-    created_at: t.timestamp().required(),
-    updated_at: t.timestamp().required(),
+    id: index(primary(autoIncrement(t.string()))),
+    tenant_id: required(index(t.string())),
+    user_id: required(t.string()),
+    package_id: required(t.string()),
+    order_no: required(t.string()),
+    quantity: required(t.string()),
+    pay_amount: required(t.decimal()),
+    trade_order_id: nullable(t.string()),
+    payment_order_id: nullable(t.string()),
+    status: required(t.string()),
+    paid_at: nullable(t.timestamp()),
+    created_at: required(t.timestamp()),
+    updated_at: required(t.timestamp()),
   },
 
-  hooks: {
-    // beforeCreate(data, ctx) { return data; },
-  },
+  hooks: {},
 
-  system: {
-    // tenantAware: true,
-  },
+  system: {},
 
-  access: {
-    // admin: { create: true, read: true, update: true, delete: true },
-  },
+  access: {},
 });

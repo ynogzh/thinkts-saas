@@ -1,26 +1,20 @@
-import { defineModel, t } from "thinkts";
+import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
 
 export default defineModel("mall_product", {
   columns: {
-    id: t.varchar(255).primary().autoIncrement().required().index(),
-    tenant_id: t.varchar(255).required().index(),
-    name: t.varchar(255).required(),
-    price: t.decimal().required(),
-    status: t.varchar(255).required(),
-    created_at: t.timestamp().required(),
-    updated_at: t.timestamp().required(),
-    deleted_at: t.timestamp().nullable(),
+    id: index(primary(autoIncrement(t.string()))),
+    tenant_id: required(index(t.string())),
+    name: required(t.string()),
+    price: required(t.decimal()),
+    status: required(t.string()),
+    created_at: required(t.timestamp()),
+    updated_at: required(t.timestamp()),
+    deleted_at: nullable(t.timestamp()),
   },
 
-  hooks: {
-    // beforeCreate(data, ctx) { return data; },
-  },
+  hooks: {},
 
-  system: {
-    // tenantAware: true,
-  },
+  system: {},
 
-  access: {
-    // admin: { create: true, read: true, update: true, delete: true },
-  },
+  access: {},
 });

@@ -1,33 +1,27 @@
-import { defineModel, t } from "thinkts";
+import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
 
 export default defineModel("iotbiz_device_usage_record", {
   columns: {
-    id: t.varchar(255).autoIncrement().required(),
-    tenant_id: t.varchar(255).required(),
-    user_id: t.varchar(255).required(),
-    device_id: t.varchar(255).required(),
-    category_id: t.varchar(255).required(),
-    session_id: t.varchar(255).required(),
-    sku_id: t.varchar(255).nullable(),
-    usage_type: t.varchar(255).required(),
-    amount: t.decimal().required(),
-    started_at: t.timestamp().required(),
-    finished_at: t.timestamp().nullable(),
-    extra_json: t.varchar(255).nullable(),
-    status: t.varchar(255).required(),
-    created_at: t.timestamp().required(),
-    updated_at: t.timestamp().required(),
+    id: autoIncrement(t.string()),
+    tenant_id: required(t.string()),
+    user_id: required(t.string()),
+    device_id: required(t.string()),
+    category_id: required(t.string()),
+    session_id: required(t.string()),
+    sku_id: nullable(t.string()),
+    usage_type: required(t.string()),
+    amount: required(t.decimal()),
+    started_at: required(t.timestamp()),
+    finished_at: nullable(t.timestamp()),
+    extra_json: nullable(t.string()),
+    status: required(t.string()),
+    created_at: required(t.timestamp()),
+    updated_at: required(t.timestamp()),
   },
 
-  hooks: {
-    // beforeCreate(data, ctx) { return data; },
-  },
+  hooks: {},
 
-  system: {
-    // tenantAware: true,
-  },
+  system: {},
 
-  access: {
-    // admin: { create: true, read: true, update: true, delete: true },
-  },
+  access: {},
 });

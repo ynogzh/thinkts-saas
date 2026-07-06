@@ -1,30 +1,24 @@
-import { defineModel, t } from "thinkts";
+import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
 
 export default defineModel("iotbiz_param_template", {
   columns: {
-    id: t.varchar(255).primary().autoIncrement().required().index(),
-    tenant_id: t.varchar(255).required().index(),
-    code: t.varchar(255).required(),
-    name: t.varchar(255).required(),
-    type_id: t.varchar(255).nullable(),
-    start_mode: t.varchar(255).required(),
-    pricing_json: t.varchar(255).nullable(),
-    start_config_json: t.varchar(255).nullable(),
-    metadata_json: t.varchar(255).nullable(),
-    status: t.varchar(255).required(),
-    created_at: t.timestamp().required(),
-    updated_at: t.timestamp().required(),
+    id: index(primary(autoIncrement(t.string()))),
+    tenant_id: required(index(t.string())),
+    code: required(t.string()),
+    name: required(t.string()),
+    type_id: nullable(t.string()),
+    start_mode: required(t.string()),
+    pricing_json: nullable(t.string()),
+    start_config_json: nullable(t.string()),
+    metadata_json: nullable(t.string()),
+    status: required(t.string()),
+    created_at: required(t.timestamp()),
+    updated_at: required(t.timestamp()),
   },
 
-  hooks: {
-    // beforeCreate(data, ctx) { return data; },
-  },
+  hooks: {},
 
-  system: {
-    // tenantAware: true,
-  },
+  system: {},
 
-  access: {
-    // admin: { create: true, read: true, update: true, delete: true },
-  },
+  access: {},
 });

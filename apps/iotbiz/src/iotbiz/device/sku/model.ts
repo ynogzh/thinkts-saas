@@ -1,34 +1,28 @@
-import { defineModel, t } from "thinkts";
+import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
 
 export default defineModel("iotbiz_device_sku", {
   columns: {
-    id: t.varchar(255).autoIncrement().required(),
-    tenant_id: t.varchar(255).required(),
-    category_id: t.varchar(255).required(),
-    profile_id: t.varchar(255).required(),
-    code: t.varchar(255).required(),
-    name: t.varchar(255).required(),
-    sale_mode: t.varchar(255).required(),
-    price: t.decimal().required(),
-    original_price: t.decimal().nullable(),
-    package_quantity: t.varchar(255).nullable(),
-    validity_days: t.varchar(255).nullable(),
-    benefits_json: t.varchar(255).nullable(),
-    extra_json: t.varchar(255).nullable(),
-    status: t.varchar(255).required(),
-    created_at: t.timestamp().required(),
-    updated_at: t.timestamp().required(),
+    id: autoIncrement(t.string()),
+    tenant_id: required(t.string()),
+    category_id: required(t.string()),
+    profile_id: required(t.string()),
+    code: required(t.string()),
+    name: required(t.string()),
+    sale_mode: required(t.string()),
+    price: required(t.decimal()),
+    original_price: nullable(t.decimal()),
+    package_quantity: nullable(t.string()),
+    validity_days: nullable(t.string()),
+    benefits_json: nullable(t.string()),
+    extra_json: nullable(t.string()),
+    status: required(t.string()),
+    created_at: required(t.timestamp()),
+    updated_at: required(t.timestamp()),
   },
 
-  hooks: {
-    // beforeCreate(data, ctx) { return data; },
-  },
+  hooks: {},
 
-  system: {
-    // tenantAware: true,
-  },
+  system: {},
 
-  access: {
-    // admin: { create: true, read: true, update: true, delete: true },
-  },
+  access: {},
 });

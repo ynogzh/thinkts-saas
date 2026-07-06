@@ -1,34 +1,28 @@
-import { defineModel, t } from "thinkts";
+import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
 
 export default defineModel("iotbiz_campaign", {
   columns: {
-    id: t.varchar(255).primary().autoIncrement().required().index(),
-    tenant_id: t.varchar(255).required().index(),
-    code: t.varchar(255).required(),
-    name: t.varchar(255).required(),
-    campaign_type: t.varchar(255).required(),
-    scene_code: t.varchar(255).nullable(),
-    device_scope_json: t.varchar(255).nullable(),
-    package_scope_json: t.varchar(255).nullable(),
-    coupon_template_id: t.varchar(255).nullable(),
-    start_at: t.timestamp().nullable(),
-    end_at: t.timestamp().nullable(),
-    rule_json: t.varchar(255).nullable(),
-    status: t.varchar(255).required(),
-    published_at: t.timestamp().nullable(),
-    created_at: t.timestamp().required(),
-    updated_at: t.timestamp().required(),
+    id: index(primary(autoIncrement(t.string()))),
+    tenant_id: required(index(t.string())),
+    code: required(t.string()),
+    name: required(t.string()),
+    campaign_type: required(t.string()),
+    scene_code: nullable(t.string()),
+    device_scope_json: nullable(t.string()),
+    package_scope_json: nullable(t.string()),
+    coupon_template_id: nullable(t.string()),
+    start_at: nullable(t.timestamp()),
+    end_at: nullable(t.timestamp()),
+    rule_json: nullable(t.string()),
+    status: required(t.string()),
+    published_at: nullable(t.timestamp()),
+    created_at: required(t.timestamp()),
+    updated_at: required(t.timestamp()),
   },
 
-  hooks: {
-    // beforeCreate(data, ctx) { return data; },
-  },
+  hooks: {},
 
-  system: {
-    // tenantAware: true,
-  },
+  system: {},
 
-  access: {
-    // admin: { create: true, read: true, update: true, delete: true },
-  },
+  access: {},
 });

@@ -22,9 +22,10 @@ export default defineConfig({
     },
   },
   server: {
+    port: 3334,
     proxy: {
       '/admin/api': {
-        target: 'http://localhost:8360',
+        target: 'http://localhost:3333',
         changeOrigin: true,
       },
     },

@@ -1,31 +1,25 @@
-import { defineModel, t } from "thinkts";
+import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
 
 export default defineModel("mall_order", {
   columns: {
-    id: t.varchar(255).primary().autoIncrement().required().index(),
-    tenant_id: t.varchar(255).required().index(),
-    order_no: t.varchar(255).required(),
-    user_id: t.varchar(255).required(),
-    amount: t.decimal().required(),
-    status: t.varchar(255).required(),
-    owner_user_id: t.varchar(255).nullable(),
-    dept_id: t.varchar(255).nullable(),
-    agent_id: t.varchar(255).nullable(),
-    channel_id: t.varchar(255).nullable(),
-    created_at: t.timestamp().required(),
-    updated_at: t.timestamp().required(),
-    deleted_at: t.timestamp().nullable(),
+    id: index(primary(autoIncrement(t.string()))),
+    tenant_id: required(index(t.string())),
+    order_no: required(t.string()),
+    user_id: required(t.string()),
+    amount: required(t.decimal()),
+    status: required(t.string()),
+    owner_user_id: nullable(t.string()),
+    dept_id: nullable(t.string()),
+    agent_id: nullable(t.string()),
+    channel_id: nullable(t.string()),
+    created_at: required(t.timestamp()),
+    updated_at: required(t.timestamp()),
+    deleted_at: nullable(t.timestamp()),
   },
 
-  hooks: {
-    // beforeCreate(data, ctx) { return data; },
-  },
+  hooks: {},
 
-  system: {
-    // tenantAware: true,
-  },
+  system: {},
 
-  access: {
-    // admin: { create: true, read: true, update: true, delete: true },
-  },
+  access: {},
 });

@@ -1,28 +1,22 @@
-import { defineModel, t } from "thinkts";
+import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
 
 export default defineModel("iotbiz_command_log", {
   columns: {
-    id: t.varchar(255).primary().autoIncrement().required().index(),
-    tenant_id: t.varchar(255).required().index(),
-    device_id: t.varchar(255).required(),
-    session_id: t.varchar(255).nullable(),
-    command_type: t.varchar(255).required(),
-    request_payload_json: t.varchar(255).nullable(),
-    response_payload_json: t.varchar(255).nullable(),
-    status: t.varchar(255).required(),
-    created_at: t.timestamp().required(),
-    updated_at: t.timestamp().required(),
+    id: index(primary(autoIncrement(t.string()))),
+    tenant_id: required(index(t.string())),
+    device_id: required(t.string()),
+    session_id: nullable(t.string()),
+    command_type: required(t.string()),
+    request_payload_json: nullable(t.string()),
+    response_payload_json: nullable(t.string()),
+    status: required(t.string()),
+    created_at: required(t.timestamp()),
+    updated_at: required(t.timestamp()),
   },
 
-  hooks: {
-    // beforeCreate(data, ctx) { return data; },
-  },
+  hooks: {},
 
-  system: {
-    // tenantAware: true,
-  },
+  system: {},
 
-  access: {
-    // admin: { create: true, read: true, update: true, delete: true },
-  },
+  access: {},
 });

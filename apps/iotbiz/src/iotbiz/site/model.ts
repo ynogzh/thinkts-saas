@@ -1,35 +1,29 @@
-import { defineModel, t } from "thinkts";
+import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
 
 export default defineModel("iotbiz_site", {
   columns: {
-    id: t.varchar(255).primary().autoIncrement().required().index(),
-    tenant_id: t.varchar(255).required().index(),
-    site_no: t.varchar(255).required(),
-    name: t.varchar(255).required(),
-    merchant_id: t.varchar(255).required(),
-    agent_id: t.varchar(255).required(),
-    address: t.varchar(255).nullable(),
-    location_label: t.varchar(255).nullable(),
-    latitude: t.decimal().nullable(),
-    longitude: t.decimal().nullable(),
-    contact_name: t.varchar(255).nullable(),
-    contact_phone: t.varchar(255).nullable(),
-    device_capacity: t.varchar(255).required(),
-    status: t.varchar(255).required(),
-    metadata_json: t.varchar(255).nullable(),
-    created_at: t.timestamp().required(),
-    updated_at: t.timestamp().required(),
+    id: index(primary(autoIncrement(t.string()))),
+    tenant_id: required(index(t.string())),
+    site_no: required(t.string()),
+    name: required(t.string()),
+    merchant_id: required(t.string()),
+    agent_id: required(t.string()),
+    address: nullable(t.string()),
+    location_label: nullable(t.string()),
+    latitude: nullable(t.decimal()),
+    longitude: nullable(t.decimal()),
+    contact_name: nullable(t.string()),
+    contact_phone: nullable(t.string()),
+    device_capacity: required(t.string()),
+    status: required(t.string()),
+    metadata_json: nullable(t.string()),
+    created_at: required(t.timestamp()),
+    updated_at: required(t.timestamp()),
   },
 
-  hooks: {
-    // beforeCreate(data, ctx) { return data; },
-  },
+  hooks: {},
 
-  system: {
-    // tenantAware: true,
-  },
+  system: {},
 
-  access: {
-    // admin: { create: true, read: true, update: true, delete: true },
-  },
+  access: {},
 });

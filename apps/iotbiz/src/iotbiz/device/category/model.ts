@@ -1,28 +1,22 @@
-import { defineModel, t } from "thinkts";
+import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
 
 export default defineModel("iotbiz_device_category", {
   columns: {
-    id: t.varchar(255).autoIncrement().required(),
-    tenant_id: t.varchar(255).required(),
-    code: t.varchar(255).required(),
-    name: t.varchar(255).required(),
-    description: t.varchar(255).nullable(),
-    icon: t.varchar(255).nullable(),
-    sort_order: t.varchar(255).required(),
-    status: t.varchar(255).required(),
-    created_at: t.timestamp().required(),
-    updated_at: t.timestamp().required(),
+    id: autoIncrement(t.string()),
+    tenant_id: required(t.string()),
+    code: required(t.string()),
+    name: required(t.string()),
+    description: nullable(t.string()),
+    icon: nullable(t.string()),
+    sort_order: required(t.string()),
+    status: required(t.string()),
+    created_at: required(t.timestamp()),
+    updated_at: required(t.timestamp()),
   },
 
-  hooks: {
-    // beforeCreate(data, ctx) { return data; },
-  },
+  hooks: {},
 
-  system: {
-    // tenantAware: true,
-  },
+  system: {},
 
-  access: {
-    // admin: { create: true, read: true, update: true, delete: true },
-  },
+  access: {},
 });

@@ -1,36 +1,30 @@
-import { defineModel, t } from "thinkts";
+import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
 
 export default defineModel("iotbiz_device", {
   columns: {
-    id: t.varchar(255).primary().autoIncrement().required().index(),
-    tenant_id: t.varchar(255).required().index(),
-    device_no: t.varchar(255).required(),
-    name: t.varchar(255).required(),
-    merchant_id: t.varchar(255).required(),
-    agent_id: t.varchar(255).required(),
-    type_id: t.varchar(255).required(),
-    location_label: t.varchar(255).nullable(),
-    online_status: t.varchar(255).required(),
-    start_mode: t.varchar(255).required(),
-    pricing_json: t.varchar(255).nullable(),
-    start_config_json: t.varchar(255).nullable(),
-    last_heartbeat_at: t.timestamp().nullable(),
-    last_start_at: t.timestamp().nullable(),
-    status: t.varchar(255).required(),
-    metadata_json: t.varchar(255).nullable(),
-    created_at: t.timestamp().required(),
-    updated_at: t.timestamp().required(),
+    id: index(primary(autoIncrement(t.string()))),
+    tenant_id: required(index(t.string())),
+    device_no: required(t.string()),
+    name: required(t.string()),
+    merchant_id: required(t.string()),
+    agent_id: required(t.string()),
+    type_id: required(t.string()),
+    location_label: nullable(t.string()),
+    online_status: required(t.string()),
+    start_mode: required(t.string()),
+    pricing_json: nullable(t.string()),
+    start_config_json: nullable(t.string()),
+    last_heartbeat_at: nullable(t.timestamp()),
+    last_start_at: nullable(t.timestamp()),
+    status: required(t.string()),
+    metadata_json: nullable(t.string()),
+    created_at: required(t.timestamp()),
+    updated_at: required(t.timestamp()),
   },
 
-  hooks: {
-    // beforeCreate(data, ctx) { return data; },
-  },
+  hooks: {},
 
-  system: {
-    // tenantAware: true,
-  },
+  system: {},
 
-  access: {
-    // admin: { create: true, read: true, update: true, delete: true },
-  },
+  access: {},
 });

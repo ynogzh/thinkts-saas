@@ -1,34 +1,28 @@
-import { defineModel, t } from "thinkts";
+import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
 
 export default defineModel("iotbiz_package", {
   columns: {
-    id: t.varchar(255).primary().autoIncrement().required().index(),
-    tenant_id: t.varchar(255).required().index(),
-    code: t.varchar(255).required(),
-    name: t.varchar(255).required(),
-    package_type: t.varchar(255).required(),
-    sale_price: t.decimal().required(),
-    recharge_amount: t.decimal().nullable(),
-    bonus_amount: t.decimal().required(),
-    total_times: t.varchar(255).nullable(),
-    total_duration_seconds: t.varchar(255).nullable(),
-    validity_days: t.varchar(255).nullable(),
-    device_type_scope_json: t.varchar(255).nullable(),
-    benefits_json: t.varchar(255).nullable(),
-    status: t.varchar(255).required(),
-    created_at: t.timestamp().required(),
-    updated_at: t.timestamp().required(),
+    id: index(primary(autoIncrement(t.string()))),
+    tenant_id: required(index(t.string())),
+    code: required(t.string()),
+    name: required(t.string()),
+    package_type: required(t.string()),
+    sale_price: required(t.decimal()),
+    recharge_amount: nullable(t.decimal()),
+    bonus_amount: required(t.decimal()),
+    total_times: nullable(t.string()),
+    total_duration_seconds: nullable(t.string()),
+    validity_days: nullable(t.string()),
+    device_type_scope_json: nullable(t.string()),
+    benefits_json: nullable(t.string()),
+    status: required(t.string()),
+    created_at: required(t.timestamp()),
+    updated_at: required(t.timestamp()),
   },
 
-  hooks: {
-    // beforeCreate(data, ctx) { return data; },
-  },
+  hooks: {},
 
-  system: {
-    // tenantAware: true,
-  },
+  system: {},
 
-  access: {
-    // admin: { create: true, read: true, update: true, delete: true },
-  },
+  access: {},
 });
