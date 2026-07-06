@@ -239,7 +239,7 @@ export class Application {
 
     this.composeMiddlewares();
     this.buildKernel();
-    loadBootstrap(srcPath, "worker", think);
+    loadBootstrap(this.options.ROOT_PATH, "worker", think);
     await think.beforeStartServer();
     if (this.middlewareReadies.length > 0) await Promise.all(this.middlewareReadies);
     this.warmUpModels();
