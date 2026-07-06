@@ -1,9 +1,12 @@
-'use client'
-
 import { useEffect, useMemo, useState, useTransition } from 'react'
-import { Loader2, Plus, RefreshCw, Search, X } from 'lucide-react'
+import { Loader2, Plus, RefreshCw, X } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
+import { Header } from '@/components/layout/header'
+import { Main } from '@/components/layout/main'
+import { ProfileDropdown } from '@/components/profile-dropdown'
+import { Search as SearchBar } from '@/components/search'
+import { ThemeSwitch } from '@/components/theme-switch'
 import { ResourceFormField } from '@/components/dynamic/resource-form-field'
 import { JsonKeyValueEditor } from '@/components/dynamic/json-key-value-editor'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -26,7 +29,6 @@ import {
   normalizeFieldValue, parseFieldValue, rowKey, renderCellValue,
   type ResourceMode,
 } from '@/lib/resource-manager-utils'
-
 // ── Types ──
 
 interface PageState { page: number; pageSize: number }
@@ -226,13 +228,22 @@ export function ResourcePage({ resource }: Props) {
   // ── Render ──
 
   return (
-    <div className="space-y-4">
-      <Card className="rounded-2xl">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">{config.title}</CardTitle>
-          <CardDescription className="text-xs">{config.model}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
+    <>
+      <Header>
+        <SearchBar />
+        <div className='ml-auto flex items-center gap-2'>
+          <ThemeSwitch />
+          <ProfileDropdown />
+        </div>
+      </Header>
+      <Main>
+        <div className="space-y-4">
+          <Card className="rounded-2xl">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">{config.title}</CardTitle>
+              <CardDescription className="text-xs">{config.model}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
           {(error || fetchError) && <Alert variant="destructive"><AlertDescription>{error ?? fetchError}</AlertDescription></Alert>}
 
           {/* Compact search bar */}
@@ -257,7 +268,7 @@ export function ResourcePage({ resource }: Props) {
                 disabled={!searchField}
               />
               <Button size="sm" className="h-8 text-xs" onClick={applySearch} disabled={!searchField}>
-                <Search className="mr-1 size-3" />查询
+              查询
               </Button>
               <Button variant="outline" size="sm" className="h-8 text-xs" onClick={resetSearch}>
                 <X className="mr-1 size-3" />重置
@@ -405,6 +416,8 @@ export function ResourcePage({ resource }: Props) {
           </SheetFooter>
         </SheetContent>
       </Sheet>
-    </div>
-  )
+      </div>
+    </Main>
+  </>
+)
 }
