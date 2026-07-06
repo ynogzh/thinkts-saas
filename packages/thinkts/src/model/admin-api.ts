@@ -82,8 +82,20 @@ export interface OkResponse {
   ok: boolean;
 }
 
+
 const LABEL_MAP: Record<string, string> = {
-  // ── Model names → Chinese title ──
+  // ── Module/group names (concise, ≤4 chars) ──
+  platform: "平台管理",
+  identity: "身份管理",
+  trade: "交易管理",
+  payment: "支付管理",
+  promote: "推广管理",
+  permission: "权限管理",
+  iotbiz: "物联网",
+  mall: "商城",
+  cms: "内容管理",
+  system: "系统管理",
+  base: "基础数据",
   platform_tenant: "租户",
   platform_tenant_module: "租户模块",
   identity_user: "用户",

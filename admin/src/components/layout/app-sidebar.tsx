@@ -63,11 +63,10 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Blocks: LucideIcons.Blocks,
 }
 
-/** Map a resource key like "platform_tenant" to its Chinese label. */
-function resourceLabel(key: string): string {
-  // Strip /resources/ prefix
+/** Map a resource key to its icon. */
+function resourceIcon(key: string): string {
   const name = key.replace(/^\/resources\//, '')
-  return RESOURCE_CATALOG[name]?.label ?? name
+  return RESOURCE_CATALOG[name]?.icon ?? 'Table'
 }
 
 function resourceIcon(key: string): string {
@@ -83,7 +82,7 @@ function menuNodesToNavGroups(menus: MenuNode[]) {
         title: node.label,
         icon: groupIcon,
         items: node.children.map((child) => ({
-          title: resourceLabel(child.key),
+          title: child.label,
           url: `/resources/${child.key.replace('/resources/', '')}`,
           icon: ICON_MAP[resourceIcon(child.key)] ?? ICON_MAP.Table,
         })),
@@ -93,7 +92,7 @@ function menuNodesToNavGroups(menus: MenuNode[]) {
       title: node.label,
       icon: groupIcon,
       items: [{
-        title: resourceLabel(node.key),
+        title: node.label,
         url: node.key.startsWith('/') ? node.key : `/${node.key}`,
         icon: groupIcon,
       }],
