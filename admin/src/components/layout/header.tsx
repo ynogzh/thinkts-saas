@@ -1,5 +1,6 @@
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { LangSwitch } from '@/components/lang-switch'
 import { cn } from '@/lib/utils'
 
 type HeaderProps = React.HTMLAttributes<HTMLElement> & {
@@ -27,6 +28,7 @@ export function Header({ className, fixed, children, ...props }: HeaderProps) {
 
         <div className='flex items-center gap-2'>
           {children}
+          <LangSwitch />
           <ThemeSwitch />
         </div>
       </div>
