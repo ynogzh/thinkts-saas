@@ -1,7 +1,16 @@
 import { useLayout } from '@/context/layout-provider'
+import { useTheme } from '@/context/theme-provider'
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail,
+  SidebarMenu, SidebarMenuButton, SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Separator } from '@/components/ui/separator'
 import { NavGroup } from './nav-group'
 import { NavUser } from './nav-user'
 import { TeamSwitcher } from './team-switcher'
@@ -108,6 +117,7 @@ function SidebarSkeleton() {
 
 export function AppSidebar() {
   const { collapsible, variant } = useLayout()
+  const { theme, setTheme } = useTheme()
   const { data: menus, isLoading, isError } = useMenus()
 
   const navGroups = menus ? menuNodesToNavGroups(menus) : sidebarData.navGroups
@@ -132,6 +142,34 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={sidebarData.user} />
+        <Separator />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton tooltip='Theme'>
+                  <LucideIcons.Sun className='size-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0' />
+                  <LucideIcons.Moon className='absolute size-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100' />
+                  <span>Theme</span>
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side='right' align='start' sideOffset={4}>
+                <DropdownMenuItem onClick={() => setTheme('light')}>
+                  Light
+                  <LucideIcons.Check size={14} className={`ms-auto ${theme !== 'light' ? 'hidden' : ''}`} />
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme('dark')}>
+                  Dark
+                  <LucideIcons.Check size={14} className={`ms-auto ${theme !== 'dark' ? 'hidden' : ''}`} />
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme('system')}>
+                  System
+                  <LucideIcons.Check size={14} className={`ms-auto ${theme !== 'system' ? 'hidden' : ''}`} />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

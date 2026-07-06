@@ -4,11 +4,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { LangSwitch } from '@/components/lang-switch'
 import { DynamicTable } from '@/components/dynamic/dynamic-table'
 import { ResourceFormField } from '@/components/dynamic/resource-form-field'
 import { Button } from '@/components/ui/button'
@@ -117,15 +112,7 @@ export function ResourcePage({ resource }: Props) {
 
   return (
     <>
-      <Header fixed>
-        <Search className='me-auto' />
-        <div className='flex items-center gap-2'>
-          <ThemeSwitch />
-          <ConfigDrawer />
-          <LangSwitch />
-          <ProfileDropdown />
-        </div>
-      </Header>
+      <Header />
 
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <div className='flex flex-wrap items-end justify-between gap-2'>

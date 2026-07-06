@@ -23,6 +23,8 @@ export interface ColumnMeta {
   type?: string
   displayField?: string
   refModel?: string
+  /** If false, render FK as plain text (no link/dialog). */
+  linkable?: boolean
 }
 
 export interface SearchFieldMeta {

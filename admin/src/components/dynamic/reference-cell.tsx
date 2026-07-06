@@ -8,6 +8,7 @@ interface ReferenceCellProps {
   displayField: string
   /** All FK ids on the current page for this model+field, used for batch fetching. */
   allPageIds?: (string | number)[]
+  linkable?: boolean
 }
 
 export function ReferenceCell({
@@ -15,6 +16,7 @@ export function ReferenceCell({
   model,
   displayField,
   allPageIds,
+  linkable,
 }: ReferenceCellProps) {
   const [displayText, setDisplayText] = useState<string | null>(null)
   const [previewOpen, setPreviewOpen] = useState(false)
@@ -37,6 +39,10 @@ export function ReferenceCell({
   }, [value, model, displayField, allPageIds])
 
   if (value == null) return <span className='text-muted-foreground text-xs'>—</span>
+  
+  if (linkable === false) {
+    return <span className='text-sm'>{displayText ?? String(value)}</span>
+  }
 
   return (
     <>

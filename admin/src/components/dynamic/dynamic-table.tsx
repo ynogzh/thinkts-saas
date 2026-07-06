@@ -164,6 +164,7 @@ export function DynamicTable({
                   model={col.refModel}
                   displayField={col.displayField}
                   allPageIds={fkIdsByColumn[col.field]}
+                  linkable={col.linkable}
                 />
               </div>
             )
