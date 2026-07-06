@@ -1,31 +1,32 @@
-import { defineModel, t, autoIncrement, index, nullable, primary, required } from "thinkts";
+import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
 
 export default defineModel("trade_order", {
   columns: {
-    id: index(autoIncrement(primary(t.bigint()))),
-    tenant_id: index(required(t.bigint())),
-    order_no: required(t.string()),
-    biz_type: required(t.string()),
-    biz_id: required(t.bigint()),
-    user_id: required(t.bigint()),
-    amount: required(t.decimal()),
-    discount_amount: t.decimal(),
-    pay_amount: required(t.decimal()),
-    status: t.string(),
-    paid_at: nullable(t.timestamp()),
-    closed_at: nullable(t.timestamp()),
-    created_at: required(t.timestamp()),
-    updated_at: required(t.timestamp())
+    id: index(primary(autoIncrement(t.bigint()))),
+    tenant_id: label("租户")(searchable(index(required(t.bigint())))),
+    order_no: label("订单号")(listable(searchable(required(t.string())))),
+    biz_type: label("业务类型")(listable(required(t.string()))),
+    biz_id: label("业务ID")(listable(t.bigint())),
+    user_id: label("用户")(searchable(listable(t.bigint()))),
+    amount: label("金额")(listable(required(t.decimal()))),
+    discount_amount: label("折扣金额")(listable(t.decimal())),
+    pay_amount: label("支付金额")(listable(required(t.decimal()))),
+    status: label("状态")(listable(searchable(t.string()))),
+    paid_at: label("支付时间")(nullable(t.timestamp())),
+    closed_at: label("关闭时间")(nullable(t.timestamp())),
+    created_at: label("创建时间")(required(t.timestamp())),
+    updated_at: label("更新时间")(required(t.timestamp())),
   },
 
   hooks: {},
 
-  system: {},
+  system: {
+    tenantAware: true,
+  },
 
   access: {
-    "superadmin": {"allow":["select","find","add","update","delete"]},
-    "admin": {"allow":["select","find","add","update","delete"]},
-    "user": {"allow":["select","find"],"writable":[],"deny":["add","update","delete"]},
-    "guest": {"allow":["select","find"],"writable":[],"deny":["add","update","delete"]}
+    superadmin: ["create", "read", "update", "delete"],
+    admin: ["create", "read", "update", "delete"],
+    user: ["read"],
   },
 });
