@@ -3,9 +3,7 @@ import { BaseService, Params } from "thinkts";
 export default class CampaignService extends BaseService {
   @Params({ tenant_id: "int", id: "int" })
   async getById(opts: { tenant_id: number; id: number }) {
-    const row = await this.findOne({ tenant_id: opts.tenant_id, id: opts.id });
-    if (!row?.id) throw new Error("campaign not found");
-    return row;
+    return this.requireById(String(opts.id), "campaign");
   }
 
   @Params({ tenant_id: "int", id: "int" })

@@ -89,7 +89,12 @@ export async function executeDslAction(execCtx: DslExecutionContext): Promise<un
       const pk = opts[primaryKey];
       const record = await model.where({ [primaryKey]: pk }).find();
       await callDslHook(ctx, modelEntry, serviceEntry, "beforeDelete", record);
-      await model.where({ [primaryKey]: pk }).delete();
+      // Soft delete: UPDATE deleted_at instead of real DELETE
+      if (record && "deleted_at" in record && modelEntry.dsl.option?.softDeletes) {
+        await model.where({ [primaryKey]: pk }).update({ deleted_at: (record as Record<string, unknown>).deleted_at ?? new Date() });
+      } else {
+        await model.where({ [primaryKey]: pk }).delete();
+      }
       return { data: await callDslHook(ctx, modelEntry, serviceEntry, "afterDelete", record) };
     }
     default:

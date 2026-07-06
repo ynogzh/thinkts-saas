@@ -25,6 +25,11 @@ const BUILT_IN_HOOKS: Partial<Record<ServiceHookName, (data: Record<string, unkn
     if ("updated_at" in data) data.updated_at = new Date();
     applyJsonNormalize(data, modelEntry);
   },
+  beforeDelete(record, modelEntry) {
+    if (modelEntry.dsl.option?.softDeletes && "deleted_at" in record) {
+      (record as Record<string, unknown>).deleted_at = new Date();
+    }
+  },
 };
 
 function applyJsonNormalize(data: Record<string, unknown>, modelEntry: DslModelEntry) {

@@ -58,6 +58,13 @@ export class BaseService {
     return await this.currentModel(config).where(where).find() as Record<string, unknown>;
   }
 
+  /** findOne + throw if not found — the most common service pattern. */
+  async requireById(id: string | number, label = "record", config?: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const row = await this.currentModel(config).where({ id }).find() as Record<string, unknown>;
+    if (!row?.id) throw new Error(`${label} not found`);
+    return row;
+  }
+
   async list(where: Record<string, unknown> = {}, config?: Record<string, unknown>): Promise<Record<string, unknown>[]> {
     return await this.currentModel(config).where(where).select() as Record<string, unknown>[];
   }
