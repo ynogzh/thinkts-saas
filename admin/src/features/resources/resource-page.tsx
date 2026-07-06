@@ -171,6 +171,7 @@ export function ResourcePage({ resource }: Props) {
             <DialogDescription>
               {mode === 'create' ? '创建新记录。' : mode === 'edit' ? '修改记录信息。' : '查看记录详情。'}
             </DialogDescription>
+          </DialogHeader>
           <div className='max-h-96 overflow-y-auto'>
             <div className='space-y-4 px-0.5'>
               {activeFields.map((field) => {
