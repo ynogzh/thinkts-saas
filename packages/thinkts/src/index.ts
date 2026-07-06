@@ -69,3 +69,4 @@ export { loadDslAppData } from "./model/loader";
 export { defineModel, toDslConfig, type RowOf, type ModelDefinition, type ModelSystem, type ModelAcl, type ModelHooks } from "./model/define";
 export { t, required, optional, nullable, primary, autoIncrement, unique, index, defaultTo, defaultNow, label, listable, searchable, filterable, comment, jsonSchema, type ColumnDefinition, type ColumnInit, type JsonFieldSchema } from "./model/columns";
 export { PluginLoader, type Plugin, type PluginLoadContext } from "./plugin";
+export { CrudController } from "./CrudController";

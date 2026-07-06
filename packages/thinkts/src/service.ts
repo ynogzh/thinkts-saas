@@ -16,6 +16,17 @@ export class BaseService {
     this.ctx = ctx;
   }
 
+  /** Authenticated user info from request context. */
+  protected get auth() {
+    const user = (this.ctx?.user as Record<string, unknown> | undefined) ?? {};
+    return {
+      userId: (user.id ?? user.user_id ?? 0) as number,
+      tenantId: (user.tenant_id ?? this.ctx?.tenantId ?? 0) as number,
+      role: String(user.role ?? "guest"),
+      username: String(user.username ?? user.name ?? "anonymous"),
+    };
+  }
+
   private requireThink() {
     const think = this.ctx?.think;
     if (!think) {
