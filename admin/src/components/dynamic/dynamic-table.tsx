@@ -58,7 +58,7 @@ function saveVisibility(tableKey: string, visibility: VisibilityState) {
   } catch { /* ignore */ }
 }
 
-function renderCellValue(val: unknown, col: ColumnMeta) {
+function renderCellValue(val: unknown, col: ColumnMeta, row?: Record<string, unknown>) {
   if (val === null || val === undefined) return <span className='text-muted-foreground text-xs'>—</span>
   if (typeof val === 'boolean') return <Badge variant={val ? 'default' : 'secondary'}>{val ? '是' : '否'}</Badge>
   if (col.type === 'datetime' || col.type === 'timestamp') {
@@ -68,6 +68,12 @@ function renderCellValue(val: unknown, col: ColumnMeta) {
   if (col.type === 'status' || col.field?.endsWith('status') || col.field?.endsWith('_status')) {
     const s = String(val)
     return <Badge variant={s === 'enabled' || s === 'active' ? 'default' : 'secondary'}>{s}</Badge>
+  }
+  // FK display: show display value if available in row data, otherwise show ID
+  if (col.displayField && row) {
+    const displayKey = `${col.field.replace(/_id$/, '')}_${col.displayField}`
+    const displayVal = row[displayKey]
+    if (displayVal) return <span className='text-sm'>{String(displayVal)}</span>
   }
   return <span>{String(val)}</span>
 }
@@ -123,7 +129,7 @@ export function DynamicTable({
       cols.push({
         accessorKey: col.field,
         header: ({ column }) => <DataTableColumnHeader column={column} title={col.title ?? col.field} />,
-        cell: ({ getValue }) => renderCellValue(getValue(), col),
+        cell: ({ getValue, row }) => renderCellValue(getValue(), col, row.original),
         enableSorting: col.sortable ?? true,
       })
     }

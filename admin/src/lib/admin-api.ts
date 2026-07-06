@@ -21,6 +21,8 @@ export interface ColumnMeta {
   width?: number
   sortable?: boolean
   type?: string
+  displayField?: string
+  refModel?: string
 }
 
 export interface SearchFieldMeta {

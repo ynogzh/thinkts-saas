@@ -23,6 +23,10 @@ export interface ColumnMeta {
   width?: number;
   sortable?: boolean;
   type?: string;
+  /** If this is a foreign key, the display field from the referenced model (e.g., "name"). */
+  displayField?: string;
+  /** The referenced model name (e.g., "platform_tenant"). */
+  refModel?: string;
 }
 
 export interface SearchFieldMeta {
@@ -442,20 +446,39 @@ function searchFieldOptions(field: string, col: ColumnDSL): SearchFieldMeta["opt
   return inferred[field];
 }
 
-function buildTableConfig(entry: DslTableEntry, modelEntry: DslModelEntry): TableConfig {
+function buildTableConfig(entry: DslTableEntry, modelEntry: DslModelEntry, models: Record<string, DslModelEntry>): TableConfig {
   const { table } = entry;
   const rawColumns = table.list?.columns ?? modelEntry.dsl.columns.map((c) => ({
     field: c.name,
     title: zh(c.label ?? c.name, c.name),
     sortable: true,
   }));
-  const colMetas: ColumnMeta[] = rawColumns.map((tc) => ({
-    field: tc.field,
-    title: zh(tc.title, tc.field),
-    width: "width" in tc ? (tc as TableColumnDSL).width : undefined,
-    sortable: tc.sortable ?? false,
-    type: resolveColType(tc.field, modelEntry.dsl.columns),
-  }));
+  const colMetas: ColumnMeta[] = rawColumns.map((tc) => {
+    const meta: ColumnMeta = {
+      field: tc.field,
+      title: zh(tc.title, tc.field),
+      width: "width" in tc ? (tc as TableColumnDSL).width : undefined,
+      sortable: tc.sortable ?? false,
+      type: resolveColType(tc.field, modelEntry.dsl.columns),
+    };
+    // Detect foreign keys and find display field from referenced model
+    if (tc.field.endsWith("_id") && tc.field !== "id") {
+      const refModelName = tc.field.replace(/_id$/, "");
+      // Try to find the referenced model
+      const refModel = models[refModelName] ?? Object.values(models).find((m) => m.name.endsWith(`_${refModelName}`));
+      if (refModel) {
+        const dsl = refModel.dsl as Record<string, unknown>;
+        const ui = dsl.ui as Record<string, unknown> | undefined;
+        const displayField = (ui?.displayField as string) ?? "name";
+        // Check if display field exists in the referenced model
+        if (refModel.dsl.columns.some((c) => c.name === displayField)) {
+          meta.displayField = displayField;
+          meta.refModel = refModel.name;
+        }
+      }
+    }
+    return meta;
+  });
 
   const searchFields: SearchFieldMeta[] = (table.search?.fields ?? []).map((sf) => {
     const col = modelEntry.dsl.columns.find((c) => c.name === sf.field);
@@ -583,7 +606,7 @@ export function createAdminApiHandlers(dslData: DslAppData): AdminHandlers {
     if (!entry) return { error: `Table not found: ${model}` };
     const modelEntry = findModel(entry.table.model ?? entry.name);
     if (!modelEntry) return { error: `Model not found for table: ${model}` };
-    return { table: buildTableConfig(entry, modelEntry) };
+    return { table: buildTableConfig(entry, modelEntry, dslData.models) };
   }
 
   async function listAction(ctx: ThinkContext, model: string): Promise<{ list: ListResponse }> {
@@ -611,9 +634,29 @@ export function createAdminApiHandlers(dslData: DslAppData): AdminHandlers {
     if (sort) query = query.order(`${sort} ${order}`);
 
     const raw = await query.page(page, pageSize).countSelect();
+    const items = (raw.data ?? []) as Record<string, unknown>[];
+
+    // Enrich FK display values
+    const tableConfig = buildTableConfig(tableEntry!, modelEntry, dslData.models);
+    const fkCols = tableConfig.list.columns.filter((c) => c.displayField && c.refModel);
+    if (fkCols.length > 0 && items.length > 0) {
+      for (const fkCol of fkCols) {
+        const ids = [...new Set(items.map((r) => r[fkCol.field]).filter(Boolean))];
+        if (ids.length === 0) continue;
+        const refModel = ctx.think.model(fkCol.refModel!, { _aclCtx: ctx });
+        const refRows = await refModel.where({ id: ["in", ids] } as unknown as Record<string, unknown>).select() as Record<string, unknown>[];
+        const lookup = new Map(refRows.map((r) => [String(r.id), String(r[fkCol.displayField!] ?? r.id)]));
+        const displayKey = `${fkCol.field.replace(/_id$/, "")}_${fkCol.displayField}`;
+        for (const row of items) {
+          const fkVal = row[fkCol.field];
+          if (fkVal != null) (row as Record<string, unknown>)[displayKey] = lookup.get(String(fkVal)) ?? String(fkVal);
+        }
+      }
+    }
+
     return {
       list: {
-        items: (raw.data ?? []) as Record<string, unknown>[],
+        items,
         total: Number(raw.total ?? 0),
         page,
         pageSize,
