@@ -156,3 +156,8 @@ export function searchable<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
 export function filterable<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
   return { ...col, filterable: true }
 }
+
+/** Attach JSON key schema for interactive editor. */
+export function jsonSchema<T>(col: ColumnDefinition<T>, schema: JsonFieldSchema[]): ColumnDefinition<T> {
+  return { ...col, jsonSchema: schema };
+}

@@ -170,7 +170,7 @@ function colDef(col: TableMeta["columns"][number]): string {
   return line;
 }
 
-/** Generate model.ts with defineModel, column labels, jsonSchema, system, access. */
+/** Generate model.ts with defineModel, column labels, system, access. */
 export function generateModelTs(table: TableMeta): string {
   const columns = table.columns.map(colDef);
   const modelName = table.name;
