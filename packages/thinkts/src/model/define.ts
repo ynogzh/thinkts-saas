@@ -36,17 +36,6 @@ export interface ModelSystem {
   immutableFields?: string[];
 }
 
-/** A single key definition inside a JSON column. */
-export interface JsonFieldSchema {
-  key: string;
-  label: string;
-  type: "string" | "number" | "boolean" | "object";
-  default?: unknown;
-}
-
-/** Per-column JSON schema: maps column name → array of key definitions. */
-export type JsonSchema = Record<string, JsonFieldSchema[]>;
-
 export interface ModelDefinition<T extends Cols = Cols> {
   readonly tableName: string;
   readonly columns: T;
@@ -54,8 +43,6 @@ export interface ModelDefinition<T extends Cols = Cols> {
   readonly hooks?: ModelHooks<T>;
   readonly system?: ModelSystem;
   readonly access?: Record<string, string[]>;
-  /** JSON column schemas — describes keys inside json fields for the editor. */
-  readonly jsonSchema?: JsonSchema;
 }
 
 /**
@@ -69,17 +56,12 @@ export function defineModel<T extends Cols>(
     hooks?: ModelHooks<T>;
     system?: ModelSystem;
     access?: Record<string, string[]>;
-    jsonSchema?: JsonSchema;
   },
 ): ModelDefinition<T> {
   const primaryKey = def.primaryKey
     ?? Object.entries(def.columns).find(([, c]) => c.primary)?.[0]
     ?? "id";
-  return {
-    tableName, columns: def.columns, primaryKey,
-    hooks: def.hooks, system: def.system, access: def.access,
-    jsonSchema: def.jsonSchema,
-  };
+  return { tableName, columns: def.columns, primaryKey, hooks: def.hooks, system: def.system, access: def.access };
 }
 
 /**
@@ -136,7 +118,11 @@ export function toDslConfig<T extends Cols>(model: ModelDefinition<T>): Record<s
     },
     access: model.access ?? {},
     system: model.system ?? {},
-    // Pass JSON schema through
-    jsonSchema: model.jsonSchema ?? {},
+    // Extract JSON schemas from column definitions
+    jsonSchema: Object.fromEntries(
+      Object.entries(model.columns)
+        .filter(([, c]) => c.jsonSchema?.length)
+        .map(([name, c]) => [name, c.jsonSchema]),
+    ),
   };
 }

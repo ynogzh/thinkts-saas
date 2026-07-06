@@ -1,4 +1,4 @@
-import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
+import { defineModel, t, primary, autoIncrement, required, nullable, index, jsonSchema } from "thinkts";
 
 export default defineModel("iotbiz_device", {
   columns: {
@@ -12,27 +12,21 @@ export default defineModel("iotbiz_device", {
     location_label: nullable(t.string()),
     online_status: required(t.string()),
     start_mode: required(t.string()),
-    pricing_json: nullable(t.string()),
-    start_config_json: nullable(t.string()),
+    pricing_json: jsonSchema(nullable(t.string()), [
+      { key: "mode", label: "计费模式", type: "string", default: "mock" },
+      { key: "unit_price", label: "单价(分)", type: "number", default: 0 },
+    ]),
+    start_config_json: jsonSchema(nullable(t.string()), [
+      { key: "command", label: "启动指令", type: "string", default: "" },
+    ]),
     last_heartbeat_at: nullable(t.timestamp()),
     last_start_at: nullable(t.timestamp()),
     status: required(t.string()),
-    metadata_json: nullable(t.string()),
+    metadata_json: jsonSchema(nullable(t.string()), [
+      { key: "notes", label: "备注", type: "string", default: "" },
+    ]),
     created_at: required(t.timestamp()),
     updated_at: required(t.timestamp()),
-  },
-
-  jsonSchema: {
-    pricing_json: [
-      { key: "mode", label: "计费模式", type: "string", default: "mock" },
-      { key: "unit_price", label: "单价(分)", type: "number", default: 0 },
-    ],
-    start_config_json: [
-      { key: "command", label: "启动指令", type: "string", default: "" },
-    ],
-    metadata_json: [
-      { key: "notes", label: "备注", type: "string", default: "" },
-    ],
   },
 
   hooks: {},

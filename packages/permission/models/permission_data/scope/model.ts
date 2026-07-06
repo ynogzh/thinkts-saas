@@ -1,15 +1,14 @@
-import { defineModel, t, autoIncrement, index, nullable, primary, required, unique } from "thinkts";
+import { defineModel, t, autoIncrement, index, nullable, primary, required } from "thinkts";
 
-export default defineModel("platform_tenant", {
+export default defineModel("permission_data_scope", {
   columns: {
     id: index(autoIncrement(primary(t.bigint()))),
-    name: required(t.string()),
-    code: index(unique(required(t.string()))),
-    status: t.string(),
-    admin_user_id: nullable(t.bigint()),
-    package_id: nullable(t.bigint()),
-    expire_at: nullable(t.timestamp()),
-    config_json: nullable(t.string()),
+    tenant_id: index(required(t.bigint())),
+    role_id: required(t.bigint()),
+    module_code: required(t.string()),
+    resource_code: required(t.string()),
+    scope_type: required(t.string()),
+    scope_value_json: nullable(t.string()),
     created_at: required(t.timestamp()),
     updated_at: required(t.timestamp())
   },

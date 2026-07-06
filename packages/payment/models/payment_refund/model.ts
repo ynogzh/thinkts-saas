@@ -1,15 +1,15 @@
-import { defineModel, t, autoIncrement, index, nullable, primary, required, unique } from "thinkts";
+import { defineModel, t, autoIncrement, index, nullable, primary, required } from "thinkts";
 
-export default defineModel("platform_tenant", {
+export default defineModel("payment_refund", {
   columns: {
     id: index(autoIncrement(primary(t.bigint()))),
-    name: required(t.string()),
-    code: index(unique(required(t.string()))),
+    tenant_id: index(required(t.bigint())),
+    refund_no: required(t.string()),
+    payment_order_id: required(t.bigint()),
+    amount: required(t.decimal()),
+    reason: nullable(t.string()),
     status: t.string(),
-    admin_user_id: nullable(t.bigint()),
-    package_id: nullable(t.bigint()),
-    expire_at: nullable(t.timestamp()),
-    config_json: nullable(t.string()),
+    third_refund_no: nullable(t.string()),
     created_at: required(t.timestamp()),
     updated_at: required(t.timestamp())
   },

@@ -4,38 +4,35 @@
  * SQL-level metadata and TypeScript type information.
  */
 
+export interface JsonFieldSchema {
+  key: string;
+  label: string;
+  type: "string" | "number" | "boolean" | "object";
+  default?: unknown;
+}
+
 export interface ColumnDefinition<T = unknown> {
-  /** SQL column type name */
   readonly _sqlType: string;
-  /** TypeScript type tag (phantom) */
   readonly _tsType?: T;
-  /** Column name override (default: field name) */
   readonly columnName?: string;
-  /** SQL type params (length, precision, scale) */
   readonly length?: number;
   readonly precision?: number;
   readonly scale?: number;
-  /** Constraints */
   readonly primary: boolean;
   readonly required: boolean;
   readonly unique: boolean;
   readonly autoIncrement: boolean;
   readonly index: boolean;
   readonly nullable: boolean;
-  /** ENUM values */
   readonly enumValues?: readonly string[];
-  /** Default value */
   readonly defaultValue?: unknown;
-  /** Comment */
   readonly comment?: string;
-  /** Admin UI: column label */
   readonly label?: string;
-  /** Admin UI: show in list table */
   readonly listable: boolean;
-  /** Admin UI: show in search fields */
   readonly searchable: boolean;
-  /** Admin UI: show in table filter dropdown */
   readonly filterable: boolean;
+  /** JSON column key schema — describes structure for interactive editor. */
+  readonly jsonSchema?: JsonFieldSchema[];
 }
 function col<T>(sqlType: string, init?: ColumnInit): ColumnDefinition<T> {
   return {
@@ -161,4 +158,9 @@ export function searchable<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
 /** Show in filter dropdown */
 export function filterable<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
   return { ...col, filterable: true };
+}
+
+/** Attach JSON key schema for interactive editor. */
+export function jsonSchema<T>(col: ColumnDefinition<T>, schema: JsonFieldSchema[]): ColumnDefinition<T> {
+  return { ...col, jsonSchema: schema };
 }
