@@ -183,9 +183,11 @@ interface LoadedPlugin {
 
 export class PluginLoader {
   private packagesDir: string;
+  private pluginList?: string[];
 
-  constructor(packagesDir: string) {
+  constructor(packagesDir: string, pluginList?: string[]) {
     this.packagesDir = packagesDir;
+    this.pluginList = pluginList;
   }
 
   /**
@@ -216,10 +218,11 @@ export class PluginLoader {
 
     const names = readdirSync(this.packagesDir);
     for (const name of names) {
-      if (name === "thinkts" || name === "thinkts-cli") continue; // skip infra
+      if (name === "thinkts" || name === "thinkts-cli") continue;
+      // If plugin list is configured, only load listed plugins
+      if (this.pluginList && !this.pluginList.includes(name)) continue;
 
       const pkgDir = join(this.packagesDir, name);
-      if (!statSync(pkgDir).isDirectory()) continue;
 
       for (const ext of ["ts", "js"]) {
         const pluginPath = join(pkgDir, `plugin.${ext}`);

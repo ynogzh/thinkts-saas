@@ -25,6 +25,7 @@ import { generateOpenAPISpec, createDocsMiddleware } from "./openapi";
 export interface ApplicationOptions {
   ROOT_PATH: string;
   packagesDir?: string;
+  plugins?: string[];
   env?: string;
   port?: number;
   host?: string;
@@ -197,7 +198,7 @@ export class Application {
     // Load plugins if packagesDir is configured
     let data = appData;
     if (this.options.packagesDir) {
-      const loader = new PluginLoader(this.options.packagesDir);
+      const loader = new PluginLoader(this.options.packagesDir, this.options.plugins);
       const pluginData = await loader.load();
       data = this.mergeData(appData, pluginData);
     }

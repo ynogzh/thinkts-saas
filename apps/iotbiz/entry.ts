@@ -7,6 +7,7 @@ const packagesDir = resolve(ROOT_PATH, "../../packages");
 const app = new Application({
   ROOT_PATH,
   packagesDir,
+  plugins: ["tenant", "identity", "permission", "trade", "payment", "promote", "cms"],
   env: process.env.NODE_ENV ?? "development",
   port: parseInt(process.env.PORT || "8360"),
 });
