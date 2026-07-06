@@ -7,8 +7,6 @@
 export interface JsonFieldSchema {
   key: string
   label: string
-  type: "string" | "number" | "boolean" | "object"
-  default?: unknown
 }
 
 export interface ColumnInit {

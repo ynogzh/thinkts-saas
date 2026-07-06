@@ -14,13 +14,13 @@ export default defineModel("iotbiz_device", {
     start_mode: label("启动模式")(listable(searchable(t.string()))),
     pricing_json: nullable(t.json<{ mode: string; unit_price: number }>({
       jsonSchema: [
-        { key: "mode", label: "计费模式", type: "string", default: "mock" },
-        { key: "unit_price", label: "单价(分)", type: "number", default: 0 },
+        { key: "mode", label: "计费模式" },
+        { key: "unit_price", label: "单价(分)" },
       ],
     })),
     start_config_json: nullable(t.json<{ command: string }>({
       jsonSchema: [
-        { key: "command", label: "启动指令", type: "string", default: "" },
+        { key: "command", label: "启动指令" },
       ],
     })),
     last_heartbeat_at: label("最后心跳")(listable(nullable(t.timestamp()))),
@@ -28,7 +28,7 @@ export default defineModel("iotbiz_device", {
     status: label("状态")(listable(searchable(t.string()))),
     metadata_json: nullable(t.json<{ notes: string }>({
       jsonSchema: [
-        { key: "notes", label: "备注", type: "string", default: "" },
+        { key: "notes", label: "备注" },
       ],
     })),
     created_at: t.timestamp(),

@@ -101,19 +101,19 @@ function isSearchable(col: TableMeta["columns"][number]): boolean {
 /** Detect JSON columns and infer their key schemas. */
 function inferJsonSchema(colName: string, label: string): string | null {
   const schemas: Record<string, string> = {
-    pricing_json: 'jsonSchema(t.json(), [{ key: "mode", label: "计费模式", type: "string", default: "mock" }, { key: "unit_price", label: "单价(分)", type: "number", default: 0 }])',
-    config_json: 'jsonSchema(t.json(), [{ key: "notes", label: "备注", type: "string", default: "" }])',
-    metadata_json: 'jsonSchema(t.json(), [{ key: "notes", label: "备注", type: "string", default: "" }])',
-    extra_json: 'jsonSchema(t.json(), [{ key: "notes", label: "备注", type: "string", default: "" }])',
-    benefits_json: 'jsonSchema(t.json(), [{ key: "name", label: "权益名称", type: "string", default: "" }])',
-    rule_json: 'jsonSchema(t.json(), [{ key: "rule_type", label: "规则类型", type: "string", default: "" }])',
-    condition_json: 'jsonSchema(t.json(), [{ key: "condition_type", label: "条件类型", type: "string", default: "" }])',
-    status_json: 'jsonSchema(t.json(), [{ key: "notes", label: "备注", type: "string", default: "" }])',
-    headers_json: 'jsonSchema(t.json(), [{ key: "notes", label: "备注", type: "string", default: "" }])',
+    pricing_json: 'jsonSchema(t.json(), [{ key: "mode", label: "计费模式" }, { key: "unit_price", label: "单价(分)" }])',
+    config_json: 'jsonSchema(t.json(), [{ key: "notes", label: "备注" }])',
+    metadata_json: 'jsonSchema(t.json(), [{ key: "notes", label: "备注" }])',
+    extra_json: 'jsonSchema(t.json(), [{ key: "notes", label: "备注" }])',
+    benefits_json: 'jsonSchema(t.json(), [{ key: "name", label: "权益名称" }])',
+    rule_json: 'jsonSchema(t.json(), [{ key: "rule_type", label: "规则类型" }])',
+    condition_json: 'jsonSchema(t.json(), [{ key: "condition_type", label: "条件类型" }])',
+    status_json: 'jsonSchema(t.json(), [{ key: "notes", label: "备注" }])',
+    headers_json: 'jsonSchema(t.json(), [{ key: "notes", label: "备注" }])',
   };
   if (schemas[colName]) return schemas[colName];
   return colName.endsWith("_json") || colName.includes("json")
-    ? `jsonSchema(t.json(), [{ key: "notes", label: "${label}", type: "string", default: "" }])`
+    ? `jsonSchema(t.json(), [{ key: "notes", label: "${label}" }])`
     : null;
 }
 
