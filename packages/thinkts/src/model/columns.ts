@@ -5,35 +5,58 @@
  */
 
 export interface JsonFieldSchema {
-  key: string;
-  label: string;
-  type: "string" | "number" | "boolean" | "object";
-  default?: unknown;
+  key: string
+  label: string
+  type: "string" | "number" | "boolean" | "object"
+  default?: unknown
+}
+
+export interface ColumnInit {
+  columnName?: string
+  length?: number
+  precision?: number
+  scale?: number
+  label?: string
+  comment?: string
+  listable?: boolean
+  searchable?: boolean
+  filterable?: boolean
+  nullable?: boolean
+  required?: boolean
+  primary?: boolean
+  autoIncrement?: boolean
+  unique?: boolean
+  index?: boolean
+  defaultValue?: unknown
+  enumValues?: readonly string[]
+  /** JSON key schema for interactive editor — only meaningful on `t.json()`. */
+  jsonSchema?: JsonFieldSchema[]
 }
 
 export interface ColumnDefinition<T = unknown> {
-  readonly _sqlType: string;
-  readonly _tsType?: T;
-  readonly columnName?: string;
-  readonly length?: number;
-  readonly precision?: number;
-  readonly scale?: number;
-  readonly primary: boolean;
-  readonly required: boolean;
-  readonly unique: boolean;
-  readonly autoIncrement: boolean;
-  readonly index: boolean;
-  readonly nullable: boolean;
-  readonly enumValues?: readonly string[];
-  readonly defaultValue?: unknown;
-  readonly comment?: string;
-  readonly label?: string;
-  readonly listable: boolean;
-  readonly searchable: boolean;
-  readonly filterable: boolean;
+  readonly _sqlType: string
+  readonly _tsType?: T
+  readonly columnName?: string
+  readonly length?: number
+  readonly precision?: number
+  readonly scale?: number
+  readonly primary: boolean
+  readonly required: boolean
+  readonly unique: boolean
+  readonly autoIncrement: boolean
+  readonly index: boolean
+  readonly nullable: boolean
+  readonly enumValues?: readonly string[]
+  readonly defaultValue?: unknown
+  readonly comment?: string
+  readonly label?: string
+  readonly listable: boolean
+  readonly searchable: boolean
+  readonly filterable: boolean
   /** JSON column key schema — describes structure for interactive editor. */
-  readonly jsonSchema?: JsonFieldSchema[];
+  readonly jsonSchema?: JsonFieldSchema[]
 }
+
 function col<T>(sqlType: string, init?: ColumnInit): ColumnDefinition<T> {
   return {
     _sqlType: sqlType,
@@ -41,126 +64,95 @@ function col<T>(sqlType: string, init?: ColumnInit): ColumnDefinition<T> {
     autoIncrement: false, index: false, nullable: false,
     listable: false, searchable: false, filterable: false,
     ...init,
-  };
+  }
 }
 
 // ── Type helpers ──
 
 export const t = {
-  /** VARCHAR(n) — maps to TypeScript string */
+  /** VARCHAR(n) */
   string: (length = 255, init?: ColumnInit) =>
     col<string>("varchar", { length, ...init }),
 
-  /** TEXT — maps to TypeScript string */
+  /** TEXT */
   text: (init?: ColumnInit) =>
     col<string>("text", init),
 
-  /** BIGINT — maps to TypeScript bigint/number */
+  /** BIGINT */
   bigint: (columnName?: string) =>
     col<bigint>("bigint", { columnName }),
 
-  /** INT — maps to TypeScript number */
+  /** INT */
   integer: (init?: ColumnInit) =>
     col<number>("int", init),
 
-  /** BOOLEAN / TINYINT(1) — maps to TypeScript boolean */
+  /** BOOLEAN / TINYINT(1) */
   boolean: (init?: ColumnInit) =>
     col<boolean>("boolean", init),
 
-  /** DECIMAL(precision, scale) — maps to TypeScript number */
+  /** DECIMAL(precision, scale) */
   decimal: (precision = 10, scale = 2, init?: ColumnInit) =>
     col<number>("decimal", { precision, scale, ...init }),
 
-  /** TIMESTAMP / DATETIME — maps to TypeScript Date */
+  /** TIMESTAMP / DATETIME */
   timestamp: (columnName?: string) =>
     col<Date>("timestamp", { columnName }),
 
-  /** DATE — maps to TypeScript Date */
+  /** DATE */
   date: (init?: ColumnInit) =>
     col<Date>("date", init),
 
-  /** ENUM(values) — maps to TypeScript union */
+  /** ENUM(values) */
   enum: <T extends readonly string[]>(values: T, init?: ColumnInit) =>
     col<T[number]>("enum", { enumValues: values, ...init }),
 
-  /** JSON — maps to TypeScript Record/object */
+  /** JSON — use `jsonSchema` in init for interactive editor. */
   json: <T = Record<string, unknown>>(init?: ColumnInit) =>
     col<T>("json", init),
-};
+}
 
 export function nullable<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
-  return { ...col, nullable: true, required: false };
+  return { ...col, nullable: true, required: false }
 }
 export function required<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
-  return { ...col, required: true, nullable: false };
+  return { ...col, required: true, nullable: false }
 }
-
-/** Make a column nullable */
 export function optional<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
-  return { ...col, nullable: true, required: false };
+  return { ...col, nullable: true, required: false }
 }
-
-/** Mark as primary key */
 export function primary<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
-  return { ...col, primary: true, required: true };
+  return { ...col, primary: true, required: true }
 }
-
-/** Auto-increment (for PK) */
 export function autoIncrement<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
-  return { ...col, autoIncrement: true };
+  return { ...col, autoIncrement: true }
 }
-
-/** Add UNIQUE constraint */
 export function unique<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
-  return { ...col, unique: true };
+  return { ...col, unique: true }
 }
-
-/** Add INDEX */
 export function index<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
-  return { ...col, index: true };
+  return { ...col, index: true }
 }
-
-/** Set default value */
 export function defaultTo<T>(value: T): (col: ColumnDefinition<T>) => ColumnDefinition<T> {
-  return (col) => ({ ...col, defaultValue: value });
+  return (col) => ({ ...col, defaultValue: value })
 }
-
-/** Set default to CURRENT_TIMESTAMP */
 export function defaultNow<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
-  return { ...col, defaultValue: "CURRENT_TIMESTAMP" };
+  return { ...col, defaultValue: "CURRENT_TIMESTAMP" }
 }
-
-/** Set ON UPDATE CURRENT_TIMESTAMP */
 export function onUpdateNow<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
-  return { ...col, comment: `${col.comment ?? ""} ON UPDATE CURRENT_TIMESTAMP`.trim() };
+  return { ...col, comment: `${col.comment ?? ""} ON UPDATE CURRENT_TIMESTAMP`.trim() }
 }
-
-/** Add column comment */
 export function comment<T>(text: string): (col: ColumnDefinition<T>) => ColumnDefinition<T> {
-  return (col) => ({ ...col, comment: text });
+  return (col) => ({ ...col, comment: text })
 }
-
-/** Admin UI label */
 export function label<T>(text: string): (col: ColumnDefinition<T>) => ColumnDefinition<T> {
-  return (col) => ({ ...col, label: text, listable: true });
+  return (col) => ({ ...col, label: text, listable: true })
 }
-
-/** Show in list table */
 export function listable<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
-  return { ...col, listable: true };
+  return { ...col, listable: true }
 }
-
-/** Show in search fields */
 export function searchable<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
-  return { ...col, searchable: true };
+  return { ...col, searchable: true }
 }
-
-/** Show in filter dropdown */
 export function filterable<T>(col: ColumnDefinition<T>): ColumnDefinition<T> {
-  return { ...col, filterable: true };
-}
-
-/** Attach JSON key schema for interactive editor. */
-export function jsonSchema<T>(col: ColumnDefinition<T>, schema: JsonFieldSchema[]): ColumnDefinition<T> {
-  return { ...col, jsonSchema: schema };
+  return { ...col, filterable: true }
 }
