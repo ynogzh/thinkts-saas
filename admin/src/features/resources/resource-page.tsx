@@ -171,7 +171,7 @@ export function ResourcePage({ resource }: Props) {
             <SheetTitle>{mode === 'create' ? `新增${config.title}` : mode === 'edit' ? `编辑${config.title}` : `${config.title}详情`}</SheetTitle>
             <SheetDescription>{mode === 'create' ? '创建新记录。' : mode === 'edit' ? '修改记录信息。' : '查看记录详情。'}</SheetDescription>
           </SheetHeader>
-          <form id='resource-form' onSubmit={(e) => { e.preventDefault(); handleSubmit() }} className='flex-1 space-y-4 overflow-y-auto px-4'>
+          <form id='resource-form' onSubmit={(e) => { e.preventDefault(); handleSubmit() }} className='flex-1 space-y-6 overflow-y-auto px-4'>
             {activeFields.map((field) => {
               const isJson = field.type === 'json' || field.field.endsWith('_json')
               const schema = config.jsonSchema?.[field.field]
