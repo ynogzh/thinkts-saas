@@ -68,6 +68,8 @@ export interface TableConfig {
   form: {
     groups: FormGroupMeta[]
   }
+  jsonSchema?: Record<string, Array<{ key: string; label: string; type: string; default?: unknown }>>
+  uiActions?: Array<{ label: string; service: string; icon?: string }>
 }
 
 export interface ListResult {

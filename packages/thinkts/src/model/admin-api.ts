@@ -65,6 +65,8 @@ export interface TableConfig {
   };
   /** Per-column JSON key schemas for the interactive editor. */
   jsonSchema?: Record<string, Array<{ key: string; label: string; type: string; default?: unknown }>>;
+  /** UI actions configured in model definition. */
+  uiActions?: Array<{ label: string; service: string; icon?: string }>;
 }
 
 export interface ListResponse {
@@ -493,6 +495,7 @@ function buildTableConfig(entry: DslTableEntry, modelEntry: DslModelEntry): Tabl
     },
     form: { groups: formGroups },
     jsonSchema: (modelEntry.dsl as Record<string, unknown>).jsonSchema as TableConfig["jsonSchema"],
+    uiActions: ((modelEntry.dsl as Record<string, unknown>).ui as Record<string, unknown>)?.actions as TableConfig["uiActions"],
   };
 }
 

@@ -35,6 +35,7 @@ export interface DynamicTableProps {
   onView?: (row: Record<string, unknown>) => void
   onEdit?: (row: Record<string, unknown>) => void
   onDelete?: (row: Record<string, unknown>) => void
+  onAction?: (service: string) => void
   rowKey?: (row: Record<string, unknown>) => string
 }
 
@@ -86,7 +87,7 @@ function buildFacetedFilter(f: SearchFieldMeta) {
 export function DynamicTable({
   config, data, loading, total = 0,
   page, pageSize, onPageChange, onPageSizeChange,
-  onSortChange, onFilterChange, onView, onEdit, onDelete,
+  onSortChange, onFilterChange, onView, onEdit, onDelete, onAction,
   rowKey = (row) => String(row.id ?? row.code ?? ''),
 }: DynamicTableProps) {
   const tableKey = `table-${config.model}`
@@ -192,6 +193,16 @@ export function DynamicTable({
 
   return (
     <div className='space-y-4'>
+      {config.uiActions && config.uiActions.length > 0 && (
+        <div className='flex items-center gap-2'>
+          {config.uiActions.map((act) => (
+            <Button key={act.label} variant='outline' size='sm'
+              onClick={() => onAction?.(act.service)}>
+              {act.label}
+            </Button>
+          ))}
+        </div>
+      )}
       <DataTableToolbar table={table} textFields={textFields} searchKey={searchKey} filters={facetedFilters} searchPlaceholder="筛选" />
       <div className='flex items-center justify-between'>
         <span className='text-sm text-muted-foreground'>共 {total} 条记录</span>

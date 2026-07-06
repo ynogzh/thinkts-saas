@@ -30,6 +30,17 @@ export interface ModelHooks<T extends Cols> {
   beforeDelete?: (record: RowOf<T>, ctx: unknown) => void | Promise<void>;
 }
 
+export interface ModelUIAction {
+  label: string
+  service: string
+  icon?: string
+}
+
+export interface ModelUIConfig {
+  actions?: ModelUIAction[]
+  displayField?: string
+}
+
 export interface ModelSystem {
   tenantAware?: boolean;
   softDelete?: boolean;
@@ -43,6 +54,7 @@ export interface ModelDefinition<T extends Cols = Cols> {
   readonly hooks?: ModelHooks<T>;
   readonly system?: ModelSystem;
   readonly access?: Record<string, string[]>;
+  readonly ui?: ModelUIConfig;
 }
 
 /**
@@ -51,17 +63,15 @@ export interface ModelDefinition<T extends Cols = Cols> {
 export function defineModel<T extends Cols>(
   tableName: string,
   def: {
-    columns: T;
-    primaryKey?: string;
-    hooks?: ModelHooks<T>;
-    system?: ModelSystem;
-    access?: Record<string, string[]>;
+    columns: T; primaryKey?: string;
+    hooks?: ModelHooks<T>; system?: ModelSystem;
+    access?: Record<string, string[]>; ui?: ModelUIConfig;
   },
 ): ModelDefinition<T> {
   const primaryKey = def.primaryKey
     ?? Object.entries(def.columns).find(([, c]) => c.primary)?.[0]
     ?? "id";
-  return { tableName, columns: def.columns, primaryKey, hooks: def.hooks, system: def.system, access: def.access };
+  return { tableName, columns: def.columns, primaryKey, hooks: def.hooks, system: def.system, access: def.access, ui: def.ui };
 }
 
 /**
@@ -124,5 +134,6 @@ export function toDslConfig<T extends Cols>(model: ModelDefinition<T>): Record<s
         .filter(([, c]) => c.jsonSchema?.length)
         .map(([name, c]) => [name, c.jsonSchema]),
     ),
+    ui: model.ui ?? {},
   };
 }

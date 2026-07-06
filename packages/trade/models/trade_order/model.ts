@@ -27,5 +27,11 @@ export default defineModel("trade_order", {
     tenantAware: true,
   },
 
+  ui: {
+    actions: [
+      { label: "发布", service: "trade_order.publish" },
+      { label: "导出", service: "trade_order.export" },
+    ],
+  },
   access: {},
 });
