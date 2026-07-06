@@ -46,7 +46,7 @@ export { createSQLAdapter } from "./model/adapters/sql";
 export { createRedisAdapter } from "./model/adapters/redis";
 export { Logger } from "./logger";
 export { thinkCache } from "./cache";
-export { Validate, SimpleValidate } from "./decorator";
+export { Validate, Params } from "./decorator";
 export type { Schema, ValidationResult } from "./validate";
 export {
   ThinkError,

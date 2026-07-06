@@ -165,15 +165,13 @@ function parseSimpleOptions(options: SimpleValidateOptions): ValidationSchema {
 }
 
 /**
- * Shorthand validation using a compact rule object.
+ * Declarative parameter validation using a compact rule object.
  *
- * Examples:
- *   @SimpleValidate({ name: "string", age: "int" })               // 必填
- *   @SimpleValidate({ name: "?string", age: ["?int", 18] })       // 可选
- *   @SimpleValidate({ email: "email", bio: ["?", "string", 0, 500] })
- *   @SimpleValidate({ user: ["object", { name: "string", age: ["?int", 0] }] })
+ * @example
+ *   @Params({ tenant_id: "int", id: "int" })
+ *   async getById(opts: { tenant_id: number; id: number }) { ... }
  */
-export function SimpleValidate(options: SimpleValidateOptions): MethodDecorator {
+export function Params(options: SimpleValidateOptions): MethodDecorator {
   return Validate(parseSimpleOptions(options));
 }
 
