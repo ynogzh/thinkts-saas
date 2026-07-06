@@ -15,7 +15,10 @@ import { DataTableToolbar } from '@/components/data-table/toolbar'
 import { DataTableViewOptions } from '@/components/data-table/view-options'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Eye, Pencil, Trash2 } from 'lucide-react'
+import { DotsHorizontalIcon } from '@radix-ui/react-icons'
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import type { TableConfig, ColumnMeta, SearchFieldMeta } from '@/lib/admin-api'
 
 export interface DynamicTableProps {
@@ -128,11 +131,18 @@ export function DynamicTable({
         id: 'actions',
         header: '操作',
         cell: ({ row }) => (
-          <div className='flex items-center gap-0.5'>
-            {onView && <Button variant='ghost' size='icon' className='size-7' onClick={() => onView(row.original)}><Eye className='size-3.5' /></Button>}
-            {onEdit && <Button variant='ghost' size='icon' className='size-7' onClick={() => onEdit(row.original)}><Pencil className='size-3.5' /></Button>}
-            {onDelete && <Button variant='ghost' size='icon' className='size-7' onClick={() => onDelete(row.original)}><Trash2 className='size-3.5 text-destructive' /></Button>}
-          </div>
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <Button variant='ghost' className='flex h-8 w-8 p-0 data-[state=open]:bg-muted'>
+                <DotsHorizontalIcon className='h-4 w-4' />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end' className='w-32'>
+              {onView && <DropdownMenuItem onClick={() => onView(row.original)}>查看</DropdownMenuItem>}
+              {onEdit && <DropdownMenuItem onClick={() => onEdit(row.original)}>编辑</DropdownMenuItem>}
+              {onDelete && <DropdownMenuItem className='text-destructive' onClick={() => onDelete(row.original)}>删除</DropdownMenuItem>}
+            </DropdownMenuContent>
+          </DropdownMenu>
         ),
         enableSorting: false,
         enableHiding: false,
