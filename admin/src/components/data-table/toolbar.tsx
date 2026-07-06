@@ -39,7 +39,7 @@ export function DataTableToolbar<TData>({
         {textFields.map((tf) => (
           <Input
             key={tf.field}
-            placeholder={`筛选 ${tf.label}`}
+            placeholder={tf.label}
             value={
               (table.getColumn(tf.field)?.getFilterValue() as string) ?? ''
             }
