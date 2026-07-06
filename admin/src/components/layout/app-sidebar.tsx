@@ -8,13 +8,16 @@ import { TeamSwitcher } from './team-switcher'
 import { useMenus } from '@/hooks/use-menus'
 import type { MenuNode } from '@/lib/admin-api'
 import { sidebarData } from './data/sidebar-data'
+import { RESOURCE_CATALOG } from '@/lib/resource-catalog'
 import * as LucideIcons from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 
-const iconMap: Record<string, React.ElementType> = {
+const ICON_MAP: Record<string, React.ElementType> = {
   Building: LucideIcons.Building,
+  Building2: LucideIcons.Building2,
   Users: LucideIcons.Users,
   Shield: LucideIcons.Shield,
+  ShieldCheck: LucideIcons.ShieldCheck,
   ShoppingCart: LucideIcons.ShoppingCart,
   CreditCard: LucideIcons.CreditCard,
   Megaphone: LucideIcons.Megaphone,
@@ -24,27 +27,75 @@ const iconMap: Record<string, React.ElementType> = {
   Folder: LucideIcons.Folder,
   LayoutDashboard: LucideIcons.LayoutDashboard,
   Package: LucideIcons.Package,
+  Menu: LucideIcons.Menu,
+  Filter: LucideIcons.Filter,
+  Database: LucideIcons.Database,
+  UserCheck: LucideIcons.UserCheck,
+  List: LucideIcons.List,
+  Receipt: LucideIcons.Receipt,
+  Undo2: LucideIcons.Undo2,
+  Wallet: LucideIcons.Wallet,
+  Webhook: LucideIcons.Webhook,
+  Ticket: LucideIcons.Ticket,
+  TicketCheck: LucideIcons.TicketCheck,
+  ClipboardList: LucideIcons.ClipboardList,
+  Percent: LucideIcons.Percent,
+  DollarSign: LucideIcons.DollarSign,
+  UserPlus: LucideIcons.UserPlus,
+  Share2: LucideIcons.Share2,
+  FolderTree: LucideIcons.FolderTree,
+  Cpu: LucideIcons.Cpu,
+  Tags: LucideIcons.Tags,
+  Smartphone: LucideIcons.Smartphone,
+  Barcode: LucideIcons.Barcode,
+  FileBadge: LucideIcons.FileBadge,
+  Activity: LucideIcons.Activity,
+  Terminal: LucideIcons.Terminal,
+  MapPin: LucideIcons.MapPin,
+  Store: LucideIcons.Store,
+  Award: LucideIcons.Award,
+  PackageCheck: LucideIcons.PackageCheck,
+  FileCode: LucideIcons.FileCode,
+  Zap: LucideIcons.Zap,
+  Split: LucideIcons.Split,
+  MessageCircle: LucideIcons.MessageCircle,
+  ShoppingBag: LucideIcons.ShoppingBag,
+  Blocks: LucideIcons.Blocks,
+}
+
+/** Map a resource key like "platform_tenant" to its Chinese label. */
+function resourceLabel(key: string): string {
+  // Strip /resources/ prefix
+  const name = key.replace(/^\/resources\//, '')
+  return RESOURCE_CATALOG[name]?.label ?? name
+}
+
+function resourceIcon(key: string): string {
+  const name = key.replace(/^\/resources\//, '')
+  return RESOURCE_CATALOG[name]?.icon ?? 'Table'
 }
 
 function menuNodesToNavGroups(menus: MenuNode[]) {
   return menus.map((node) => {
-    const icon = iconMap[node.icon] ?? iconMap.Folder
+    const groupIcon = ICON_MAP[node.icon] ?? ICON_MAP.Folder
     if (node.children?.length) {
       return {
         title: node.label,
+        icon: groupIcon,
         items: node.children.map((child) => ({
-          title: child.label,
+          title: resourceLabel(child.key),
           url: `/resources/${child.key.replace('/resources/', '')}`,
-          icon: iconMap.Table,
+          icon: ICON_MAP[resourceIcon(child.key)] ?? ICON_MAP.Table,
         })),
       }
     }
     return {
       title: node.label,
+      icon: groupIcon,
       items: [{
-        title: node.label,
+        title: resourceLabel(node.key),
         url: node.key.startsWith('/') ? node.key : `/${node.key}`,
-        icon,
+        icon: groupIcon,
       }],
     }
   })
@@ -52,9 +103,9 @@ function menuNodesToNavGroups(menus: MenuNode[]) {
 
 function SidebarSkeleton() {
   return (
-    <div className='space-y-2 px-2'>
+    <div className="space-y-2 px-2">
       {Array.from({ length: 4 }).map((_, i) => (
-        <Skeleton key={i} className='h-8 w-full' />
+        <Skeleton key={i} className="h-8 w-full" />
       ))}
     </div>
   )
@@ -72,8 +123,12 @@ export function AppSidebar() {
         <TeamSwitcher teams={sidebarData.teams} />
       </SidebarHeader>
       <SidebarContent>
-        {isLoading ? <SidebarSkeleton /> : isError ? (
-          <div className='px-4 py-2 text-sm text-muted-foreground'>Failed to load menus</div>
+        {isLoading ? (
+          <SidebarSkeleton />
+        ) : isError ? (
+          <div className="px-4 py-2 text-sm text-muted-foreground">
+            Failed to load menus
+          </div>
         ) : (
           navGroups.map((props) => (
             <NavGroup key={props.title} {...props} />

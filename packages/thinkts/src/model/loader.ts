@@ -162,9 +162,10 @@ export function loadDslAppData(srcPath: string): DslAppData {
       }
     }
 
-    // Table: prefer model.ts embedded, fall back to table.json
+    // Table: prefer model.ts embedded object, fall back to table.json
     const embeddedTable = (dsl as Record<string, unknown>).table as Record<string, unknown> | undefined;
-    result.tables[name] = embeddedTable
+    const embeddedIsObject = embeddedTable && typeof embeddedTable === "object";
+    result.tables[name] = embeddedIsObject
       ? { name, path: dir, table: embeddedTable as TableDSL }
       : (loadTableDSL(dir) ? { name, path: dir, table: loadTableDSL(dir)! } : { name, path: dir, table: { title: name, model: tableName } });
 

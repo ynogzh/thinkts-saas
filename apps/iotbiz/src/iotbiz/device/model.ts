@@ -22,6 +22,19 @@ export default defineModel("iotbiz_device", {
     updated_at: required(t.timestamp()),
   },
 
+  jsonSchema: {
+    pricing_json: [
+      { key: "mode", label: "计费模式", type: "string", default: "mock" },
+      { key: "unit_price", label: "单价(分)", type: "number", default: 0 },
+    ],
+    start_config_json: [
+      { key: "command", label: "启动指令", type: "string", default: "" },
+    ],
+    metadata_json: [
+      { key: "notes", label: "备注", type: "string", default: "" },
+    ],
+  },
+
   hooks: {},
 
   system: {},

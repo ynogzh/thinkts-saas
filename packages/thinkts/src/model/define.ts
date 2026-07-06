@@ -30,55 +30,60 @@ export interface ModelHooks<T extends Cols> {
   beforeDelete?: (record: RowOf<T>, ctx: unknown) => void | Promise<void>;
 }
 
-
 export interface ModelSystem {
-  /** Auto-add WHERE tenant_id = ? to all queries */
   tenantAware?: boolean;
-  /** Soft delete via deleted_at column */
   softDelete?: boolean;
-  /** Fields that cannot be edited via CRUD API */
   immutableFields?: string[];
 }
+
+/** A single key definition inside a JSON column. */
+export interface JsonFieldSchema {
+  key: string;
+  label: string;
+  type: "string" | "number" | "boolean" | "object";
+  default?: unknown;
+}
+
+/** Per-column JSON schema: maps column name → array of key definitions. */
+export type JsonSchema = Record<string, JsonFieldSchema[]>;
 
 export interface ModelDefinition<T extends Cols = Cols> {
   readonly tableName: string;
   readonly columns: T;
   readonly primaryKey: string;
   readonly hooks?: ModelHooks<T>;
-  /** System invariants (framework-enforced) */
   readonly system?: ModelSystem;
-  /** Default access for business roles (can be overridden via admin) */
   readonly access?: Record<string, string[]>;
+  /** JSON column schemas — describes keys inside json fields for the editor. */
+  readonly jsonSchema?: JsonSchema;
 }
 
 /**
  * Define a database model with full TypeScript type inference.
- *
- * ```ts
- * const Device = defineModel("iotbiz_device", {
- *   columns: { id: t.bigint(), name: t.string(128) },
- *   hooks: {
- *     beforeCreate(data, ctx) { return data; }, // data is typed
- *   },
- * });
- * type DeviceRow = RowOf<typeof Device.columns>;
- * ```
  */
 export function defineModel<T extends Cols>(
   tableName: string,
-  def: { columns: T; primaryKey?: string; hooks?: ModelHooks<T>; system?: ModelSystem; access?: Record<string, string[]> },
+  def: {
+    columns: T;
+    primaryKey?: string;
+    hooks?: ModelHooks<T>;
+    system?: ModelSystem;
+    access?: Record<string, string[]>;
+    jsonSchema?: JsonSchema;
+  },
 ): ModelDefinition<T> {
   const primaryKey = def.primaryKey
     ?? Object.entries(def.columns).find(([, c]) => c.primary)?.[0]
     ?? "id";
-  return { tableName, columns: def.columns, primaryKey, hooks: def.hooks, system: def.system, access: def.access };
+  return {
+    tableName, columns: def.columns, primaryKey,
+    hooks: def.hooks, system: def.system, access: def.access,
+    jsonSchema: def.jsonSchema,
+  };
 }
 
 /**
- * Convert ModelDefinition to internal DSL format with:
- * - modelConfig: column definitions (SQL schema)
- * - tableConfig: admin table UI configuration
- * - accessConfig: default role access
+ * Convert ModelDefinition to internal DSL format.
  */
 export function toDslConfig<T extends Cols>(model: ModelDefinition<T>): Record<string, unknown> {
   const columns = Object.entries(model.columns).map(([name, col]) => {
@@ -99,27 +104,39 @@ export function toDslConfig<T extends Cols>(model: ModelDefinition<T>): Record<s
     if (col.comment) entry.comment = col.comment;
     return entry;
   });
+
+  const hasExplicit = Object.values(model.columns).some((col) => col.listable);
+  const hasSearchable = Object.values(model.columns).some((col) => col.searchable);
+
   return {
     name: model.tableName, tableName: model.tableName, primaryKey: model.primaryKey,
     columns, option: { timestamps: true, softDeletes: model.system?.softDelete ?? false },
-    // Table UI config — derived from column metadata
+    // Table UI config
     table: {
       title: model.tableName, model: model.tableName,
       list: {
         columns: Object.entries(model.columns)
-          .filter(([, c]) => c.listable)
-          .map(([name, c]) => ({ field: name, label: c.label ?? name })),
+          .filter(([, c]) => hasExplicit ? c.listable : true)
+          .map(([name, c]) => ({ field: name, title: c.label ?? name })),
         orderBy: { field: model.primaryKey, direction: "desc" },
       },
       search: {
         fields: Object.entries(model.columns)
-          .filter(([, c]) => c.searchable)
-          .map(([name, c]) => ({ field: name, label: c.label ?? name })),
+          .filter(([name, c]) => hasSearchable ? c.searchable : !["id", "created_at", "updated_at", "deleted_at"].includes(name))
+          .map(([name, c]) => ({ field: name, title: c.label ?? name })),
+      },
+      form: {
+        groups: [{
+          title: "基本信息",
+          fields: Object.entries(model.columns)
+            .filter(([name]) => !["id", "created_at", "updated_at", "deleted_at"].includes(name))
+            .map(([name, c]) => ({ field: name, title: c.label ?? name, required: c.required, type: c._sqlType })),
+        }],
       },
     },
-    // Access config
     access: model.access ?? {},
-    // System invariants
     system: model.system ?? {},
+    // Pass JSON schema through
+    jsonSchema: model.jsonSchema ?? {},
   };
 }
