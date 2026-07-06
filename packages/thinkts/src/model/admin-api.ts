@@ -135,7 +135,11 @@ const LABEL_MAP: Record<string, string> = {
   mall_order: "商城订单",
   mall_order_item: "订单明细",
   base: "基础数据",
-  // ── Field names → Chinese ──
+  promote_agent_level: "代理等级",
+  promote_agent: "代理",
+  promote_coupon_template: "优惠券模板",
+  promote_coupon_scope: "优惠券范围",
+  permission_permission: "权限管理",
   id: "ID",
   tenant_id: "租户",
   username: "用户名",
@@ -218,6 +222,9 @@ function columnType(col: ColumnDSL): string {
 }
 
 function resolveColType(field: string, cols: ColumnDSL[]): string {
+  // Field-name-based overrides
+  if (field.includes("password")) return "password";
+  if (field.endsWith("_json")) return "json";
   return columnType(cols.find((c) => c.name === field) ?? { name: field, type: "varchar" });
 }
 
@@ -243,14 +250,13 @@ function buildTableConfig(entry: DslTableEntry, modelEntry: DslModelEntry): Tabl
     operator: sf.operator,
     options: sf.options,
   }));
-
   const formGroups: FormGroupMeta[] = (table.form?.groups ?? []).map((g) => ({
     title: g.title,
     columns: g.columns,
     fields: (g.fields ?? []).map((f) => ({
       field: f.field,
       label: zh(f.title, f.field),
-      type: f.type,
+      type: resolveColType(f.field, modelEntry.dsl.columns),
       required: f.required ?? false,
       options: f.options,
     })),
