@@ -142,15 +142,18 @@ function modifiers(col: TableMeta["columns"][number]): string[] {
 
 function colDef(col: TableMeta["columns"][number]): string {
   const label = toLabel(col.name);
-  let base = tsType(col);
 
-  // JSON schema detection
+  // JSON schema detection — wrap base before building line
   const jsonSchema = (col.dataType === "json" || col.dataType === "jsonb" || col.name.endsWith("_json"))
-    ? inferJsonSchema(col.name, label) : null ;
+    ? inferJsonSchema(col.name, label) : null;
 
   // Apply modifiers using wrapper style
   const mods = modifiers(col);
+  let base = tsType(col);
   for (const m of mods) base = `${m}(${base})`;
+
+  // Wrap with jsonSchema if detected (before label/listable/searchable)
+  if (jsonSchema) base = `jsonSchema(${base}, [${jsonSchema}])`;
 
   let line = `    ${col.name}:`;
   if (isListable(col) || isSearchable(col)) {
@@ -163,8 +166,6 @@ function colDef(col: TableMeta["columns"][number]): string {
   } else {
     line += ` ${base}`;
   }
-
-  if (jsonSchema) line += `,  // ${jsonSchema}`;
 
   return line;
 }
