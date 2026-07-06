@@ -1,22 +1,26 @@
-import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
+import { defineModel, t, label, listable, searchable, required, nullable, primary, autoIncrement, unique, index, jsonSchema } from "thinkts";
 
+/**
+ * permission_permission — 
+ */
 export default defineModel("permission_permission", {
   columns: {
-    id: required(autoIncrement(primary(t.bigint()))),
-    module_code: listable(required(index(t.string()))),
-    code: label("编码")(searchable(listable(required(index(t.string()))))),
-    name: label("名称")(searchable(listable(required(t.string())))),
-    type: label("类型")(listable(required(t.string()))),
-    parent_code: listable(nullable(t.string())),
-    api_method: listable(nullable(t.string())),
-    api_path: listable(nullable(t.string())),
-    created_at: required(t.timestamp()),
-    updated_at: required(t.timestamp()),
+    id: autoIncrement(primary(t.bigint())),
+    module_code: label("模块编码")(listable(index(t.string()))),
+    code: label("编码")(listable(searchable(index(unique(t.string()))))),
+    name: label("名称")(listable(searchable(t.string()))),
+    type: label("类型")(listable(t.string())),
+    parent_code: label("Parent Code")(listable(nullable(t.string()))),
+    api_method: label("Api Method")(listable(nullable(t.string()))),
+    api_path: label("Api Path")(listable(nullable(t.string()))),
+    created_at: t.timestamp(),
+    updated_at: t.timestamp()
   },
 
   hooks: {},
 
-  system: {},
+  system: {
+  },
 
   access: {},
 });

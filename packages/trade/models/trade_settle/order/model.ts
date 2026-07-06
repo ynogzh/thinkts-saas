@@ -1,18 +1,21 @@
-import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
+import { defineModel, t, label, listable, searchable, required, nullable, primary, autoIncrement, unique, index, jsonSchema } from "thinkts";
 
+/**
+ * trade_settle_order — 
+ */
 export default defineModel("trade_settle_order", {
   columns: {
-    id: required(autoIncrement(primary(t.bigint()))),
-    tenant_id: label("租户")(searchable(listable(required(index(t.bigint()))))),
-    settle_no: listable(required(index(t.string()))),
-    settle_type: listable(required(t.string())),
-    receiver_type: listable(required(t.string())),
-    receiver_id: listable(required(t.bigint())),
-    amount: label("金额")(listable(required(t.string()))),
-    status: label("状态")(searchable(listable(required(t.string())))),
-    settled_at: listable(nullable(t.timestamp())),
-    created_at: required(t.timestamp()),
-    updated_at: required(t.timestamp()),
+    id: autoIncrement(primary(t.bigint())),
+    tenant_id: label("租户")(listable(searchable(index(t.bigint())))),
+    settle_no: label("Settle No")(listable(index(t.string()))),
+    settle_type: label("Settle Type")(listable(t.string())),
+    receiver_type: label("接收方类型")(listable(t.string())),
+    receiver_id: label("Receiver Id")(listable(searchable(t.bigint()))),
+    amount: label("金额")(listable(t.decimal())),
+    status: label("状态")(listable(searchable(t.string()))),
+    settled_at: label("Settled At")(listable(nullable(t.timestamp()))),
+    created_at: t.timestamp(),
+    updated_at: t.timestamp()
   },
 
   hooks: {},

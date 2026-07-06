@@ -1,15 +1,18 @@
-import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
+import { defineModel, t, label, listable, searchable, required, nullable, primary, autoIncrement, unique, index, jsonSchema } from "thinkts";
 
+/**
+ * mall_product — 
+ */
 export default defineModel("mall_product", {
   columns: {
-    id: required(autoIncrement(primary(t.bigint()))),
-    tenant_id: label("租户")(searchable(listable(required(index(t.bigint()))))),
-    name: label("名称")(searchable(listable(required(t.string())))),
-    price: label("单价")(listable(required(t.string()))),
-    status: label("状态")(searchable(listable(required(index(t.string()))))),
-    created_at: required(t.timestamp()),
-    updated_at: required(t.timestamp()),
-    deleted_at: nullable(t.timestamp()),
+    id: autoIncrement(primary(t.bigint())),
+    tenant_id: label("租户")(listable(searchable(index(t.bigint())))),
+    name: label("名称")(listable(searchable(t.string()))),
+    price: label("单价")(listable(t.decimal())),
+    status: label("状态")(listable(searchable(index(t.string())))),
+    created_at: t.timestamp(),
+    updated_at: t.timestamp(),
+    deleted_at: nullable(t.timestamp())
   },
 
   hooks: {},

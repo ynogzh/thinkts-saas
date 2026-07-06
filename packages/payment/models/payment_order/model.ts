@@ -1,20 +1,23 @@
-import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
+import { defineModel, t, label, listable, searchable, required, nullable, primary, autoIncrement, unique, index, jsonSchema } from "thinkts";
 
+/**
+ * payment_order — 
+ */
 export default defineModel("payment_order", {
   columns: {
-    id: required(autoIncrement(primary(t.bigint()))),
-    tenant_id: label("租户")(searchable(listable(required(index(t.bigint()))))),
-    pay_no: label("支付单号")(searchable(listable(required(index(t.string()))))),
-    trade_order_id: listable(required(index(t.bigint()))),
-    biz_type: label("业务类型")(listable(required(t.string()))),
-    biz_id: label("业务ID")(listable(required(t.bigint()))),
-    amount: label("金额")(listable(required(t.string()))),
-    channel_code: listable(required(t.string())),
-    status: label("状态")(searchable(listable(required(t.string())))),
-    third_trade_no: listable(nullable(t.string())),
+    id: autoIncrement(primary(t.bigint())),
+    tenant_id: label("租户")(listable(searchable(index(t.bigint())))),
+    pay_no: label("支付单号")(listable(searchable(index(t.string())))),
+    trade_order_id: label("交易订单")(listable(searchable(index(t.bigint())))),
+    biz_type: label("业务类型")(listable(t.string())),
+    biz_id: label("业务ID")(listable(searchable(t.bigint()))),
+    amount: label("金额")(listable(t.decimal())),
+    channel_code: label("渠道编码")(listable(t.string())),
+    status: label("状态")(listable(searchable(t.string()))),
+    third_trade_no: label("第三方交易号")(listable(nullable(t.string()))),
     paid_at: label("支付时间")(listable(nullable(t.timestamp()))),
-    created_at: required(t.timestamp()),
-    updated_at: required(t.timestamp()),
+    created_at: t.timestamp(),
+    updated_at: t.timestamp()
   },
 
   hooks: {},

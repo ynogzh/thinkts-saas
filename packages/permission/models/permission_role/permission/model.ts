@@ -1,12 +1,15 @@
-import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
+import { defineModel, t, label, listable, searchable, required, nullable, primary, autoIncrement, unique, index, jsonSchema } from "thinkts";
 
+/**
+ * permission_role_permission — 
+ */
 export default defineModel("permission_role_permission", {
   columns: {
-    id: required(autoIncrement(primary(t.bigint()))),
-    tenant_id: label("租户")(searchable(listable(required(index(t.bigint()))))),
-    role_id: label("角色")(listable(required(index(t.bigint())))),
-    permission_code: listable(required(index(t.string()))),
-    created_at: required(t.timestamp()),
+    id: autoIncrement(primary(t.bigint())),
+    tenant_id: label("租户")(listable(searchable(index(t.bigint())))),
+    role_id: label("角色")(listable(searchable(index(t.bigint())))),
+    permission_code: label("Permission Code")(listable(index(t.string()))),
+    created_at: t.timestamp()
   },
 
   hooks: {},

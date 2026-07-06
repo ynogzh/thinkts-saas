@@ -1,25 +1,28 @@
-import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
+import { defineModel, t, label, listable, searchable, required, nullable, primary, autoIncrement, unique, index, jsonSchema } from "thinkts";
 
+/**
+ * iotbiz_device — 
+ */
 export default defineModel("iotbiz_device", {
   columns: {
-    id: required(autoIncrement(primary(t.bigint()))),
-    tenant_id: label("租户")(searchable(listable(required(index(t.bigint()))))),
-    device_no: label("设备编号")(searchable(listable(required(index(t.string()))))),
-    name: label("名称")(searchable(listable(required(t.string())))),
-    merchant_id: label("商户")(searchable(listable(required(index(t.bigint()))))),
-    agent_id: label("代理")(listable(required(t.bigint()))),
-    type_id: listable(required(t.bigint())),
-    location_label: listable(nullable(t.string())),
-    online_status: searchable(listable(required(t.string()))),
-    start_mode: searchable(listable(required(t.string()))),
-    pricing_json: nullable(t.json()),
-    start_config_json: nullable(t.json()),
-    last_heartbeat_at: listable(nullable(t.timestamp())),
-    last_start_at: listable(nullable(t.timestamp())),
-    status: label("状态")(searchable(listable(required(t.string())))),
-    metadata_json: nullable(t.json()),
-    created_at: required(t.timestamp()),
-    updated_at: required(t.timestamp()),
+    id: autoIncrement(primary(t.bigint())),
+    tenant_id: label("租户")(listable(searchable(index(t.bigint())))),
+    device_no: label("设备编号")(listable(searchable(index(t.string())))),
+    name: label("名称")(listable(searchable(t.string()))),
+    merchant_id: label("商户")(listable(searchable(index(t.bigint())))),
+    agent_id: label("代理")(listable(searchable(t.bigint()))),
+    type_id: label("Type Id")(listable(searchable(t.bigint()))),
+    location_label: label("位置")(listable(nullable(t.string()))),
+    online_status: label("在线状态")(listable(searchable(t.string()))),
+    start_mode: label("启动模式")(listable(searchable(t.string()))),
+    pricing_json: nullable(t.json()),  // jsonSchema(t.json(), [{ key: "mode", label: "计费模式", type: "string", default: "mock" }, { key: "unit_price", label: "单价(分)", type: "number", default: 0 }]),
+    start_config_json: nullable(t.json()),  // jsonSchema(t.json(), [{ key: "notes", label: "启动配置", type: "string", default: "" }]),
+    last_heartbeat_at: label("最后心跳")(listable(nullable(t.timestamp()))),
+    last_start_at: label("最后启动")(listable(nullable(t.timestamp()))),
+    status: label("状态")(listable(searchable(t.string()))),
+    metadata_json: nullable(t.json()),  // jsonSchema(t.json(), [{ key: "notes", label: "备注", type: "string", default: "" }]),
+    created_at: t.timestamp(),
+    updated_at: t.timestamp()
   },
 
   hooks: {},
