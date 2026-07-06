@@ -1,94 +1,214 @@
-import { useMemo } from 'react'
-import type { ColumnDef } from '@tanstack/react-table'
+import { useMemo, useState } from 'react'
 import {
+  type ColumnDef, type ColumnFiltersState,
+  type SortingState, type VisibilityState,
   flexRender, getCoreRowModel, getFilteredRowModel,
   getPaginationRowModel, getSortedRowModel, useReactTable,
 } from '@tanstack/react-table'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table'
-import { DataTablePagination } from '@/components/data-table'
+import { DataTableColumnHeader } from '@/components/data-table/column-header'
+import { DataTablePagination } from '@/components/data-table/pagination'
+import { DataTableToolbar } from '@/components/data-table/toolbar'
+import { DataTableViewOptions } from '@/components/data-table/view-options'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Pencil, Trash2 } from 'lucide-react'
-import type { TableConfig } from '@/lib/admin-api'
+import { Eye, Pencil, Trash2 } from 'lucide-react'
+import type { TableConfig, ColumnMeta, SearchFieldMeta } from '@/lib/admin-api'
 
-interface Props {
+export interface DynamicTableProps {
   config: TableConfig
   data: Record<string, unknown>[]
-  onEdit?: (record: Record<string, unknown>) => void
-  onDelete?: (record: Record<string, unknown>) => void
+  loading?: boolean
+  total?: number
+  page: number
+  pageSize: number
+  onPageChange: (page: number) => void
+  onPageSizeChange: (size: number) => void
+  onSortChange?: (field: string, direction: 'asc' | 'desc') => void
+  onFilterChange?: (filters: Record<string, string>) => void
+  onView?: (row: Record<string, unknown>) => void
+  onEdit?: (row: Record<string, unknown>) => void
+  onDelete?: (row: Record<string, unknown>) => void
+  rowKey?: (row: Record<string, unknown>) => string
 }
 
-export function DynamicTable({ config, data, onEdit, onDelete }: Props) {
-  const hasActions = !!(onEdit || onDelete)
+const LS_KEY = 'thinkts-admin-column-visibility'
 
-  const columns = useMemo<ColumnDef<Record<string, unknown>>[]>(() => {
-    const cols = config.list.columns.map((col) => ({
-      accessorKey: col.field,
-      header: col.title ?? col.field,
-      cell: ({ getValue }: { getValue: () => unknown }) => {
-        const val = getValue()
-        if (val === null || val === undefined) return <span className='text-muted-foreground'>—</span>
-        if (typeof val === 'object') return <span className='text-xs font-mono'>{JSON.stringify(val)}</span>
-        return <span>{String(val)}</span>
+function loadVisibility(tableKey: string): Record<string, boolean> {
+  try {
+    const stored = localStorage.getItem(LS_KEY)
+    if (stored) return JSON.parse(stored)[tableKey] ?? {}
+  } catch { /* ignore */ }
+  return {}
+}
+
+function saveVisibility(tableKey: string, visibility: VisibilityState) {
+  try {
+    const stored = localStorage.getItem(LS_KEY)
+    const all = stored ? JSON.parse(stored) : {}
+    all[tableKey] = visibility
+    localStorage.setItem(LS_KEY, JSON.stringify(all))
+  } catch { /* ignore */ }
+}
+
+function renderCellValue(val: unknown, col: ColumnMeta) {
+  if (val === null || val === undefined) return <span className='text-muted-foreground text-xs'>—</span>
+  if (typeof val === 'boolean') return <Badge variant={val ? 'default' : 'secondary'}>{val ? '是' : '否'}</Badge>
+  if (col.type === 'datetime' || col.type === 'timestamp') {
+    const s = String(val)
+    return <span className='text-xs'>{s.replace('T', ' ').replace(/\.\d+Z?$/, '')}</span>
+  }
+  if (col.type === 'status' || col.field?.endsWith('status') || col.field?.endsWith('_status')) {
+    const s = String(val)
+    return <Badge variant={s === 'enabled' || s === 'active' ? 'default' : 'secondary'}>{s}</Badge>
+  }
+  return <span>{String(val)}</span>
+}
+
+function buildFacetedFilter(f: SearchFieldMeta) {
+  if (!f.options?.length) return undefined
+  return {
+    columnId: f.field,
+    title: f.label,
+    options: f.options.map((o) => ({
+      label: o.label,
+      value: String(o.value),
+    })),
+  }
+}
+
+export function DynamicTable({
+  config, data, loading, total = 0,
+  page, pageSize, onPageChange, onPageSizeChange,
+  onSortChange, onFilterChange, onView, onEdit, onDelete,
+  rowKey = (row) => String(row.id ?? row.code ?? ''),
+}: DynamicTableProps) {
+  const tableKey = `table-${config.model}`
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(() => loadVisibility(tableKey))
+  const [rowSelection, setRowSelection] = useState({})
+
+  const hasActions = !!(onView || onEdit || onDelete)
+  const searchFields = config.search?.fields ?? []
+  const facetedFilters = searchFields.map(buildFacetedFilter).filter(Boolean) as NonNullable<ReturnType<typeof buildFacetedFilter>>[]
+  const searchKey = searchFields.find((f) => !f.options?.length)?.field
+
+  const columns: ColumnDef<Record<string, unknown>>[] = useMemo(() => {
+    const cols: ColumnDef<Record<string, unknown>>[] = [
+      {
+        id: 'select',
+        header: ({ table }) => (
+          <Checkbox
+            checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
+            onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox checked={row.getIsSelected()} onCheckedChange={(v) => row.toggleSelected(!!v)} />
+        ),
+        enableSorting: false,
+        enableHiding: false,
       },
-      enableSorting: col.sortable ?? false,
-    }))
-
+    ]
+    for (const col of config.list.columns) {
+      cols.push({
+        accessorKey: col.field,
+        header: ({ column }) => <DataTableColumnHeader column={column} title={col.title ?? col.field} />,
+        cell: ({ getValue }) => renderCellValue(getValue(), col),
+        enableSorting: col.sortable ?? true,
+      })
+    }
     if (hasActions) {
       cols.push({
         id: 'actions',
-        header: 'Actions',
+        header: '操作',
         cell: ({ row }) => (
-          <div className='flex items-center gap-1'>
-            {onEdit && (
-              <Button variant='ghost' size='icon' onClick={() => onEdit(row.original)}>
-                <Pencil className='h-4 w-4' />
-              </Button>
-            )}
-            {onDelete && (
-              <Button variant='ghost' size='icon' onClick={() => onDelete(row.original)}>
-                <Trash2 className='h-4 w-4 text-destructive' />
-              </Button>
-            )}
+          <div className='flex items-center gap-0.5'>
+            {onView && <Button variant='ghost' size='icon' className='size-7' onClick={() => onView(row.original)}><Eye className='size-3.5' /></Button>}
+            {onEdit && <Button variant='ghost' size='icon' className='size-7' onClick={() => onEdit(row.original)}><Pencil className='size-3.5' /></Button>}
+            {onDelete && <Button variant='ghost' size='icon' className='size-7' onClick={() => onDelete(row.original)}><Trash2 className='size-3.5 text-destructive' /></Button>}
           </div>
         ),
         enableSorting: false,
+        enableHiding: false,
       })
     }
-
     return cols
-  }, [config, hasActions, onEdit, onDelete])
+  }, [config, hasActions, onView, onEdit, onDelete])
 
   const table = useReactTable({
     data,
     columns,
+    getRowId: (row) => rowKey(row),
+    pageCount: Math.max(1, Math.ceil(total / pageSize)),
+    manualPagination: true,
+    manualSorting: true,
+    manualFiltering: true,
+    onSortingChange: (updater) => {
+      const next = typeof updater === 'function' ? updater(sorting) : updater
+      setSorting(next)
+      if (onSortChange && next.length > 0) {
+        onSortChange(next[0].id, next[0].desc ? 'desc' : 'asc')
+      }
+    },
+    onColumnFiltersChange: (updater) => {
+      const next = typeof updater === 'function' ? updater(columnFilters) : updater
+      setColumnFilters(next)
+      const filters: Record<string, string> = {}
+      for (const f of next) {
+        if (typeof f.value === 'string') filters[f.id] = f.value
+        else if (Array.isArray(f.value)) filters[f.id] = f.value.join(',')
+      }
+      onFilterChange?.(filters)
+    },
+    onColumnVisibilityChange: (updater) => {
+      const next = typeof updater === 'function' ? updater(columnVisibility) : updater
+      setColumnVisibility(next)
+      saveVisibility(tableKey, next as VisibilityState)
+    },
+    onRowSelectionChange: setRowSelection,
+    onPaginationChange: () => {}, // manual
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    initialState: { pagination: { pageSize: config.list.pageSize } },
+    state: { sorting, columnFilters, columnVisibility, rowSelection, pagination: { pageIndex: page - 1, pageSize } },
   })
 
   return (
-    <div className='flex flex-col gap-4'>
+    <div className='space-y-4'>
+      <DataTableToolbar table={table} searchKey={searchKey} filters={facetedFilters} searchPlaceholder={`筛选 ${searchFields.find((f) => f.field === searchKey)?.label ?? ''}`} />
+      <div className='flex items-center justify-between'>
+        <span className='text-sm text-muted-foreground'>共 {total} 条记录</span>
+        <DataTableViewOptions table={table} />
+      </div>
       <div className='rounded-md border'>
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((hg) => (
-              <TableRow key={hg.id}>
-                {hg.headers.map((h) => (
-                  <TableHead key={h.id}>
-                    {h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} colSpan={header.colSpan}>
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.length ? (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} className='h-24 text-center text-muted-foreground'>
+                  加载中...
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -98,8 +218,8 @@ export function DynamicTable({ config, data, onEdit, onDelete }: Props) {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className='h-24 text-center'>
-                  No results.
+                <TableCell colSpan={columns.length} className='h-24 text-center text-muted-foreground'>
+                  暂无数据
                 </TableCell>
               </TableRow>
             )}
