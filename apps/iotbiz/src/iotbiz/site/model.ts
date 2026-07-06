@@ -1,29 +1,31 @@
-import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
+import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
 
 export default defineModel("iotbiz_site", {
   columns: {
-    id: index(primary(autoIncrement(t.string()))),
-    tenant_id: required(index(t.string())),
-    site_no: required(t.string()),
-    name: required(t.string()),
-    merchant_id: required(t.string()),
-    agent_id: required(t.string()),
-    address: nullable(t.string()),
-    location_label: nullable(t.string()),
-    latitude: nullable(t.decimal()),
-    longitude: nullable(t.decimal()),
-    contact_name: nullable(t.string()),
-    contact_phone: nullable(t.string()),
-    device_capacity: required(t.string()),
-    status: required(t.string()),
-    metadata_json: nullable(t.string()),
+    id: required(autoIncrement(primary(t.bigint()))),
+    tenant_id: label("租户")(searchable(listable(required(index(t.bigint()))))),
+    site_no: label("站点编号")(searchable(listable(required(index(t.string()))))),
+    name: label("名称")(searchable(listable(required(t.string())))),
+    merchant_id: label("商户")(searchable(listable(required(index(t.bigint()))))),
+    agent_id: label("代理")(listable(required(t.bigint()))),
+    address: listable(nullable(t.string())),
+    location_label: listable(nullable(t.string())),
+    latitude: listable(nullable(t.string())),
+    longitude: listable(nullable(t.string())),
+    contact_name: listable(nullable(t.string())),
+    contact_phone: listable(nullable(t.string())),
+    device_capacity: listable(required(t.bigint())),
+    status: label("状态")(searchable(listable(required(t.string())))),
+    metadata_json: nullable(t.json()),
     created_at: required(t.timestamp()),
     updated_at: required(t.timestamp()),
   },
 
   hooks: {},
 
-  system: {},
+  system: {
+    tenantAware: true,
+  },
 
   access: {},
 });

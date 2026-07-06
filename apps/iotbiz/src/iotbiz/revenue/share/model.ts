@@ -1,27 +1,29 @@
-import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
+import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
 
 export default defineModel("iotbiz_revenue_share", {
   columns: {
-    id: index(primary(autoIncrement(t.string()))),
-    tenant_id: required(index(t.string())),
-    biz_type: required(t.string()),
-    biz_id: required(t.string()),
-    session_id: required(t.string()),
-    trade_order_id: required(t.string()),
-    receiver_type: required(t.string()),
-    receiver_id: nullable(t.string()),
-    rule_type: required(t.string()),
-    rate: required(t.decimal()),
-    amount: required(t.decimal()),
-    settle_order_id: nullable(t.string()),
-    status: required(t.string()),
+    id: required(autoIncrement(primary(t.bigint()))),
+    tenant_id: label("租户")(searchable(listable(required(index(t.bigint()))))),
+    biz_type: label("业务类型")(listable(required(t.string()))),
+    biz_id: label("业务ID")(listable(required(t.bigint()))),
+    session_id: label("会话")(listable(required(t.bigint()))),
+    trade_order_id: listable(required(t.bigint())),
+    receiver_type: listable(required(index(t.string()))),
+    receiver_id: listable(nullable(index(t.bigint()))),
+    rule_type: listable(required(t.string())),
+    rate: listable(required(t.string())),
+    amount: label("金额")(listable(required(t.string()))),
+    settle_order_id: listable(nullable(t.bigint())),
+    status: label("状态")(searchable(listable(required(index(t.string()))))),
     created_at: required(t.timestamp()),
     updated_at: required(t.timestamp()),
   },
 
   hooks: {},
 
-  system: {},
+  system: {
+    tenantAware: true,
+  },
 
   access: {},
 });

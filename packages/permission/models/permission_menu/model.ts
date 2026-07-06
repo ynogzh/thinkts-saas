@@ -1,29 +1,24 @@
-import { defineModel, t, autoIncrement, index, nullable, primary, required } from "thinkts";
+import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
 
 export default defineModel("permission_menu", {
   columns: {
-    id: index(autoIncrement(primary(t.bigint()))),
-    module_code: index(required(t.string())),
-    parent_id: nullable(t.bigint()),
-    name: required(t.string()),
-    path: nullable(t.string()),
-    component: nullable(t.string()),
-    icon: nullable(t.string()),
-    permission_code: nullable(t.string()),
-    sort: t.integer(),
-    status: t.string(),
+    id: required(autoIncrement(primary(t.bigint()))),
+    module_code: listable(required(index(t.string()))),
+    parent_id: listable(nullable(index(t.bigint()))),
+    name: label("名称")(searchable(listable(required(t.string())))),
+    path: listable(nullable(t.string())),
+    component: listable(nullable(t.string())),
+    icon: listable(nullable(t.string())),
+    permission_code: listable(nullable(t.string())),
+    sort: label("排序")(listable(required(t.bigint()))),
+    status: label("状态")(searchable(listable(required(t.string())))),
     created_at: required(t.timestamp()),
-    updated_at: required(t.timestamp())
+    updated_at: required(t.timestamp()),
   },
 
   hooks: {},
 
   system: {},
 
-  access: {
-    "superadmin": {"allow":["select","find","add","update","delete"]},
-    "admin": {"allow":["select","find","add","update","delete"]},
-    "user": {"allow":["select","find"],"writable":[],"deny":["add","update","delete"]},
-    "guest": {"allow":["select","find","add","update","delete"],"writable":null,"readable":null}
-  },
+  access: {},
 });

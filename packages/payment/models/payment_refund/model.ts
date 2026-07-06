@@ -1,27 +1,24 @@
-import { defineModel, t, autoIncrement, index, nullable, primary, required } from "thinkts";
+import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
 
 export default defineModel("payment_refund", {
   columns: {
-    id: index(autoIncrement(primary(t.bigint()))),
-    tenant_id: index(required(t.bigint())),
-    refund_no: required(t.string()),
-    payment_order_id: required(t.bigint()),
-    amount: required(t.decimal()),
-    reason: nullable(t.string()),
-    status: t.string(),
-    third_refund_no: nullable(t.string()),
+    id: required(autoIncrement(primary(t.bigint()))),
+    tenant_id: label("租户")(searchable(listable(required(index(t.bigint()))))),
+    refund_no: label("退款单号")(searchable(listable(required(index(t.string()))))),
+    payment_order_id: listable(required(index(t.bigint()))),
+    amount: label("金额")(listable(required(t.string()))),
+    reason: listable(nullable(t.string())),
+    status: label("状态")(searchable(listable(required(t.string())))),
+    third_refund_no: listable(nullable(t.string())),
     created_at: required(t.timestamp()),
-    updated_at: required(t.timestamp())
+    updated_at: required(t.timestamp()),
   },
 
   hooks: {},
 
-  system: {},
-
-  access: {
-    "superadmin": {"allow":["select","find","add","update","delete"]},
-    "admin": {"allow":["select","find","add","update","delete"]},
-    "user": {"allow":["select","find"],"writable":[],"deny":["add","update","delete"]},
-    "guest": {"allow":["select","find"],"writable":[],"deny":["add","update","delete"]}
+  system: {
+    tenantAware: true,
   },
+
+  access: {},
 });

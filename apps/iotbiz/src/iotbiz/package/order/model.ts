@@ -1,25 +1,27 @@
-import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
+import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
 
 export default defineModel("iotbiz_package_order", {
   columns: {
-    id: index(primary(autoIncrement(t.string()))),
-    tenant_id: required(index(t.string())),
-    user_id: required(t.string()),
-    package_id: required(t.string()),
-    order_no: required(t.string()),
-    quantity: required(t.string()),
-    pay_amount: required(t.decimal()),
-    trade_order_id: nullable(t.string()),
-    payment_order_id: nullable(t.string()),
-    status: required(t.string()),
-    paid_at: nullable(t.timestamp()),
+    id: required(autoIncrement(primary(t.bigint()))),
+    tenant_id: label("租户")(searchable(listable(required(index(t.bigint()))))),
+    user_id: label("用户")(searchable(listable(required(t.bigint())))),
+    package_id: listable(required(t.bigint())),
+    order_no: label("订单号")(searchable(listable(required(index(t.string()))))),
+    quantity: label("数量")(listable(required(t.bigint()))),
+    pay_amount: listable(required(t.string())),
+    trade_order_id: listable(nullable(t.bigint())),
+    payment_order_id: listable(nullable(t.bigint())),
+    status: label("状态")(searchable(listable(required(t.string())))),
+    paid_at: label("支付时间")(listable(nullable(t.timestamp()))),
     created_at: required(t.timestamp()),
     updated_at: required(t.timestamp()),
   },
 
   hooks: {},
 
-  system: {},
+  system: {
+    tenantAware: true,
+  },
 
   access: {},
 });

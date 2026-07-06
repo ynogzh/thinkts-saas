@@ -1,27 +1,24 @@
-import { defineModel, t, autoIncrement, index, primary, required } from "thinkts";
+import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
 
 export default defineModel("promote_coupon_use_record", {
   columns: {
-    id: index(autoIncrement(primary(t.bigint()))),
-    tenant_id: index(required(t.bigint())),
-    user_coupon_id: required(t.bigint()),
-    user_id: required(t.bigint()),
-    biz_type: required(t.string()),
-    biz_id: required(t.bigint()),
-    discount_amount: required(t.decimal()),
-    status: t.string(),
-    used_at: required(t.timestamp()),
-    created_at: required(t.timestamp())
+    id: required(autoIncrement(primary(t.bigint()))),
+    tenant_id: label("租户")(searchable(listable(required(index(t.bigint()))))),
+    user_coupon_id: listable(required(index(t.bigint()))),
+    user_id: label("用户")(searchable(listable(required(t.bigint())))),
+    biz_type: label("业务类型")(listable(required(index(t.string())))),
+    biz_id: label("业务ID")(listable(required(index(t.bigint())))),
+    discount_amount: listable(required(t.string())),
+    status: label("状态")(searchable(listable(required(t.string())))),
+    used_at: listable(required(t.timestamp())),
+    created_at: required(t.timestamp()),
   },
 
   hooks: {},
 
-  system: {},
-
-  access: {
-    "superadmin": {"allow":["select","find","add","update","delete"]},
-    "admin": {"allow":["select","find","add","update","delete"]},
-    "user": {"allow":["select","find"],"writable":[],"deny":["add","update","delete"]},
-    "guest": {"allow":["select","find"],"writable":[],"deny":["add","update","delete"]}
+  system: {
+    tenantAware: true,
   },
+
+  access: {},
 });

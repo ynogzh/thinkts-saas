@@ -1,25 +1,22 @@
-import { defineModel, t, autoIncrement, index, primary, required } from "thinkts";
+import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
 
 export default defineModel("promote_agent_level", {
   columns: {
-    id: index(autoIncrement(primary(t.bigint()))),
-    tenant_id: index(required(t.bigint())),
-    name: required(t.string()),
-    level: required(t.integer()),
-    commission_rate: required(t.decimal()),
-    status: t.string(),
+    id: required(autoIncrement(primary(t.bigint()))),
+    tenant_id: label("租户")(searchable(listable(required(index(t.bigint()))))),
+    name: label("名称")(searchable(listable(required(t.string())))),
+    level: listable(required(index(t.bigint()))),
+    commission_rate: listable(required(t.string())),
+    status: label("状态")(searchable(listable(required(t.string())))),
     created_at: required(t.timestamp()),
-    updated_at: required(t.timestamp())
+    updated_at: required(t.timestamp()),
   },
 
   hooks: {},
 
-  system: {},
-
-  access: {
-    "superadmin": {"allow":["select","find","add","update","delete"]},
-    "admin": {"allow":["select","find","add","update","delete"]},
-    "user": {"allow":["select","find"],"writable":[],"deny":["add","update","delete"]},
-    "guest": {"allow":["select","find"],"writable":[],"deny":["add","update","delete"]}
+  system: {
+    tenantAware: true,
   },
+
+  access: {},
 });

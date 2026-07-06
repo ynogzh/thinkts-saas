@@ -1,24 +1,21 @@
-import { defineModel, t, autoIncrement, index, nullable, primary, required } from "thinkts";
+import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
 
 export default defineModel("promote_coupon_scope", {
   columns: {
-    id: index(autoIncrement(primary(t.bigint()))),
-    tenant_id: index(required(t.bigint())),
-    template_id: required(t.bigint()),
-    scope_type: required(t.string()),
-    scope_value: nullable(t.string()),
-    include_type: t.string(),
-    created_at: required(t.timestamp())
+    id: required(autoIncrement(primary(t.bigint()))),
+    tenant_id: label("租户")(searchable(listable(required(index(t.bigint()))))),
+    template_id: listable(required(index(t.bigint()))),
+    scope_type: listable(required(index(t.string()))),
+    scope_value: listable(nullable(index(t.string()))),
+    include_type: listable(required(t.string())),
+    created_at: required(t.timestamp()),
   },
 
   hooks: {},
 
-  system: {},
-
-  access: {
-    "superadmin": {"allow":["select","find","add","update","delete"]},
-    "admin": {"allow":["select","find","add","update","delete"]},
-    "user": {"allow":["select","find"],"writable":[],"deny":["add","update","delete"]},
-    "guest": {"allow":["select","find"],"writable":[],"deny":["add","update","delete"]}
+  system: {
+    tenantAware: true,
   },
+
+  access: {},
 });

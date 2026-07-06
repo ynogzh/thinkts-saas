@@ -1,22 +1,24 @@
-import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
+import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
 
 export default defineModel("iotbiz_device_category", {
   columns: {
-    id: autoIncrement(t.string()),
-    tenant_id: required(t.string()),
-    code: required(t.string()),
-    name: required(t.string()),
-    description: nullable(t.string()),
-    icon: nullable(t.string()),
-    sort_order: required(t.string()),
-    status: required(t.string()),
+    id: required(autoIncrement(primary(t.bigint()))),
+    tenant_id: label("租户")(searchable(listable(required(index(t.bigint()))))),
+    code: label("编码")(searchable(listable(required(index(t.string()))))),
+    name: label("名称")(searchable(listable(required(t.string())))),
+    description: listable(nullable(t.string())),
+    icon: listable(nullable(t.string())),
+    sort_order: listable(required(t.bigint())),
+    status: label("状态")(searchable(listable(required(index(t.string()))))),
     created_at: required(t.timestamp()),
     updated_at: required(t.timestamp()),
   },
 
   hooks: {},
 
-  system: {},
+  system: {
+    tenantAware: true,
+  },
 
   access: {},
 });

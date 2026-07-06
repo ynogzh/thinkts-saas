@@ -1,27 +1,22 @@
-import { defineModel, t, autoIncrement, index, nullable, primary, required, unique } from "thinkts";
+import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
 
 export default defineModel("platform_tenant", {
   columns: {
-    id: index(autoIncrement(primary(t.bigint()))),
-    name: required(t.string()),
-    code: index(unique(required(t.string()))),
-    status: t.string(),
-    admin_user_id: nullable(t.bigint()),
-    package_id: nullable(t.bigint()),
-    expire_at: nullable(t.timestamp()),
-    config_json: nullable(t.string()),
+    id: required(autoIncrement(primary(t.bigint()))),
+    name: label("名称")(searchable(listable(required(t.string())))),
+    code: label("编码")(searchable(listable(required(index(t.string()))))),
+    status: label("状态")(searchable(listable(required(t.string())))),
+    admin_user_id: listable(nullable(t.bigint())),
+    package_id: listable(nullable(t.bigint())),
+    expire_at: label("到期时间")(listable(nullable(t.timestamp()))),
+    config_json: nullable(t.json()),
     created_at: required(t.timestamp()),
-    updated_at: required(t.timestamp())
+    updated_at: required(t.timestamp()),
   },
 
   hooks: {},
 
   system: {},
 
-  access: {
-    "superadmin": {"allow":["select","find","add","update","delete"]},
-    "admin": {"allow":["select","find","add","update","delete"]},
-    "user": {"allow":["select","find"],"writable":[],"deny":["add","update","delete"]},
-    "guest": {"allow":["select","find"],"writable":[],"deny":["add","update","delete"]}
-  },
+  access: {},
 });

@@ -1,30 +1,27 @@
-import { defineModel, t, autoIncrement, index, nullable, primary, required } from "thinkts";
+import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
 
 export default defineModel("payment_order", {
   columns: {
-    id: index(autoIncrement(primary(t.bigint()))),
-    tenant_id: index(required(t.bigint())),
-    pay_no: required(t.string()),
-    trade_order_id: required(t.bigint()),
-    biz_type: required(t.string()),
-    biz_id: required(t.bigint()),
-    amount: required(t.decimal()),
-    channel_code: required(t.string()),
-    status: t.string(),
-    third_trade_no: nullable(t.string()),
-    paid_at: nullable(t.timestamp()),
+    id: required(autoIncrement(primary(t.bigint()))),
+    tenant_id: label("租户")(searchable(listable(required(index(t.bigint()))))),
+    pay_no: label("支付单号")(searchable(listable(required(index(t.string()))))),
+    trade_order_id: listable(required(index(t.bigint()))),
+    biz_type: label("业务类型")(listable(required(t.string()))),
+    biz_id: label("业务ID")(listable(required(t.bigint()))),
+    amount: label("金额")(listable(required(t.string()))),
+    channel_code: listable(required(t.string())),
+    status: label("状态")(searchable(listable(required(t.string())))),
+    third_trade_no: listable(nullable(t.string())),
+    paid_at: label("支付时间")(listable(nullable(t.timestamp()))),
     created_at: required(t.timestamp()),
-    updated_at: required(t.timestamp())
+    updated_at: required(t.timestamp()),
   },
 
   hooks: {},
 
-  system: {},
-
-  access: {
-    "superadmin": {"allow":["select","find","add","update","delete"]},
-    "admin": {"allow":["select","find","add","update","delete"]},
-    "user": {"allow":["select","find"],"writable":[],"deny":["add","update","delete"]},
-    "guest": {"allow":["select","find","add","update","delete"],"writable":null,"readable":null}
+  system: {
+    tenantAware: true,
   },
+
+  access: {},
 });

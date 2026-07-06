@@ -1,12 +1,12 @@
-import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
+import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
 
 export default defineModel("mall_product", {
   columns: {
-    id: index(primary(autoIncrement(t.string()))),
-    tenant_id: required(index(t.string())),
-    name: required(t.string()),
-    price: required(t.decimal()),
-    status: required(t.string()),
+    id: required(autoIncrement(primary(t.bigint()))),
+    tenant_id: label("租户")(searchable(listable(required(index(t.bigint()))))),
+    name: label("名称")(searchable(listable(required(t.string())))),
+    price: label("单价")(listable(required(t.string()))),
+    status: label("状态")(searchable(listable(required(index(t.string()))))),
     created_at: required(t.timestamp()),
     updated_at: required(t.timestamp()),
     deleted_at: nullable(t.timestamp()),
@@ -14,7 +14,10 @@ export default defineModel("mall_product", {
 
   hooks: {},
 
-  system: {},
+  system: {
+    tenantAware: true,
+    softDelete: true,
+  },
 
   access: {},
 });

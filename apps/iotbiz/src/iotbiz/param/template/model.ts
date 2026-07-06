@@ -1,24 +1,26 @@
-import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
+import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
 
 export default defineModel("iotbiz_param_template", {
   columns: {
-    id: index(primary(autoIncrement(t.string()))),
-    tenant_id: required(index(t.string())),
-    code: required(t.string()),
-    name: required(t.string()),
-    type_id: nullable(t.string()),
-    start_mode: required(t.string()),
-    pricing_json: nullable(t.string()),
-    start_config_json: nullable(t.string()),
-    metadata_json: nullable(t.string()),
-    status: required(t.string()),
+    id: required(autoIncrement(primary(t.bigint()))),
+    tenant_id: label("租户")(searchable(listable(required(index(t.bigint()))))),
+    code: label("编码")(searchable(listable(required(index(t.string()))))),
+    name: label("名称")(searchable(listable(required(t.string())))),
+    type_id: listable(nullable(index(t.bigint()))),
+    start_mode: searchable(listable(required(t.string()))),
+    pricing_json: nullable(t.json()),
+    start_config_json: nullable(t.json()),
+    metadata_json: nullable(t.json()),
+    status: label("状态")(searchable(listable(required(index(t.string()))))),
     created_at: required(t.timestamp()),
     updated_at: required(t.timestamp()),
   },
 
   hooks: {},
 
-  system: {},
+  system: {
+    tenantAware: true,
+  },
 
   access: {},
 });

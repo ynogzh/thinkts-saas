@@ -1,31 +1,28 @@
-import { defineModel, t, autoIncrement, index, nullable, primary, required } from "thinkts";
+import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
 
 export default defineModel("promote_user_coupon", {
   columns: {
-    id: index(autoIncrement(primary(t.bigint()))),
-    tenant_id: index(required(t.bigint())),
-    user_id: required(t.bigint()),
-    template_id: required(t.bigint()),
-    coupon_no: required(t.string()),
-    status: t.string(),
-    received_at: required(t.timestamp()),
-    valid_start_at: required(t.timestamp()),
-    valid_end_at: required(t.timestamp()),
-    locked_biz_type: nullable(t.string()),
-    locked_biz_id: nullable(t.bigint()),
-    used_at: nullable(t.timestamp()),
+    id: required(autoIncrement(primary(t.bigint()))),
+    tenant_id: label("租户")(searchable(listable(required(index(t.bigint()))))),
+    user_id: label("用户")(searchable(listable(required(index(t.bigint()))))),
+    template_id: listable(required(t.bigint())),
+    coupon_no: label("券编号")(listable(required(index(t.string())))),
+    status: label("状态")(searchable(listable(required(index(t.string()))))),
+    received_at: listable(required(t.timestamp())),
+    valid_start_at: listable(required(t.timestamp())),
+    valid_end_at: listable(required(index(t.timestamp()))),
+    locked_biz_type: listable(nullable(t.string())),
+    locked_biz_id: listable(nullable(t.bigint())),
+    used_at: listable(nullable(t.timestamp())),
     created_at: required(t.timestamp()),
-    updated_at: required(t.timestamp())
+    updated_at: required(t.timestamp()),
   },
 
   hooks: {},
 
-  system: {},
-
-  access: {
-    "superadmin": {"allow":["select","find","add","update","delete"]},
-    "admin": {"allow":["select","find","add","update","delete"]},
-    "user": {"allow":["select","find"],"writable":[],"deny":["add","update","delete"]},
-    "guest": {"allow":["select","find"],"writable":[],"deny":["add","update","delete"]}
+  system: {
+    tenantAware: true,
   },
+
+  access: {},
 });

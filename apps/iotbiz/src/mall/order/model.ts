@@ -1,17 +1,17 @@
-import { defineModel, t, primary, autoIncrement, required, nullable, unique, index, defaultTo, comment } from "thinkts";
+import { defineModel, t, label, listable, searchable, primary, autoIncrement, required, nullable, index } from "thinkts";
 
 export default defineModel("mall_order", {
   columns: {
-    id: index(primary(autoIncrement(t.string()))),
-    tenant_id: required(index(t.string())),
-    order_no: required(t.string()),
-    user_id: required(t.string()),
-    amount: required(t.decimal()),
-    status: required(t.string()),
-    owner_user_id: nullable(t.string()),
-    dept_id: nullable(t.string()),
-    agent_id: nullable(t.string()),
-    channel_id: nullable(t.string()),
+    id: required(autoIncrement(primary(t.bigint()))),
+    tenant_id: label("租户")(searchable(listable(required(index(t.bigint()))))),
+    order_no: label("订单号")(searchable(listable(required(index(t.string()))))),
+    user_id: label("用户")(searchable(listable(required(index(t.bigint()))))),
+    amount: label("金额")(listable(required(t.string()))),
+    status: label("状态")(searchable(listable(required(t.string())))),
+    owner_user_id: listable(nullable(t.bigint())),
+    dept_id: label("部门")(listable(nullable(t.bigint()))),
+    agent_id: label("代理")(listable(nullable(index(t.bigint())))),
+    channel_id: label("渠道")(listable(nullable(index(t.bigint())))),
     created_at: required(t.timestamp()),
     updated_at: required(t.timestamp()),
     deleted_at: nullable(t.timestamp()),
@@ -19,7 +19,10 @@ export default defineModel("mall_order", {
 
   hooks: {},
 
-  system: {},
+  system: {
+    tenantAware: true,
+    softDelete: true,
+  },
 
   access: {},
 });
