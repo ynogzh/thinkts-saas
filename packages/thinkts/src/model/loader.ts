@@ -71,6 +71,31 @@ function resolveModelImport(value: ModelDefinition | ModelDSL | Record<string, u
 }
 
 function loadServiceHooks(dir: string): ServiceHooks {
+  // Try service.ts first, then service.js
+  const tsPath = join(dir, "service.ts");
+  const tsMod = tryImport<{ default?: object; [k: string]: unknown }>(tsPath);
+  if (tsMod) {
+    const ctor = tsMod.default ?? tsMod;
+    // Class-based service: wrap each method as a plain hook
+    if (typeof ctor === "function" && "prototype" in ctor && (ctor as { prototype?: unknown }).prototype) {
+      const hooks: ServiceHooks = {};
+      const proto = (ctor as { prototype: Record<string, unknown> }).prototype;
+      for (const key of Object.getOwnPropertyNames(proto)) {
+        if (key === "constructor") continue;
+        const fn = proto[key];
+        if (typeof fn === "function") {
+          hooks[key] = function (this: unknown, ...args: unknown[]) {
+            const ctx = (this as { ctx?: unknown })?.ctx;
+            const instance = new (ctor as new (c?: unknown) => Record<string, unknown>)(ctx);
+            return (fn as (...a: unknown[]) => unknown).apply(instance, args);
+          };
+        }
+      }
+      return hooks;
+    }
+    // Plain exports
+    return tsMod as unknown as ServiceHooks;
+  }
   const jsPath = join(dir, "service.js");
   return tryImport<ServiceHooks>(jsPath) ?? {};
 }
