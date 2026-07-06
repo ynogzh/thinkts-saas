@@ -126,27 +126,31 @@ export function DynamicTable({
       cols.push({
         accessorKey: col.field,
         header: ({ column }) => <DataTableColumnHeader column={column} title={col.title ?? col.field} />,
-        cell: ({ getValue, row }) => renderCellValue(getValue(), col, row.original),
+        cell: ({ getValue, row }) => (
+          <div className='max-w-[180px] truncate'>{renderCellValue(getValue(), col, row.original)}</div>
+        ),
         enableSorting: col.sortable ?? true,
       })
     }
     if (hasActions) {
       cols.push({
         id: 'actions',
-        header: '操作',
+        header: () => <div className='text-right'>操作</div>,
         cell: ({ row }) => (
-          <DropdownMenu modal={false}>
-            <DropdownMenuTrigger asChild>
-              <Button variant='ghost' className='flex h-8 w-8 p-0 data-[state=open]:bg-muted'>
-                <DotsHorizontalIcon className='h-4 w-4' />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end' className='w-32'>
-              {onView && <DropdownMenuItem onClick={() => onView(row.original)}>查看</DropdownMenuItem>}
-              {onEdit && <DropdownMenuItem onClick={() => onEdit(row.original)}>编辑</DropdownMenuItem>}
-              {onDelete && <DropdownMenuItem className='text-destructive' onClick={() => onDelete(row.original)}>删除</DropdownMenuItem>}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className='flex justify-end'>
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button variant='ghost' className='flex h-8 w-8 p-0 data-[state=open]:bg-muted'>
+                  <DotsHorizontalIcon className='h-4 w-4' />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align='end' className='w-32'>
+                {onView && <DropdownMenuItem onClick={() => onView(row.original)}>查看</DropdownMenuItem>}
+                {onEdit && <DropdownMenuItem onClick={() => onEdit(row.original)}>编辑</DropdownMenuItem>}
+                {onDelete && <DropdownMenuItem className='text-destructive' onClick={() => onDelete(row.original)}>删除</DropdownMenuItem>}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         ),
         enableSorting: false,
         enableHiding: false,
@@ -210,16 +214,21 @@ export function DynamicTable({
       <div className='flex items-center justify-between'>
         <span className='text-sm text-muted-foreground'>共 {total} 条记录</span>
       </div>
-      <div className='rounded-md border'>
+      <div className='rounded-md border overflow-x-auto'>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} colSpan={header.colSpan}>
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
+                {headerGroup.headers.map((header) => {
+                  const isSelect = header.column.id === 'select'
+                  const isActions = header.column.id === 'actions'
+                  return (
+                    <TableHead key={header.id} colSpan={header.colSpan}
+                      className={isSelect ? 'sticky left-0 z-10 bg-background' : isActions ? 'sticky right-0 z-10 bg-background' : ''}>
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  )
+                })}
               </TableRow>
             ))}
           </TableHeader>
@@ -233,11 +242,16 @@ export function DynamicTable({
             ) : table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    const isSelect = cell.column.id === 'select'
+                    const isActions = cell.column.id === 'actions'
+                    return (
+                      <TableCell key={cell.id}
+                        className={isSelect ? 'sticky left-0 z-10 bg-background' : isActions ? 'sticky right-0 z-10 bg-background' : ''}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    )
+                  })}
                 </TableRow>
               ))
             ) : (
