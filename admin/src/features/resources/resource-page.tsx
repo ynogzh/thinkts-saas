@@ -170,7 +170,7 @@ export function ResourcePage({ resource }: Props) {
             <SheetTitle>{mode === 'create' ? `新增${config.title}` : mode === 'edit' ? `编辑${config.title}` : `${config.title}详情`}</SheetTitle>
             <SheetDescription>{config.model}</SheetDescription>
           </SheetHeader>
-          <div className='grid gap-3 py-4 md:grid-cols-2'>
+          <div className='space-y-1.5 py-4'>
             {activeFields.map((field) => {
               const isJson = field.type === 'json' || field.field.endsWith('_json')
               const schema = config.jsonSchema?.[field.field]
