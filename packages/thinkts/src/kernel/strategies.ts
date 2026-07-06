@@ -64,6 +64,8 @@ function resolveAclRule(acl: AclConfig, modelName: string, role: string): AclRul
 export class DefaultAuthorizerStrategy implements AuthorizerStrategy {
   async authorize(ctx: KernelContext): Promise<boolean> {
     const acl = (ctx.think.Model.acl as AclConfig | undefined) ?? {};
+    // open/ routes are always public — no ACL check
+    if (ctx.controller?.startsWith("open/")) return true;
     if (Object.keys(acl).length === 0) return true;
     const role = (ctx.user?.role as string) ?? "guest";
     const modelName = ctx.route?.entry.resource ?? ctx.controller ?? "*";
