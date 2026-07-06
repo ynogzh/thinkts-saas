@@ -94,11 +94,9 @@ export function DynamicTable({
 
   const hasActions = !!(onView || onEdit || onDelete)
   const searchFields = config.search?.fields ?? []
-  const facetedFilters = searchFields.map(buildFacetedFilter).filter(Boolean) as NonNullable<ReturnType<typeof buildFacetedFilter>>[]
-  // Pick best text-search field: business identity > anything else
-  const identityFields = ["order_no", "name", "title", "code", "device_no", "merchant_no", "agent_no", "session_no", "username", "phone", "email"];
-  const textFields = searchFields.filter((f) => !f.options?.length);
-  const searchKey = textFields.find((f) => identityFields.includes(f.field))?.field ?? textFields[0]?.field;
+  const facetedFilters = searchFields.filter((f) => f.options?.length).map(buildFacetedFilter).filter(Boolean) as NonNullable<ReturnType<typeof buildFacetedFilter>>[]
+  const textFields = searchFields.filter((f) => !f.options?.length).slice(0, 3)  // max 3 text inputs
+  const searchKey = textFields[0]?.field
 
   const columns: ColumnDef<Record<string, unknown>>[] = useMemo(() => {
     const cols: ColumnDef<Record<string, unknown>>[] = [
@@ -184,10 +182,9 @@ export function DynamicTable({
 
   return (
     <div className='space-y-4'>
-      <DataTableToolbar table={table} searchKey={searchKey} filters={facetedFilters} searchPlaceholder={`筛选 ${searchFields.find((f) => f.field === searchKey)?.label ?? ''}`} />
+      <DataTableToolbar table={table} textFields={textFields} searchKey={searchKey} filters={facetedFilters} searchPlaceholder="筛选" />
       <div className='flex items-center justify-between'>
         <span className='text-sm text-muted-foreground'>共 {total} 条记录</span>
-        <DataTableViewOptions table={table} />
       </div>
       <div className='rounded-md border'>
         <Table>

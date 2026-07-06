@@ -4,11 +4,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DataTableFacetedFilter } from './faceted-filter'
 import { DataTableViewOptions } from './view-options'
+import type { SearchFieldMeta } from '@/lib/admin-api'
 
 type DataTableToolbarProps<TData> = {
   table: Table<TData>
   searchPlaceholder?: string
   searchKey?: string
+  textFields?: SearchFieldMeta[]
   filters?: {
     columnId: string
     title: string
@@ -24,6 +26,7 @@ export function DataTableToolbar<TData>({
   table,
   searchPlaceholder = 'Filter...',
   searchKey,
+  textFields = [],
   filters = [],
 }: DataTableToolbarProps<TData>) {
   const isFiltered =
@@ -31,8 +34,23 @@ export function DataTableToolbar<TData>({
 
   return (
     <div className='flex items-center justify-between'>
-      <div className='flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-2'>
-        {searchKey ? (
+      <div className='flex flex-1 flex-wrap items-center gap-2'>
+        {/* Multiple text inputs for all searchable text fields */}
+        {textFields.map((tf) => (
+          <Input
+            key={tf.field}
+            placeholder={`筛选 ${tf.label}`}
+            value={
+              (table.getColumn(tf.field)?.getFilterValue() as string) ?? ''
+            }
+            onChange={(event) =>
+              table.getColumn(tf.field)?.setFilterValue(event.target.value)
+            }
+            className='h-8 w-32 lg:w-40'
+          />
+        ))}
+        {/* Primary search with searchKey */}
+        {!textFields.length && searchKey ? (
           <Input
             placeholder={searchPlaceholder}
             value={
@@ -43,28 +61,27 @@ export function DataTableToolbar<TData>({
             }
             className='h-8 w-37.5 lg:w-62.5'
           />
-        ) : (
+        ) : !textFields.length ? (
           <Input
             placeholder={searchPlaceholder}
             value={table.getState().globalFilter ?? ''}
             onChange={(event) => table.setGlobalFilter(event.target.value)}
             className='h-8 w-37.5 lg:w-62.5'
           />
-        )}
-        <div className='flex gap-x-2'>
-          {filters.map((filter) => {
-            const column = table.getColumn(filter.columnId)
-            if (!column) return null
-            return (
-              <DataTableFacetedFilter
-                key={filter.columnId}
-                column={column}
-                title={filter.title}
-                options={filter.options}
-              />
-            )
-          })}
-        </div>
+        ) : null}
+        {/* Faceted filters */}
+        {filters.map((filter) => {
+          const column = table.getColumn(filter.columnId)
+          if (!column) return null
+          return (
+            <DataTableFacetedFilter
+              key={filter.columnId}
+              column={column}
+              title={filter.title}
+              options={filter.options}
+            />
+          )
+        })}
         {isFiltered && (
           <Button
             variant='ghost'
