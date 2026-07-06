@@ -69,10 +69,6 @@ function resourceIcon(key: string): string {
   return RESOURCE_CATALOG[name]?.icon ?? 'Table'
 }
 
-function resourceIcon(key: string): string {
-  const name = key.replace(/^\/resources\//, '')
-  return RESOURCE_CATALOG[name]?.icon ?? 'Table'
-}
 
 function menuNodesToNavGroups(menus: MenuNode[]) {
   return menus.map((node) => {
