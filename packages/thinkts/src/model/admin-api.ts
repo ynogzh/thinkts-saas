@@ -42,6 +42,7 @@ export interface FormFieldMeta {
   label: string;
   type?: string;
   required?: boolean;
+  maxLength?: number;
   options?: Array<{ label: string; value: unknown }>;
 }
 

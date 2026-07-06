@@ -21,11 +21,15 @@ export function ResourceFormField({
 }: Props) {
   const placeholder = field.placeholder ?? `请输入${field.label}`
   const readOnly = field.readonly ?? false
+  const isRequired = field.required ?? false
+  const isEmpty = isRequired && !value.trim()
 
   return (
     <div className='grid grid-cols-6 items-center gap-x-4 gap-y-1'>
-      <Label className='col-span-2 text-end'>{field.label}</Label>
-
+      <Label className='col-span-2 text-end'>
+        {isRequired && <span className='text-destructive mr-0.5'>*</span>}
+        {field.label}
+      </Label>
       {mode === 'view' ? (
         <div className='col-span-4 min-h-9 rounded-md border bg-muted/50 px-3 py-1.5 text-sm'>{value || '—'}</div>
       ) : field.type === 'textarea' || field.type === 'json' ? (
