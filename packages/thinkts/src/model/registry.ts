@@ -216,9 +216,6 @@ export interface DslServiceEntry {
 }
 
 export interface DslApiEntry {
-}
-
-export interface DslApiEntry {
   name: string;
   path: string;
   routes: ApiRouteDSL[];

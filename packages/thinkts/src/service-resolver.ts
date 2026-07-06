@@ -22,7 +22,7 @@ export class ServiceResolver {
 
     const parts = name.split(".");
     if (parts.length >= 2) {
-      const result = this.tryDsl(dslServices, parts, opts, serviceCtx)
+      const result = this.tryModel(dslServices, parts, opts, serviceCtx)
         ?? this.tryClass(services, parts, opts, serviceCtx);
       if (result !== undefined) return result;
     }
@@ -30,8 +30,8 @@ export class ServiceResolver {
     return this.tryLookup(services, name, opts ?? {}, args, serviceCtx);
   }
 
-  /** DSL service hooks: `model_name.method` mapped through dslServices registry. */
-  private tryDsl(
+  /** Model-associated services: `model_name.method` from dslServices registry. */
+  private tryModel(
     dsl: Record<string, DslServiceEntry>,
     parts: string[],
     opts: Record<string, unknown> | undefined,
