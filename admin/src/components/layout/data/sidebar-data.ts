@@ -1,5 +1,5 @@
 import {
-  AudioWaveform, Building2, Command, GalleryVerticalEnd,
+  Building2, Command,
   LayoutDashboard, ListTodo, MessagesSquare, Package,
   Settings, ShieldCheck, Users,
 } from 'lucide-react'

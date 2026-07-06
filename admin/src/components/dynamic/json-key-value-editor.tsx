@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label'
 interface JsonFieldDef {
   key: string
   label: string
-  type: 'string' | 'number' | 'boolean' | 'object'
+  type: string
   default?: unknown
 }
 

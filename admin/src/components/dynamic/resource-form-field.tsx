@@ -22,7 +22,6 @@ export function ResourceFormField({
   const placeholder = field.placeholder ?? `请输入${field.label}`
   const readOnly = field.readonly ?? false
   const isRequired = field.required ?? false
-  const isEmpty = isRequired && !value.trim()
 
   return (
     <div className='grid grid-cols-6 items-center gap-x-4 gap-y-1'>
@@ -53,7 +52,7 @@ export function ResourceFormField({
       ) : field.type === 'file' || field.type === 'image' ? (
         <div className='col-span-4 space-y-1.5'>
           <Input value={value} onChange={(e) => onChange(field.field, e.target.value)} readOnly={readOnly} placeholder={placeholder} />
-          {mode !== 'view' && onUpload && (
+          {onUpload && (
             <Input type='file' accept={field.accept ?? (field.type === 'image' ? 'image/*' : undefined)} disabled={pending || readOnly}
               onChange={async (e) => { const file = e.target.files?.[0]; if (!file) return; await onUpload(field, file); e.currentTarget.value = '' }} />
           )}

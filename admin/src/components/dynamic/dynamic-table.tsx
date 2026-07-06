@@ -12,7 +12,6 @@ import {
 import { DataTableColumnHeader } from '@/components/data-table/column-header'
 import { DataTablePagination } from '@/components/data-table/pagination'
 import { DataTableToolbar } from '@/components/data-table/toolbar'
-import { DataTableViewOptions } from '@/components/data-table/view-options'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
@@ -28,8 +27,6 @@ export interface DynamicTableProps {
   total?: number
   page: number
   pageSize: number
-  onPageChange: (page: number) => void
-  onPageSizeChange: (size: number) => void
   onSortChange?: (field: string, direction: 'asc' | 'desc') => void
   onFilterChange?: (filters: Record<string, string>) => void
   onView?: (row: Record<string, unknown>) => void
@@ -92,7 +89,7 @@ function buildFacetedFilter(f: SearchFieldMeta) {
 
 export function DynamicTable({
   config, data, loading, total = 0,
-  page, pageSize, onPageChange, onPageSizeChange,
+  page, pageSize, 
   onSortChange, onFilterChange, onView, onEdit, onDelete, onAction,
   rowKey = (row) => String(row.id ?? row.code ?? ''),
 }: DynamicTableProps) {

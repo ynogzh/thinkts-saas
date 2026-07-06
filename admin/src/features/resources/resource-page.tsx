@@ -19,7 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import {
   type TableConfig, type FormFieldMeta,
   fetchTableConfig, fetchList,
-  createRecord, updateRecord, deleteRecord, batchDeleteRecords,
+  createRecord, updateRecord, deleteRecord,
   fetchOptions, uploadFile, type OptionItem,
 } from '@/lib/admin-api'
 import {
@@ -87,10 +87,6 @@ export function ResourcePage({ resource }: Props) {
     if (!window.confirm(`确认删除 #${id} ?`)) return
     deleteMutation.mutate(id)
   }
-  function handleBatchDelete(ids: string[]) {
-    if (!ids.length || !window.confirm(`确认批量删除 ${ids.length} 条记录？`)) return
-    startTransition(async () => { try { setError(null); await batchDeleteRecords(resource, ids); await refresh() } catch (e) { setError(e instanceof Error ? e.message : '批量删除失败') } })
-  }
 
   function updateField(field: string, value: string) { setFormValues((c) => ({ ...c, [field]: value })) }
   async function handleFileUpload(field: FormFieldMeta, file: File) {
@@ -110,7 +106,7 @@ export function ResourcePage({ resource }: Props) {
     const pendingFields = activeFields.filter((f) => f.optionsSource && !(f.field in fieldOptions))
     if (!pendingFields.length) return; let c = false
     void Promise.all(pendingFields.map(async (f) => { if (!f.optionsSource) return null; const o = await fetchOptions(f.optionsSource.model, f.optionsSource.labelField, f.optionsSource.valueField); return [f.field, o] as const }))
-      .then((e) => { if (!c) setFieldOptions((cur) => ({ ...cur, ...Object.fromEntries(e.filter(Boolean)) })) })
+      .then((e) => { if (!c) setFieldOptions((cur) => ({ ...cur, ...Object.fromEntries((e.filter(Boolean) as [string, OptionItem[]][])) })) })
     return () => { c = true }
   }, [activeFields, fieldOptions, mode, config])
 
@@ -155,8 +151,6 @@ export function ResourcePage({ resource }: Props) {
           total={total}
           page={pageState.page}
           pageSize={pageState.pageSize}
-          onPageChange={(p) => startTransition(async () => { setPageState((ps) => ({ ...ps, page: p })); await queryClient.invalidateQueries({ queryKey: ['list', resource] }) })}
-          onPageSizeChange={(s) => startTransition(async () => { setPageState({ page: 1, pageSize: s }); await queryClient.invalidateQueries({ queryKey: ['list', resource] }) })}
           onFilterChange={(f) => { setFilters(f); startTransition(async () => { setPageState((p) => ({ ...p, page: 1 })); await queryClient.invalidateQueries({ queryKey: ['list', resource] }) }) }}
           onView={(row) => openDialog('view', row)}
           onEdit={(row) => openDialog('edit', row)}

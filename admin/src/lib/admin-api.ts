@@ -137,7 +137,7 @@ export async function fetchList(
     if (value != null && value !== '') searchParams.set(key, String(value))
   }
   const qs = searchParams.toString()
-  const data = await request<{ list: { items: unknown[]; total: number; currentPage: number; pageSize: number } }>(
+  const data = await request<{ list: { items: unknown[]; total: number; currentPage: number; pageSize: number; page?: number } }>(
     `${API_BASE}/admin/api/tables/${encodeURIComponent(model)}/data${qs ? `?${qs}` : ''}`,
   )
   return {
