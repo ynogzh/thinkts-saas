@@ -95,7 +95,10 @@ export function DynamicTable({
   const hasActions = !!(onView || onEdit || onDelete)
   const searchFields = config.search?.fields ?? []
   const facetedFilters = searchFields.map(buildFacetedFilter).filter(Boolean) as NonNullable<ReturnType<typeof buildFacetedFilter>>[]
-  const searchKey = searchFields.find((f) => !f.options?.length)?.field
+  // Pick best text-search field: business identity > anything else
+  const identityFields = ["order_no", "name", "title", "code", "device_no", "merchant_no", "agent_no", "session_no", "username", "phone", "email"];
+  const textFields = searchFields.filter((f) => !f.options?.length);
+  const searchKey = textFields.find((f) => identityFields.includes(f.field))?.field ?? textFields[0]?.field;
 
   const columns: ColumnDef<Record<string, unknown>>[] = useMemo(() => {
     const cols: ColumnDef<Record<string, unknown>>[] = [
