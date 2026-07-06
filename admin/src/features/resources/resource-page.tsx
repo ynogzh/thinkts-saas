@@ -13,7 +13,7 @@ import { ResourceFormField } from '@/components/dynamic/resource-form-field'
 import { JsonKeyValueEditor } from '@/components/dynamic/json-key-value-editor'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   type TableConfig, type FormFieldMeta,
@@ -164,29 +164,35 @@ export function ResourcePage({ resource }: Props) {
         />
       </Main>
 
-      <Sheet open={Boolean(mode)} onOpenChange={(open) => (open ? undefined : closeDialog())}>
-        <SheetContent side='right' className='w-full sm:max-w-lg lg:max-w-2xl overflow-y-auto'>
-          <SheetHeader>
-            <SheetTitle>{mode === 'create' ? `新增${config.title}` : mode === 'edit' ? `编辑${config.title}` : `${config.title}详情`}</SheetTitle>
-            <SheetDescription>{config.model}</SheetDescription>
-          </SheetHeader>
-          <div className='space-y-1.5 py-4'>
-            {activeFields.map((field) => {
-              const isJson = field.type === 'json' || field.field.endsWith('_json')
-              const schema = config.jsonSchema?.[field.field]
-              if (isJson && schema && mode !== 'view') {
-                return <div key={field.field} className='md:col-span-2'><JsonKeyValueEditor schema={schema} value={formValues[field.field] ?? ''} onChange={(v) => updateField(field.field, v)} /></div>
-              }
-              return <ResourceFormField key={field.field} field={field} mode={mode ?? 'view'} value={formValues[field.field] ?? ''} options={fieldOptions[field.field]} loadingOptions={!!(field.optionsSource && !(field.field in fieldOptions))} pending={pending} onChange={updateField} onUpload={handleFileUpload} />
-            })}
+      <Dialog open={Boolean(mode)} onOpenChange={(open) => (open ? undefined : closeDialog())}>
+        <DialogContent className='sm:max-w-lg'>
+          <DialogHeader className='text-start'>
+            <DialogTitle>{mode === 'create' ? `新增${config.title}` : mode === 'edit' ? `编辑${config.title}` : `${config.title}详情`}</DialogTitle>
+            <DialogDescription>
+              {mode === 'create' ? '创建新记录。' : mode === 'edit' ? '修改记录信息。' : '查看记录详情。'}
+            </DialogDescription>
+          <div className='max-h-96 overflow-y-auto'>
+            <div className='space-y-4 px-0.5'>
+              {activeFields.map((field) => {
+                const isJson = field.type === 'json' || field.field.endsWith('_json')
+                const schema = config.jsonSchema?.[field.field]
+                if (isJson && schema && mode !== 'view') {
+                  return <div key={field.field} className='grid grid-cols-6 items-start gap-x-4 gap-y-1'>
+                    <span className='col-span-2 text-end text-sm text-muted-foreground pt-1'>{field.label}</span>
+                    <div className='col-span-4'><JsonKeyValueEditor schema={schema} value={formValues[field.field] ?? ''} onChange={(v) => updateField(field.field, v)} /></div>
+                  </div>
+                }
+                return <ResourceFormField key={field.field} field={field} mode={mode ?? 'view'} value={formValues[field.field] ?? ''} options={fieldOptions[field.field]} loadingOptions={!!(field.optionsSource && !(field.field in fieldOptions))} pending={pending} onChange={updateField} onUpload={handleFileUpload} />
+              })}
+            </div>
           </div>
           {error && <Alert variant='destructive'><AlertDescription>{error}</AlertDescription></Alert>}
-          <SheetFooter className='flex-row gap-2'>
+          <DialogFooter className='flex-row gap-2'>
             <Button variant='outline' size='sm' onClick={closeDialog}>关闭</Button>
             {mode !== 'view' && <Button size='sm' onClick={handleSubmit} disabled={pending || createMutation.isPending || updateMutation.isPending}>{(pending || createMutation.isPending || updateMutation.isPending) ? <Loader2 className='mr-1 size-3 animate-spin' /> : null}保存</Button>}
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
