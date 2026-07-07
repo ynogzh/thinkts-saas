@@ -1,5 +1,5 @@
 import { describe, it, expect } from "bun:test";
-import { parseModelRoute } from "./dsl";
+import { parseModelRoute } from "./framework-routes";
 
 describe("parseModelRoute", () => {
   it("splits single underscore into nested module and resource", () => {

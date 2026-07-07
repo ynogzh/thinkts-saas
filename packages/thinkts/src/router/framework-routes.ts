@@ -1,6 +1,5 @@
 import type { ThinkContext } from "../types";
 import type { DslAppData, DslModelEntry, DslServiceEntry } from "../model/registry";
-import { createAdminApiHandlers } from "../model/admin-api";
 import { BaseService, bindServiceContext } from "../service";
 import type { RouteTable } from "./table";
 import { executeDslAction } from "../model/executor";
@@ -32,6 +31,7 @@ function createDslActionHandler(
   action: string,
   entry: DslModelEntry,
   service?: DslServiceEntry,
+  dslData?: DslAppData,
 ): (ctx: ThinkContext) => Promise<unknown> {
   return async (ctx: ThinkContext) => {
     const { module, resource } = parseModelRoute(entry.name);
@@ -62,23 +62,23 @@ function createDslActionHandler(
       opts = { ...(ctx.body as Record<string, unknown> ?? {}), ...(ctx.params ?? {}) };
     }
 
-    return executeDslAction({ ctx, modelEntry: entry, serviceEntry: service, action, opts });
+    return executeDslAction({ ctx, modelEntry: entry, serviceEntry: service, action, opts, dslData });
   };
 }
 
-export function registerDslModelRoutes(table: RouteTable, dslData: DslAppData): void {
+export function registerFrameworkModelRoutes(table: RouteTable, dslData: DslAppData): void {
   for (const [name, entry] of Object.entries(dslData.models)) {
     const service = dslData.services[name];
     const { path } = parseModelRoute(name);
     const tableEntry = dslData.tables[name];
 
-    const listHandler = createDslActionHandler("list", entry, service);
-    const createHandler = createDslActionHandler("create", entry, service);
-    const getHandler = createDslActionHandler("get", entry, service);
-    const updateHandler = createDslActionHandler("update", entry, service);
-    const deleteHandler = createDslActionHandler("delete", entry, service);
-    const pageHandler = createDslActionHandler("page", entry, service);
-    const searchHandler = createDslActionHandler("search", entry, service);
+    const listHandler = createDslActionHandler("list", entry, service, dslData);
+    const createHandler = createDslActionHandler("create", entry, service, dslData);
+    const getHandler = createDslActionHandler("get", entry, service, dslData);
+    const updateHandler = createDslActionHandler("update", entry, service, dslData);
+    const deleteHandler = createDslActionHandler("delete", entry, service, dslData);
+    const pageHandler = createDslActionHandler("page", entry, service, dslData);
+    const searchHandler = createDslActionHandler("search", entry, service, dslData);
 
     const routeMeta = parseModelRoute(name);
 
@@ -102,6 +102,11 @@ export function registerDslModelRoutes(table: RouteTable, dslData: DslAppData): 
     table.exact.set(`${path}/create`, createEntry);
     table.exact.set(`${path}/page`, pageEntry);
     table.exact.set(`${path}/search`, searchEntry);
+
+    const configEntry = staticEntry("config", createDslActionHandler("config", entry, service, dslData));
+    table.exact.set(`${path}/config`, configEntry);
+
+    table.exact.set(`${path}/export`, staticEntry("export", createDslActionHandler("export", entry, service, dslData)));
 
     if (tableEntry) {
       const tableRouteEntry = {
@@ -165,7 +170,7 @@ function dslApiPathToRegex(path: string): RegExp {
   return new RegExp(`^${pattern}$`);
 }
 
-export function registerDslApiRoutes(
+export function registerFrameworkApiRoutes(
   table: RouteTable, dslData: DslAppData, services: Record<string, unknown>,
 ): void {
   for (const entry of Object.values(dslData.apis)) {
@@ -210,84 +215,6 @@ export function registerDslApiRoutes(
   }
 }
 
-export function registerDslAdminRoutes(table: RouteTable, dslData: DslAppData): void {
-  const admin = createAdminApiHandlers(dslData);
-
-  // Exact match routes (no params)
-  const exacts: Array<{ path: string; handler: (ctx: ThinkContext) => Promise<unknown> }> = [
-    { path: "/admin/api/menus", handler: async (ctx: ThinkContext) => admin.menusAction(ctx) },
-    { path: "/admin/api/tables", handler: async () => admin.tablesAction() },
-  ];
-  for (const { path, handler } of exacts) {
-    table.exact.set(path, { match: path, type: "dsl-admin", module: "admin", controller: path, action: "list", handler });
-  }
-
-  // Parameterized routes (radix tree)
-  const params: Array<{ path: string; handler: (ctx: ThinkContext) => Promise<unknown> }> = [
-    {
-      path: "/admin/api/tables/:model",
-      handler: async (ctx: ThinkContext) => admin.tableConfigAction(ctx.params?.model ?? ""),
-    },
-    {
-      path: "/admin/api/tables/:model/data",
-      handler: async (ctx: ThinkContext) => admin.listAction(ctx, ctx.params?.model ?? ""),
-    },
-    {
-      path: "/admin/api/forms/:model",
-      handler: async (ctx: ThinkContext) => admin.formConfigAction(ctx.params?.model ?? ""),
-    },
-    {
-      path: "/admin/api/forms/:model/:id",
-      handler: async (ctx: ThinkContext) => admin.getRecordAction(ctx, ctx.params?.model ?? "", ctx.params?.id ?? ""),
-    },
-    {
-      path: "/admin/api/actions/:model/create",
-      handler: async (ctx: ThinkContext) => admin.createAction(ctx, ctx.params?.model ?? ""),
-    },
-    {
-      path: "/admin/api/actions/:model/:id",
-      handler: async (ctx: ThinkContext) => admin.updateAction(ctx, ctx.params?.model ?? "", ctx.params?.id ?? ""),
-    },
-    {
-      path: "/admin/api/actions/:model/:id/delete",
-      handler: async (ctx: ThinkContext) => admin.deleteAction(ctx, ctx.params?.model ?? "", ctx.params?.id ?? ""),
-    },
-    {
-      path: "/admin/api/batch-lookup",
-      handler: async (ctx: ThinkContext) => admin.batchLookupAction(ctx),
-    },
-    {
-      path: "/admin/api/entity",
-      handler: async (ctx: ThinkContext) => {
-        const url = new URL(ctx.request.url);
-        const model = url.searchParams.get("model") ?? "";
-        const id = url.searchParams.get("id") ?? "";
-        return admin.entityDetailAction(ctx, model, id);
-      },
-    },
-    {
-      path: "/admin/api/entity/list",
-      handler: async (ctx: ThinkContext) => admin.entityListAction(ctx),
-    },
-    {
-      path: "/admin/api/tables/:model/export",
-      handler: async (ctx: ThinkContext) => {
-        const result = await admin.exportCsvAction(ctx, ctx.params?.model ?? "");
-        return {
-          body: result.csv,
-          headers: {
-            "Content-Type": "text/csv; charset=utf-8",
-            "Content-Disposition": `attachment; filename="${result.filename}"`,
-          },
-        };
-      },
-    },
-  ];
-  for (const { path, handler } of params) {
-    table.radix.insert(path, { match: path, type: "dsl-admin", module: "admin", controller: path, action: "data", handler });
-  }
-}
-
-export function hasDslModels(dslData?: DslAppData): boolean {
+export function hasFrameworkModels(dslData?: DslAppData): boolean {
   return !!dslData && Object.keys(dslData.models).length > 0;
 }

@@ -3,7 +3,7 @@ import type { DslAppData } from "./model/registry";
 import { toKebabCase, toPascalCase } from "../utils";
 import { createHandler, normalizePath, type ParsedRoute, type RouteEntry } from "./handler";
 import { createResourceHandler } from "./resource";
-import { registerDslModelRoutes, registerDslApiRoutes, registerDslAdminRoutes } from "./dsl";
+import { registerFrameworkModelRoutes, registerFrameworkApiRoutes } from "./framework-routes";
 import { RadixTree } from "./radix";
 
 export interface RouteTable {
@@ -32,7 +32,6 @@ export function parseRouterRules(rules: unknown[]): RouterRule[] {
 }
 
 function addToRadix(path: string, entry: RouteEntry, radix: RadixTree): void {
-  // Only add structured paths (not wildcards or regex) to radix tree
   if (path.includes("*") || path.startsWith("^") || path.endsWith("$")) return;
   radix.insert(path, entry);
 }
@@ -49,11 +48,9 @@ export function buildRouteTable(
   const defaultAction = config.defaultAction ?? "index";
 
   if (dslData) {
-    registerDslModelRoutes(table, dslData);
-    registerDslApiRoutes(table, dslData, services);
-    registerDslAdminRoutes(table, dslData);
+    registerFrameworkModelRoutes(table, dslData);
+    registerFrameworkApiRoutes(table, dslData, services);
   }
-  // Register custom routes first
   if (customRules) {
     for (const rule of customRules) {
       if (rule.type === "redirect") {
@@ -107,7 +104,6 @@ export function buildRouteTable(
     }
   }
 
-  // Register Service routes first
   for (const [servicePascal, ServiceClass] of Object.entries(services)) {
     if (typeof ServiceClass !== "function") continue;
     const hasSlash = servicePascal.includes("/");
@@ -152,7 +148,6 @@ export function buildRouteTable(
       table.patterns.push({ ...entry, match: path + "/*" });
     }
   }
-  // Register Controller routes (overrides Service)
   for (const [controllerPascal, ControllerClass] of Object.entries(controllers)) {
     if (typeof ControllerClass !== "function") continue;
     const hasSlash = controllerPascal.includes("/");
@@ -212,15 +207,12 @@ export interface RouteMatch {
 export function matchRoute(table: RouteTable, pathname: string): RouteMatch | undefined {
   const normalized = normalizePath(pathname);
 
-  // 1. Exact match — O(1)
   const exact = table.exact.get(normalized);
   if (exact) return { entry: exact };
 
-  // 2. Radix tree — O(k) where k = number of URL segments
   const radixMatch = table.radix.match(normalized);
   if (radixMatch) return radixMatch;
 
-  // 3. Linear fallback for wildcard/regex patterns — O(n)
   for (const entry of table.patterns) {
     if (typeof entry.match === "string") {
       if (entry.match.endsWith("*")) {

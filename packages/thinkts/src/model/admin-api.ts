@@ -542,7 +542,7 @@ function searchFieldOptions(field: string, col: ColumnDSL): SearchFieldMeta["opt
   return inferred[field];
 }
 
-function buildTableConfig(entry: DslTableEntry, modelEntry: DslModelEntry, models: Record<string, DslModelEntry>): TableConfig {
+export function buildTableConfig(entry: DslTableEntry, modelEntry: DslModelEntry, models: Record<string, DslModelEntry>): TableConfig {
   const { table } = entry;
   const rawColumns = table.list?.columns ?? modelEntry.dsl.columns.map((c) => ({
     field: c.name,
@@ -640,7 +640,6 @@ export interface AdminHandlers {
   batchLookupAction(ctx: ThinkContext): Promise<Record<string, Record<string, string>>>;
   entityDetailAction(ctx: ThinkContext, model: string, id: string): Promise<{ data: Record<string, unknown> | null }>;
   entityListAction(ctx: ThinkContext): Promise<{ data: Record<string, unknown>[] }>;
-  exportCsvAction(ctx: ThinkContext, model: string): Promise<Record<string, unknown>>;
 }
 
 export function createAdminApiHandlers(dslData: DslAppData): AdminHandlers {
@@ -855,39 +854,6 @@ export function createAdminApiHandlers(dslData: DslAppData): AdminHandlers {
     return { data: record };
   }
 
-  async function exportCsvAction(ctx: ThinkContext, model: string): Promise<{ csv: string; filename: string }> {
-    const modelEntry = findModel(model);
-    if (!modelEntry) throw new Error(`Model not found: ${model}`);
-    const tableEntry = findTable(model);
-    const columns = tableEntry?.table.list?.columns ?? modelEntry.dsl.columns.map((c) => ({ field: c.name, title: c.label ?? c.name }));
-
-    const url = new URL(ctx.request.url);
-    const where: Record<string, unknown> = {};
-    if (tableEntry?.table.search?.fields) {
-      for (const sf of tableEntry.table.search.fields) {
-        const val = url.searchParams.get(sf.field);
-        if (val) where[sf.field] = val;
-      }
-    }
-
-    const m = ctx.think.model(modelEntry.name, { _aclCtx: ctx });
-    const rows = await m.where(where).select() as Record<string, unknown>[];
-
-    const header = columns.map((c) => {
-      const col = modelEntry.dsl.columns.find((dc) => dc.name === c.field);
-      return col?.label ?? c.field;
-    });
-    const csvRows = [header.join(",")];
-    for (const row of rows) {
-      csvRows.push(columns.map((c) => {
-        const val = row[c.field];
-        if (val == null) return "";
-        const s = String(val).replace(/"/g, '""');
-        return s.includes(",") || s.includes('"') ? `"${s}"` : s;
-      }).join(","));
-    }
-    return { csv: csvRows.join("\n"), filename: `${model}.csv` };
-  }
 
   return {
     menusAction,
@@ -902,7 +868,6 @@ export function createAdminApiHandlers(dslData: DslAppData): AdminHandlers {
     batchLookupAction,
     entityDetailAction,
     entityListAction,
-    exportCsvAction,
   };
 }
 

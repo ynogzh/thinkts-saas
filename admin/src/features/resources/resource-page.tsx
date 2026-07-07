@@ -102,7 +102,9 @@ export function ResourcePage({ resource }: Props) {
     if (!config) return
     const params = new URLSearchParams()
     for (const [k, v] of Object.entries(filters)) { if (v) params.set(k, v) }
-    window.open(`/admin/api/tables/${encodeURIComponent(resource)}/export?${params.toString()}`, '_blank')
+    const parts = resource.split('_')
+    const path = parts.length === 1 ? `/${parts[0]}` : `/${parts[0]}/${parts.slice(1).join('/')}`
+    window.open(`${path}/export?${params.toString()}`, '_blank')
   }
 
   useEffect(() => {
