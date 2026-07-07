@@ -122,7 +122,11 @@ export function toDslConfig<T extends Cols>(model: ModelDefinition<T>): Record<s
           title: "基本信息",
           fields: Object.entries(model.columns)
             .filter(([name]) => !["id", "created_at", "updated_at", "deleted_at"].includes(name))
-            .map(([name, c]) => ({ field: name, title: c.label ?? name, required: c.required, type: c._sqlType })),
+            .map(([name, c]) => {
+              const f: Record<string, unknown> = { field: name, title: c.label ?? name, required: c.required, type: c._sqlType };
+              if (c.validation) f.validation = c.validation;
+              return f;
+            }),
         }],
       },
     },

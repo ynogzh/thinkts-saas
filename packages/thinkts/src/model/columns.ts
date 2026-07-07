@@ -11,6 +11,14 @@ export interface JsonFieldSchema {
   default?: unknown
 }
 
+export interface ValidationRules {
+  maxLength?: number
+  pattern?: string
+  message?: string
+  min?: number
+  max?: number
+}
+
 export interface ColumnInit {
   columnName?: string
   length?: number
@@ -31,6 +39,8 @@ export interface ColumnInit {
   enumValues?: readonly string[]
   /** JSON key schema for interactive editor — only meaningful on `t.json()`. */
   jsonSchema?: JsonFieldSchema[]
+  /** Validation rules passed to frontend form. */
+  validation?: ValidationRules
 }
 
 export interface ColumnDefinition<T = unknown> {
@@ -55,6 +65,8 @@ export interface ColumnDefinition<T = unknown> {
   readonly filterable: boolean
   /** JSON column key schema — describes structure for interactive editor. */
   readonly jsonSchema?: JsonFieldSchema[]
+  /** Validation rules for frontend form. */
+  readonly validation?: ValidationRules
 }
 
 function col<T>(sqlType: string, init?: ColumnInit): ColumnDefinition<T> {

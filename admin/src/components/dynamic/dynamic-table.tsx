@@ -14,6 +14,7 @@ import { DataTablePagination } from '@/components/data-table/pagination'
 import { DataTableToolbar } from '@/components/data-table/toolbar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -35,6 +36,8 @@ export interface DynamicTableProps {
   onEdit?: (row: Record<string, unknown>) => void
   onDelete?: (row: Record<string, unknown>) => void
   onAction?: (service: string) => void
+  onInlineEdit?: (row: Record<string, unknown>, field: string, value: string) => void
+  onBatchAction?: (service: string, selectedIds: string[]) => void
   rowKey?: (row: Record<string, unknown>) => string
 }
 
@@ -76,6 +79,35 @@ function renderCellValue(val: unknown, col: ColumnMeta, row?: Record<string, unk
   return <span>{String(val)}</span>
 }
 
+function InlineEditCell({ value, field, row, onSave }: {
+  value: string | number | null
+  field: string
+  row: Record<string, unknown>
+  onSave?: (row: Record<string, unknown>, field: string, value: string) => void
+}) {
+  const [editing, setEditing] = useState(false)
+  const [editValue, setEditValue] = useState(String(value ?? ''))
+
+  if (!onSave || editing === false) {
+    return (
+      <span onDoubleClick={() => { setEditing(true); setEditValue(String(value ?? '')) }} className='cursor-pointer hover:bg-muted/50 rounded px-1 -mx-1'>
+        {String(value ?? '')}
+      </span>
+    )
+  }
+
+  return (
+    <Input
+      value={editValue}
+      onChange={(e) => setEditValue(e.target.value)}
+      onBlur={() => { setEditing(false); if (editValue !== String(value ?? '')) onSave(row, field, editValue) }}
+      onKeyDown={(e) => { if (e.key === 'Enter') { setEditing(false); if (editValue !== String(value ?? '')) onSave(row, field, editValue) } if (e.key === 'Escape') setEditing(false) }}
+      className='h-7 text-sm'
+      autoFocus
+    />
+  )
+}
+
 interface FacetedFilterDef {
   columnId: string
   title: string
@@ -93,11 +125,10 @@ function buildFacetedFilter(f: SearchFieldMeta): FacetedFilterDef | undefined {
     })),
   }
 }
-
 export function DynamicTable({
   config, data, loading, total = 0,
   page, pageSize, 
-  onSortChange, onFilterChange, onView, onEdit, onDelete, onAction,
+  onSortChange, onFilterChange, onView, onEdit, onDelete, onAction, onInlineEdit, onBatchAction,
   rowKey = (row) => String(row.id ?? row.code ?? ''),
 }: DynamicTableProps) {
   const tableKey = `table-${config.model}`
@@ -169,6 +200,20 @@ export function DynamicTable({
               </div>
             )
           }
+          const isFk = col.refModel
+          const isStatus = col.type === 'status' || col.field?.endsWith('_status')
+          const isBool = col.type === 'boolean'
+          const isDt = col.type === 'datetime' || col.type === 'timestamp'
+          const canInlineEdit = onInlineEdit && !isFk && !isStatus && !isBool && !isDt
+
+          if (canInlineEdit) {
+            return (
+              <div className='max-w-[180px] truncate'>
+                <InlineEditCell value={val} field={col.field} row={row.original} onSave={onInlineEdit} />
+              </div>
+            )
+          }
+
           return <div className='max-w-[180px] truncate'>{renderCellValue(val, col, row.original)}</div>
         },
         enableSorting: col.sortable ?? true,
@@ -199,7 +244,7 @@ export function DynamicTable({
       })
     }
     return cols
-  }, [config, hasActions, onView, onEdit, onDelete, fkIdsByColumn])
+  }, [config, hasActions, onView, onEdit, onDelete, onInlineEdit, fkIdsByColumn])
 
   const table = useReactTable({
     data,
@@ -239,9 +284,22 @@ export function DynamicTable({
     getSortedRowModel: getSortedRowModel(),
     state: { sorting, columnFilters, columnVisibility, rowSelection, pagination: { pageIndex: page - 1, pageSize } },
   })
-
   return (
     <div className='space-y-4'>
+      {config.batchActions && config.batchActions.length > 0 && Object.keys(rowSelection).length > 0 && (
+        <div className='flex items-center gap-2 rounded-md border bg-muted/50 px-3 py-2'>
+          <span className='text-sm text-muted-foreground mr-2'>已选 {Object.keys(rowSelection).length} 条</span>
+          {config.batchActions.map((act) => (
+            <Button key={act.label} variant='outline' size='sm'
+              onClick={() => {
+                const ids = Object.keys(rowSelection)
+                onBatchAction?.(act.service, ids)
+              }}>
+              {act.label}
+            </Button>
+          ))}
+        </div>
+      )}
       {config.uiActions && config.uiActions.length > 0 && (
         <div className='flex items-center gap-2'>
           {config.uiActions.map((act) => (

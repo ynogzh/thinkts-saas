@@ -76,6 +76,4 @@ export const RESOURCE_CATALOG: Record<string, ResourceCatalogEntry> = {
   mall_order: { label: '商城订单', icon: 'ShoppingCart' },
   mall_order_item: { label: '订单明细', icon: 'List' },
 
-  // ── Base ──
-  base: { label: '基础数据', icon: 'Database' },
 }

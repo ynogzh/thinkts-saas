@@ -48,6 +48,14 @@ export interface FormFieldMeta {
   description?: string
   accept?: string
   default?: unknown
+  /** Validation rules from backend model definition. */
+  validation?: {
+    maxLength?: number
+    pattern?: string
+    message?: string
+    min?: number
+    max?: number
+  }
 }
 
 export interface FormGroupMeta {
@@ -74,6 +82,8 @@ export interface TableConfig {
   }
   jsonSchema?: Record<string, Array<{ key: string; label: string; type: string; default?: unknown }>>
   uiActions?: Array<{ label: string; service: string; icon?: string }>
+  /** Batch operations on selected rows. */
+  batchActions?: Array<{ label: string; service: string; icon?: string }>
 }
 
 export interface ListResult {

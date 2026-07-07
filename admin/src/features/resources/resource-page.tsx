@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useTransition } from 'react'
-import { Loader2, Plus, RefreshCw } from 'lucide-react'
+import { Download, Loader2, Plus, RefreshCw } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { Header } from '@/components/layout/header'
@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { JsonKeyValueEditor } from '@/components/dynamic/json-key-value-editor'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -97,6 +98,13 @@ export function ResourcePage({ resource }: Props) {
     else if (currentRow) { const id = rowKey(currentRow); if (id) updateMutation.mutate({ id, data: payload }) }
   }
 
+  function handleExportCsv() {
+    if (!config) return
+    const params = new URLSearchParams()
+    for (const [k, v] of Object.entries(filters)) { if (v) params.set(k, v) }
+    window.open(`/admin/api/tables/${encodeURIComponent(resource)}/export?${params.toString()}`, '_blank')
+  }
+
   useEffect(() => {
     if (!mode || mode === 'view' || !config) return
     const pendingFields = activeFields.filter((f) => f.optionsSource && !(f.field in fieldOptions))
@@ -110,6 +118,9 @@ export function ResourcePage({ resource }: Props) {
   if (!config && fetchError) return <Alert variant='destructive'><AlertDescription>{fetchError}</AlertDescription></Alert>
   if (!config) return null
 
+  const formGroups = config.form?.groups ?? []
+  const hasMultipleGroups = formGroups.length > 1
+
   return (
     <>
       <Header />
@@ -121,6 +132,9 @@ export function ResourcePage({ resource }: Props) {
             <p className='text-muted-foreground'>{config.model}</p>
           </div>
           <div className='flex items-center gap-2'>
+            <Button variant='outline' size='sm' onClick={handleExportCsv}>
+              <Download className='mr-1 size-3' />导出
+            </Button>
             <Button variant='outline' size='sm' onClick={refresh} disabled={pending}>
               {pending ? <Loader2 className='mr-1 size-3 animate-spin' /> : <RefreshCw className='mr-1 size-3' />}
               刷新
@@ -155,19 +169,46 @@ export function ResourcePage({ resource }: Props) {
             <SheetDescription>{mode === 'create' ? '创建新记录。' : mode === 'edit' ? '修改记录信息。' : '查看记录详情。'}</SheetDescription>
           </SheetHeader>
           <form id='resource-form' onSubmit={(e) => { e.preventDefault(); handleSubmit() }} className='flex-1 space-y-6 overflow-y-auto px-4'>
-            {activeFields.map((field) => {
-              const isJson = field.type === 'json' || field.field.endsWith('_json')
-              const schema = config.jsonSchema?.[field.field]
-              if (isJson && schema && mode !== 'view') {
-                return (
-                  <div key={field.field}>
-                    <Label>{field.label}</Label>
-                    <JsonKeyValueEditor schema={schema} value={formValues[field.field] ?? ''} onChange={(v) => updateField(field.field, v)} />
-                  </div>
-                )
-              }
-              return <ResourceFormField key={field.field} field={field} mode={mode ?? 'view'} value={formValues[field.field] ?? ''} options={fieldOptions[field.field]} loadingOptions={!!(field.optionsSource && !(field.field in fieldOptions))} pending={pending} onChange={updateField} onUpload={handleFileUpload} />
-            })}
+            {hasMultipleGroups ? (
+              <Tabs defaultValue='0' className='w-full'>
+                <TabsList className='w-full'>
+                  {formGroups.map((g, i) => (
+                    <TabsTrigger key={i} value={String(i)} className='flex-1'>{g.title ?? `分组${i + 1}`}</TabsTrigger>
+                  ))}
+                </TabsList>
+                {formGroups.map((g, gi) => (
+                  <TabsContent key={gi} value={String(gi)} className='space-y-4'>
+                    {g.fields.map((field) => {
+                      const isJson = field.type === 'json' || field.field.endsWith('_json')
+                      const schema = config.jsonSchema?.[field.field]
+                      if (isJson && schema && mode !== 'view') {
+                        return (
+                          <div key={field.field}>
+                            <Label>{field.label}</Label>
+                            <JsonKeyValueEditor schema={schema} value={formValues[field.field] ?? ''} onChange={(v) => updateField(field.field, v)} />
+                          </div>
+                        )
+                      }
+                      return <ResourceFormField key={field.field} field={field} mode={mode ?? 'view'} value={formValues[field.field] ?? ''} options={fieldOptions[field.field]} loadingOptions={!!(field.optionsSource && !(field.field in fieldOptions))} pending={pending} onChange={updateField} onUpload={handleFileUpload} />
+                    })}
+                  </TabsContent>
+                ))}
+              </Tabs>
+            ) : (
+              activeFields.map((field) => {
+                const isJson = field.type === 'json' || field.field.endsWith('_json')
+                const schema = config.jsonSchema?.[field.field]
+                if (isJson && schema && mode !== 'view') {
+                  return (
+                    <div key={field.field}>
+                      <Label>{field.label}</Label>
+                      <JsonKeyValueEditor schema={schema} value={formValues[field.field] ?? ''} onChange={(v) => updateField(field.field, v)} />
+                    </div>
+                  )
+                }
+                return <ResourceFormField key={field.field} field={field} mode={mode ?? 'view'} value={formValues[field.field] ?? ''} options={fieldOptions[field.field]} loadingOptions={!!(field.optionsSource && !(field.field in fieldOptions))} pending={pending} onChange={updateField} onUpload={handleFileUpload} />
+              })
+            )}
           </form>
           {error && <Alert variant='destructive'><AlertDescription>{error}</AlertDescription></Alert>}
           <SheetFooter className='gap-2'>

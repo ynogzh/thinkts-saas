@@ -1,6 +1,7 @@
 import type { ThinkContext } from "../types";
 import type { DslAppData, DslModelEntry, DslTableEntry, TableColumnDSL } from "./registry";
 import type { ColumnDSL } from "./registry";
+import type { ValidationRules } from "./columns";
 
 // ── Response types ──
 
@@ -46,6 +47,7 @@ export interface FormFieldMeta {
   required?: boolean;
   maxLength?: number;
   options?: Array<{ label: string; value: unknown }>;
+  validation?: ValidationRules;
 }
 
 export interface FormGroupMeta {
@@ -93,7 +95,6 @@ export interface OkResponse {
 
 
 const LABEL_MAP: Record<string, string> = {
-  // ── Module/group names (concise, ≤4 chars) ──
   platform: "平台管理",
   identity: "身份管理",
   trade: "交易管理",
@@ -110,7 +111,6 @@ const LABEL_MAP: Record<string, string> = {
   account: "账户管理",
   event: "事件管理",
   dashboard: "仪表盘",
-  base: "基础数据",
   channel_channel: "渠道",
   channel_invite_code: "邀请码",
   channel_source_record: "渠道来源",
@@ -186,32 +186,6 @@ const LABEL_MAP: Record<string, string> = {
   mall_product: "商品",
   mall_order: "商城订单",
   mall_order_item: "订单明细",
-  base: "基础数据",
-  channel_channel: "渠道",
-  channel_invite_code: "邀请码",
-  channel_source_record: "渠道来源",
-  config_setting: "系统设置",
-  config_dict: "字典",
-  config_dict_item: "字典项",
-  config_file: "文件",
-  config_audit_log: "审计日志",
-  config_operation_log: "操作日志",
-  event_record: "事件记录",
-  event_webhook_config: "Webhook配置",
-  event_webhook_log: "Webhook日志",
-  platform_module: "模块管理",
-  platform_package: "套餐包",
-  account_asset: "账户资产",
-  account_asset_record: "资产记录",
-  account_freeze_record: "冻结记录",
-  dashboard_dashboard: "仪表盘",
-  dashboard_data_source: "数据源",
-  dashboard_widget: "组件",
-  operation_ad: "广告",
-  operation_ad_position: "广告位",
-  operation_tag: "标签",
-  operation_tag_relation: "标签关联",
-  operation_ticket: "工单",
   promote_agent_level: "代理等级",
   promote_agent: "代理",
   promote_coupon_template: "优惠券模板",
@@ -618,13 +592,17 @@ function buildTableConfig(entry: DslTableEntry, modelEntry: DslModelEntry, model
   const formGroups: FormGroupMeta[] = (table.form?.groups ?? []).map((g) => ({
     title: g.title,
     columns: g.columns,
-    fields: (g.fields ?? []).map((f) => ({
-      field: f.field,
-      label: zh(f.title, f.field),
-      type: resolveColType(f.field, modelEntry.dsl.columns),
-      required: f.required ?? false,
-      options: f.options,
-    })),
+    fields: (g.fields ?? []).map((f) => {
+      const meta: FormFieldMeta = {
+        field: f.field,
+        label: zh(f.title, f.field),
+        type: resolveColType(f.field, modelEntry.dsl.columns),
+        required: f.required ?? false,
+        options: f.options,
+      };
+      if (f.validation) meta.validation = f.validation as FormFieldMeta['validation'];
+      return meta;
+    }),
   }));
 
   const orderBy = table.list?.orderBy;
@@ -662,6 +640,7 @@ export interface AdminHandlers {
   batchLookupAction(ctx: ThinkContext): Promise<Record<string, Record<string, string>>>;
   entityDetailAction(ctx: ThinkContext, model: string, id: string): Promise<{ data: Record<string, unknown> | null }>;
   entityListAction(ctx: ThinkContext): Promise<{ data: Record<string, unknown>[] }>;
+  exportCsvAction(ctx: ThinkContext, model: string): Promise<Record<string, unknown>>;
 }
 
 export function createAdminApiHandlers(dslData: DslAppData): AdminHandlers {
@@ -709,15 +688,6 @@ export function createAdminApiHandlers(dslData: DslAppData): AdminHandlers {
     }));
   }
 
-  // ── tables list ──
-
-  function buildTablesList(): TableMeta[] {
-    return tableEntries.map((e) => ({
-      name: e.name,
-      title: e.table.title ?? e.name,
-      model: e.table.model ?? e.name,
-    }));
-  }
 
   // ── Handlers ──
 
@@ -798,15 +768,6 @@ export function createAdminApiHandlers(dslData: DslAppData): AdminHandlers {
     return result;
   }
 
-  async function entityDetailAction(ctx: ThinkContext, model: string, id: string): Promise<{ data: Record<string, unknown> | null }> {
-    const modelEntry = findModel(model);
-    if (!modelEntry) throw new Error(`Model not found: ${model}`);
-    const pk = modelEntry.dsl.primaryKey ?? "id";
-    const m = ctx.think.model(modelEntry.name, { _aclCtx: ctx });
-    const record = await m.where({ [pk]: id }).find();
-    return { data: record as Record<string, unknown> | null };
-  }
-
   async function entityListAction(ctx: ThinkContext): Promise<{ data: Record<string, unknown>[] }> {
     const body = (ctx.body ?? {}) as { model?: string; ids?: (number | string)[]; fields?: string[] };
     const modelEntry = findModel(body.model ?? "");
@@ -874,21 +835,6 @@ export function createAdminApiHandlers(dslData: DslAppData): AdminHandlers {
     return { ok: true };
   }
 
-  async function batchLookupAction(ctx: ThinkContext): Promise<Record<string, Record<string, string>>> {
-    const body = (ctx.body as { lookups: Array<{ model: string; ids: (string | number)[]; field: string }> }) ?? { lookups: [] };
-    const result: Record<string, Record<string, string>> = {};
-    for (const entry of body.lookups) {
-      const m = ctx.think.model(entry.model, { _aclCtx: ctx });
-      const rows = (await m.where({ id: ["in", entry.ids] } as unknown as Record<string, unknown>).select()) as Record<string, unknown>[];
-      const map: Record<string, string> = {};
-      for (const row of rows) {
-        map[String(row.id)] = String(row[entry.field] ?? row.id);
-      }
-      result[entry.model] = map;
-    }
-    return result;
-  }
-
   async function entityDetailAction(ctx: ThinkContext, modelName: string, id: string): Promise<{ data: Record<string, unknown> | null }> {
     const url = new URL(ctx.request.url);
     const fieldsParam = url.searchParams.get("fields");
@@ -909,21 +855,38 @@ export function createAdminApiHandlers(dslData: DslAppData): AdminHandlers {
     return { data: record };
   }
 
-  async function entityListAction(ctx: ThinkContext): Promise<{ data: Record<string, unknown>[] }> {
-    const body = (ctx.body as { model: string; ids: (string | number)[]; fields?: string[] }) ?? { model: "", ids: [] };
-    const modelEntry = findModel(body.model);
-    if (!modelEntry) throw new Error(`Model not found: ${body.model}`);
-    const m = ctx.think.model(modelEntry.name, { _aclCtx: ctx });
-    const rows = (await m.where({ id: ["in", body.ids] } as unknown as Record<string, unknown>).select()) as Record<string, unknown>[];
-    if (!body.fields || body.fields.length === 0) return { data: rows };
-    const result = rows.map((r) => {
-      const filtered: Record<string, unknown> = {};
-      for (const f of body.fields!) {
-        if (f in r) filtered[f] = r[f];
+  async function exportCsvAction(ctx: ThinkContext, model: string): Promise<{ csv: string; filename: string }> {
+    const modelEntry = findModel(model);
+    if (!modelEntry) throw new Error(`Model not found: ${model}`);
+    const tableEntry = findTable(model);
+    const columns = tableEntry?.table.list?.columns ?? modelEntry.dsl.columns.map((c) => ({ field: c.name, title: c.label ?? c.name }));
+
+    const url = new URL(ctx.request.url);
+    const where: Record<string, unknown> = {};
+    if (tableEntry?.table.search?.fields) {
+      for (const sf of tableEntry.table.search.fields) {
+        const val = url.searchParams.get(sf.field);
+        if (val) where[sf.field] = val;
       }
-      return filtered;
+    }
+
+    const m = ctx.think.model(modelEntry.name, { _aclCtx: ctx });
+    const rows = await m.where(where).select() as Record<string, unknown>[];
+
+    const header = columns.map((c) => {
+      const col = modelEntry.dsl.columns.find((dc) => dc.name === c.field);
+      return col?.label ?? c.field;
     });
-    return { data: result };
+    const csvRows = [header.join(",")];
+    for (const row of rows) {
+      csvRows.push(columns.map((c) => {
+        const val = row[c.field];
+        if (val == null) return "";
+        const s = String(val).replace(/"/g, '""');
+        return s.includes(",") || s.includes('"') ? `"${s}"` : s;
+      }).join(","));
+    }
+    return { csv: csvRows.join("\n"), filename: `${model}.csv` };
   }
 
   return {
@@ -939,6 +902,7 @@ export function createAdminApiHandlers(dslData: DslAppData): AdminHandlers {
     batchLookupAction,
     entityDetailAction,
     entityListAction,
+    exportCsvAction,
   };
 }
 

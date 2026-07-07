@@ -269,6 +269,19 @@ export function registerDslAdminRoutes(table: RouteTable, dslData: DslAppData): 
       path: "/admin/api/entity/list",
       handler: async (ctx: ThinkContext) => admin.entityListAction(ctx),
     },
+    {
+      path: "/admin/api/tables/:model/export",
+      handler: async (ctx: ThinkContext) => {
+        const result = await admin.exportCsvAction(ctx, ctx.params?.model ?? "");
+        return {
+          body: result.csv,
+          headers: {
+            "Content-Type": "text/csv; charset=utf-8",
+            "Content-Disposition": `attachment; filename="${result.filename}"`,
+          },
+        };
+      },
+    },
   ];
   for (const { path, handler } of params) {
     table.radix.insert(path, { match: path, type: "dsl-admin", module: "admin", controller: path, action: "data", handler });

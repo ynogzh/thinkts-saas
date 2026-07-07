@@ -1,5 +1,6 @@
 import type { ThinkContext } from "../types";
 import type { ModelConfig } from "./core";
+import type { ValidationRules } from "./columns";
 
 export interface ColumnDSL {
   name: string;
@@ -74,6 +75,7 @@ export interface ModelDSL {
     softDeletes?: boolean;
   };
   dataResource?: DataResourceMeta;
+  [key: string]: unknown;
 }
 
 export interface IndexDSL {
@@ -161,6 +163,7 @@ export interface TableFormFieldDSL {
   required?: boolean;
   options?: Array<{ label: string; value: unknown }>;
   rules?: string[];
+  validation?: ValidationRules;
 }
 
 export interface TableFormGroupDSL {
