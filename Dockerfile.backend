@@ -40,4 +40,4 @@ ENV PORT=8360
 
 EXPOSE 8360
 
-CMD ["bun", "apps/iotbiz/entry.ts"]
+CMD ["bun", "apps/iotbiz/main.ts"]

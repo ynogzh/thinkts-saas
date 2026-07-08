@@ -13,7 +13,7 @@ sleep 1
 
 echo "=== Starting backend (port 3333) ==="
 cd "$ROOT_DIR/apps/iotbiz"
-bun entry.ts &
+bun main.ts &
 BACKEND_PID=$!
 echo "  PID: $BACKEND_PID"
 

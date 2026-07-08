@@ -4,8 +4,8 @@
   "private": true,
   "workspaces": ["packages/*", "apps/*"],
   "scripts": {
-    "dev:api": "cd apps/iotbiz/api && bun dev",
-    "dev:admin": "cd apps/iotbiz/admin && pnpm dev",
+    "dev:api": "cd apps/iotbiz && bun run main.ts",
+    "dev:admin": "cd admin && pnpm dev",
     "test:thinkts": "cd packages/thinkts && bun test",
     "test:cli": "cd packages/thinkts-cli && bun test"
   },
