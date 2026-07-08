@@ -24,10 +24,17 @@ export default defineConfig({
   server: {
     port: 3334,
     proxy: {
-      '/admin/api': {
-        target: 'http://localhost:3333',
-        changeOrigin: true,
-      },
+      // Framework model routes: /identity/*, /platform/*, /trade/*, etc.
+      '/identity': { target: 'http://localhost:3333', changeOrigin: true },
+      '/platform': { target: 'http://localhost:3333', changeOrigin: true },
+      '/trade': { target: 'http://localhost:3333', changeOrigin: true },
+      '/payment': { target: 'http://localhost:3333', changeOrigin: true },
+      '/promote': { target: 'http://localhost:3333', changeOrigin: true },
+      '/permission': { target: 'http://localhost:3333', changeOrigin: true },
+      '/cms': { target: 'http://localhost:3333', changeOrigin: true },
+      '/iotbiz': { target: 'http://localhost:3333', changeOrigin: true },
+      '/mall': { target: 'http://localhost:3333', changeOrigin: true },
+      '/open': { target: 'http://localhost:3333', changeOrigin: true },
     },
   },
   test: {
