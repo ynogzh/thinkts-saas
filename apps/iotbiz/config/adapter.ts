@@ -7,7 +7,7 @@ const SQLAdapter = createSQLAdapter({
   user: process.env.DB_USER ?? "root",
   password: process.env.DB_PASSWORD ?? "",
   database: process.env.DB_NAME ?? "thinkts_saas_demo",
-  max: 10,
+  max: parseInt(process.env.DB_POOL_MAX || "2", 10),
   idleTimeout: 30,
   maxLifetime: 0,
 });
